@@ -45,6 +45,10 @@ function requireAdmin(req, res, next) {
 }
 
 // ════════════════ AUTH ROUTES ════════════════
+function formatMembershipId(id) {
+  return 'VIRTUXGAMING' + String(id).padStart(9, '0');
+}
+
 // Register
 app.post('/api/auth/register', (req, res) => {
   try {
@@ -53,19 +57,37 @@ app.post('/api/auth/register', (req, res) => {
       return res.status(400).json({ error: 'Name, email, and password are required' });
     }
 
-    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase().trim());
+    const cleanEmail = email.toLowerCase().trim();
+    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(cleanEmail);
     if (existing) {
       return res.status(400).json({ error: 'An account with this email already exists' });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const stmt = db.prepare(`
-      INSERT INTO users (name, email, password, phone, role)
-      VALUES (?, ?, ?, ?, 'user')
-    `);
-    const result = stmt.run(name.trim(), email.toLowerCase().trim(), hashedPassword, phone ? phone.trim() : null);
+    const tempId = ((db.prepare('SELECT COUNT(*) as count FROM users').get() || {}).count || 0) + 1;
+    const initialMemId = formatMembershipId(tempId);
 
-    const newUser = { id: result.lastInsertRowid, name: name.trim(), email: email.toLowerCase().trim(), role: 'user', phone: phone || '' };
+    const stmt = db.prepare(`
+      INSERT INTO users (name, email, password, phone, role, membership_id, stamps_count)
+      VALUES (?, ?, ?, ?, 'user', ?, 0)
+    `);
+    const result = stmt.run(name.trim(), cleanEmail, hashedPassword, phone ? phone.trim() : null, initialMemId, 0);
+
+    const actualId = result.lastInsertRowid || tempId;
+    const finalMemId = formatMembershipId(actualId);
+    try {
+      db.prepare('UPDATE users SET membership_id = ? WHERE id = ?').run(finalMemId, actualId);
+    } catch (e) {}
+
+    const newUser = {
+      id: actualId,
+      name: name.trim(),
+      email: cleanEmail,
+      role: 'user',
+      phone: phone || '',
+      membership_id: finalMemId,
+      stamps_count: 0
+    };
     const token = jwt.sign(newUser, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({ message: 'Account registered successfully', user: newUser, token });
@@ -83,7 +105,8 @@ app.post('/api/auth/login', (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase().trim());
+    const cleanEmail = email.toLowerCase().trim();
+    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(cleanEmail);
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -93,7 +116,23 @@ app.post('/api/auth/login', (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const userData = { id: user.id, name: user.name, email: user.email, role: user.role, phone: user.phone || '' };
+    let membership_id = user.membership_id;
+    if (!membership_id) {
+      membership_id = formatMembershipId(user.id);
+      try {
+        db.prepare('UPDATE users SET membership_id = ? WHERE id = ?').run(membership_id, user.id);
+      } catch (e) {}
+    }
+
+    const userData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      phone: user.phone || '',
+      membership_id,
+      stamps_count: user.stamps_count || 0
+    };
     const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '7d' });
 
     res.json({ message: 'Login successful', user: userData, token });
@@ -103,19 +142,266 @@ app.post('/api/auth/login', (req, res) => {
   }
 });
 
-// Get Current User Profile + User Bookings
+// Google Authentication (Sign In & Sign Up)
+app.post('/api/auth/google', (req, res) => {
+  try {
+    const { email, name, phone, googleId } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Google account email is required' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    let user = db.prepare('SELECT * FROM users WHERE email = ?').get(cleanEmail);
+
+    if (user) {
+      let membership_id = user.membership_id;
+      if (!membership_id) {
+        membership_id = formatMembershipId(user.id);
+        try {
+          db.prepare('UPDATE users SET membership_id = ? WHERE id = ?').run(membership_id, user.id);
+        } catch (e) {}
+      }
+
+      const userData = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone || '',
+        membership_id,
+        stamps_count: user.stamps_count || 0
+      };
+      const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '7d' });
+      return res.json({ message: 'Google sign-in successful', user: userData, token });
+    }
+
+    // Register new user via Google
+    const dummyPassword = bcrypt.hashSync('google_' + (googleId || Date.now()) + Math.random(), 10);
+    const tempId = ((db.prepare('SELECT COUNT(*) as count FROM users').get() || {}).count || 0) + 1;
+    const initialMemId = formatMembershipId(tempId);
+
+    const result = db.prepare(`
+      INSERT INTO users (name, email, password, phone, role, membership_id, stamps_count)
+      VALUES (?, ?, ?, ?, 'user', ?, 0)
+    `).run(name ? name.trim() : 'Google Gamer', cleanEmail, dummyPassword, phone ? phone.trim() : null, initialMemId, 0);
+
+    const actualId = result.lastInsertRowid || tempId;
+    const finalMemId = formatMembershipId(actualId);
+    try {
+      db.prepare('UPDATE users SET membership_id = ? WHERE id = ?').run(finalMemId, actualId);
+    } catch (e) {}
+
+    const newUser = {
+      id: actualId,
+      name: name ? name.trim() : 'Google Gamer',
+      email: cleanEmail,
+      role: 'user',
+      phone: phone || '',
+      membership_id: finalMemId,
+      stamps_count: 0
+    };
+    const token = jwt.sign(newUser, JWT_SECRET, { expiresIn: '7d' });
+
+    res.status(201).json({ message: 'Google account registered successfully', user: newUser, token });
+  } catch (err) {
+    console.error('Google auth error:', err);
+    res.status(500).json({ error: 'Server error during Google authentication' });
+  }
+});
+
+// Update Profile (Name, Phone, Email)
+app.put('/api/auth/profile', authenticateToken, (req, res) => {
+  try {
+    const { name, phone, email } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and email are required' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    // Ensure email is not occupied by another user
+    const existing = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(cleanEmail, req.user.id);
+    if (existing) {
+      return res.status(400).json({ error: 'This email is already associated with another account' });
+    }
+
+    db.prepare('UPDATE users SET name = ?, phone = ?, email = ? WHERE id = ?')
+      .run(name.trim(), phone ? phone.trim() : null, cleanEmail, req.user.id);
+
+    const updated = db.prepare('SELECT id, name, email, phone, role, membership_id, stamps_count, created_at FROM users WHERE id = ?').get(req.user.id);
+    if (updated && !updated.membership_id) {
+      updated.membership_id = formatMembershipId(updated.id);
+    }
+
+    // Refresh JWT with updated details
+    const token = jwt.sign({
+      id: updated.id,
+      name: updated.name,
+      email: updated.email,
+      role: updated.role,
+      phone: updated.phone || '',
+      membership_id: updated.membership_id,
+      stamps_count: updated.stamps_count || 0
+    }, JWT_SECRET, { expiresIn: '7d' });
+
+    res.json({ message: 'Profile updated successfully!', user: updated, token });
+  } catch (err) {
+    console.error('Update profile error:', err);
+    res.status(500).json({ error: 'Could not update profile' });
+  }
+});
+
+// Get Current User Profile + User Bookings + Stamps
 app.get('/api/auth/me', authenticateToken, (req, res) => {
   try {
-    const user = db.prepare('SELECT id, name, email, phone, role, created_at FROM users WHERE id = ?').get(req.user.id);
+    const user = db.prepare('SELECT id, name, email, phone, role, membership_id, stamps_count, created_at FROM users WHERE id = ?').get(req.user.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (!user.membership_id) {
+      user.membership_id = formatMembershipId(user.id);
+      try {
+        db.prepare('UPDATE users SET membership_id = ? WHERE id = ?').run(user.membership_id, user.id);
+      } catch (e) {}
+    }
 
     const bookings = db.prepare('SELECT * FROM bookings WHERE user_id = ? OR phone = ? ORDER BY id DESC').all(user.id, user.phone || '');
     const myFeedback = db.prepare('SELECT * FROM feedback WHERE user_id = ? OR email = ? ORDER BY id DESC').all(user.id, user.email);
+    let stampRequests = [];
+    try {
+      stampRequests = db.prepare('SELECT * FROM stamp_requests WHERE user_id = ? ORDER BY id DESC').all(user.id);
+    } catch (e) {}
 
-    res.json({ user, bookings, feedback: myFeedback });
+    res.json({
+      user,
+      bookings,
+      feedback: myFeedback,
+      stamp_requests: stampRequests,
+      stamps_count: user.stamps_count || 0
+    });
   } catch (err) {
     console.error('Fetch profile error:', err);
     res.status(500).json({ error: 'Could not fetch profile' });
+  }
+});
+
+// ════════════════ LOYALTY STAMPS ROUTES ════════════════
+// Customer: Request a Stamp (for store visits / purchases > ₹149)
+app.post('/api/stamps/request', authenticateToken, (req, res) => {
+  try {
+    const user = db.prepare('SELECT id, name, email, membership_id, stamps_count FROM users WHERE id = ?').get(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if ((user.stamps_count || 0) >= 10) {
+      return res.status(400).json({ error: 'You have completed all 10 stamps! Show your Membership ID at the counter to claim your surprise reward!' });
+    }
+
+    const { bill_amount, bill_notes } = req.body;
+    const amount = Number(bill_amount) || 150;
+    if (amount < 149) {
+      return res.status(400).json({ error: 'Visit purchase must be ₹149 or higher to qualify for a stamp.' });
+    }
+
+    const memId = user.membership_id || formatMembershipId(user.id);
+    const result = db.prepare(`
+      INSERT INTO stamp_requests (user_id, membership_id, user_name, user_email, bill_amount, bill_notes, status)
+      VALUES (?, ?, ?, ?, ?, ?, 'pending')
+    `).run(user.id, memId, user.name, user.email, amount, bill_notes ? String(bill_notes).trim() : 'Store visit over ₹149');
+
+    res.status(201).json({
+      message: 'Stamp request submitted! Once approved by the store manager, your stamp will appear in your envelope.',
+      requestId: result.lastInsertRowid
+    });
+  } catch (err) {
+    console.error('Stamp request error:', err);
+    res.status(500).json({ error: 'Could not submit stamp request' });
+  }
+});
+
+// Customer: Get Stamp Envelope Status
+app.get('/api/stamps/status', authenticateToken, (req, res) => {
+  try {
+    const user = db.prepare('SELECT id, name, membership_id, stamps_count FROM users WHERE id = ?').get(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    let requests = [];
+    try {
+      requests = db.prepare('SELECT * FROM stamp_requests WHERE user_id = ? ORDER BY id DESC').all(user.id);
+    } catch (e) {}
+
+    res.json({
+      membership_id: user.membership_id || formatMembershipId(user.id),
+      stamps_count: user.stamps_count || 0,
+      max_stamps: 10,
+      surprise_unlocked: (user.stamps_count || 0) >= 10,
+      requests
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Could not fetch stamp status' });
+  }
+});
+
+// Admin: Get All Stamp Requests
+app.get('/api/admin/stamps', requireAdmin, (req, res) => {
+  try {
+    const list = db.prepare('SELECT * FROM stamp_requests ORDER BY id DESC').all();
+    res.json(list);
+  } catch (err) {
+    res.status(500).json({ error: 'Could not fetch stamp requests' });
+  }
+});
+
+// Admin: Approve Stamp Request
+app.post('/api/admin/stamps/approve/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    const request = db.prepare('SELECT * FROM stamp_requests WHERE id = ?').get(id);
+    if (!request) return res.status(404).json({ error: 'Request not found' });
+
+    const user = db.prepare('SELECT id, stamps_count FROM users WHERE id = ?').get(request.user_id);
+    const newCount = Math.min(10, ((user ? user.stamps_count : 0) || 0) + 1);
+
+    if (user) {
+      db.prepare('UPDATE users SET stamps_count = ? WHERE id = ?').run(newCount, user.id);
+    }
+    db.prepare("UPDATE stamp_requests SET status = 'approved' WHERE id = ?").run(id);
+
+    res.json({ message: 'Stamp approved! Customer now has ' + newCount + '/10 stamps.', stamps_count: newCount });
+  } catch (err) {
+    res.status(500).json({ error: 'Could not approve stamp' });
+  }
+});
+
+// Admin: Reject Stamp Request
+app.post('/api/admin/stamps/reject/:id', requireAdmin, (req, res) => {
+  try {
+    const { id } = req.params;
+    db.prepare("UPDATE stamp_requests SET status = 'rejected' WHERE id = ?").run(id);
+    res.json({ message: 'Stamp request rejected' });
+  } catch (err) {
+    res.status(500).json({ error: 'Could not reject stamp request' });
+  }
+});
+
+// Admin: Manually Add / Subtract / Reset Stamps
+app.post('/api/admin/stamps/adjust', requireAdmin, (req, res) => {
+  try {
+    const { identifier, action } = req.body; // action: 'add' | 'subtract' | 'reset'
+    if (!identifier) return res.status(400).json({ error: 'User identifier required' });
+
+    const cleanId = String(identifier).trim();
+    const user = db.prepare('SELECT id, name, membership_id, stamps_count FROM users WHERE membership_id = ? OR email = ? OR id = ?')
+      .get(cleanId, cleanId.toLowerCase(), Number(cleanId) || -1);
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    let count = user.stamps_count || 0;
+    if (action === 'subtract') count = Math.max(0, count - 1);
+    else if (action === 'reset') count = 0;
+    else count = Math.min(10, count + 1);
+
+    db.prepare('UPDATE users SET stamps_count = ? WHERE id = ?').run(count, user.id);
+    res.json({ message: `Stamps updated for ${user.name}: ${count}/10`, stamps_count: count });
+  } catch (err) {
+    res.status(500).json({ error: 'Could not adjust stamps' });
   }
 });
 
@@ -454,8 +740,13 @@ app.delete('/api/admin/cafe/:id', requireAdmin, (req, res) => {
 // Admin: Users list
 app.get('/api/admin/users', requireAdmin, (req, res) => {
   try {
-    const users = db.prepare('SELECT id, name, email, phone, role, created_at FROM users ORDER BY id DESC').all();
-    res.json(users);
+    const users = db.prepare('SELECT id, name, email, phone, role, membership_id, stamps_count, created_at FROM users ORDER BY id DESC').all();
+    const formatted = users.map(u => ({
+      ...u,
+      membership_id: u.membership_id || formatMembershipId(u.id),
+      stamps_count: u.stamps_count || 0
+    }));
+    res.json(formatted);
   } catch (err) {
     res.status(500).json({ error: 'Could not fetch users' });
   }

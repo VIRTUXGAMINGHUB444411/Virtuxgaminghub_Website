@@ -16,6 +16,7 @@ const staticFiles = [
   'feedback.html',
   'login.html',
   'admin.html',
+  'dashboard.html',
   'styles.css',
   'script.js',
   'logo.png'

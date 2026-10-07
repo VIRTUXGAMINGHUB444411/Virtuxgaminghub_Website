@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -207,6 +207,9 @@
       <div class="admin-nav-item" onclick="switchAdminTab('announcements', this)">
         <span>📢</span> Live Banners
       </div>
+      <div class="admin-nav-item" onclick="switchAdminTab('stamps', this)">
+        <span>📮</span> Loyalty &amp; Stamps
+      </div>
       <div class="admin-nav-item" onclick="switchAdminTab('users', this)">
         <span>👥</span> Registered Users
       </div>
@@ -372,12 +375,62 @@
         </div>
       </section>
 
+      <!-- ══════════ VIEW: LOYALTY & STAMPS ══════════ -->
+      <section class="admin-view" id="view-stamps">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+          <div>
+            <h2 style="font-family:var(--font-heading);margin-bottom:0.25rem;">Loyalty Card &amp; <span class="gradient-text">Stamps Manager</span></h2>
+            <p style="color:var(--gray-400);font-size:0.9rem;">Approve customer store visit stamp requests (orders &gt; ₹149) or directly grant stamps.</p>
+          </div>
+          <button onclick="loadStamps()" class="btn-secondary" style="font-size:0.85rem;">🔄 Refresh Requests</button>
+        </div>
+
+        <!-- Manual Stamp Grant Box -->
+        <div style="background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.25);border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem;">
+          <h4 style="color:var(--cyan);margin-bottom:0.75rem;font-family:var(--font-heading);">⚡ Quick Manual Stamp Action</h4>
+          <form onsubmit="handleManualStampSubmit(event)" style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;">
+            <div class="form-group" style="flex:1;min-width:240px;margin-bottom:0;">
+              <label>Member ID, Email, or User ID</label>
+              <input type="text" id="manualStampIdentifier" placeholder="e.g. VIRTUXGAMING000000001 or email" required />
+            </div>
+            <div class="form-group" style="width:160px;margin-bottom:0;">
+              <label>Action</label>
+              <select id="manualStampAction">
+                <option value="add">+1 Add Stamp</option>
+                <option value="subtract">-1 Remove Stamp</option>
+                <option value="reset">Reset to 0 Stamps</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-primary" style="font-size:0.85rem;padding:0.7rem 1.25rem;">Execute</button>
+          </form>
+        </div>
+
+        <h3 style="font-family:var(--font-heading);font-size:1.15rem;margin-bottom:1rem;color:#fff;">Incoming Store Visit Requests (Spend &gt; ₹149)</h3>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Membership ID</th>
+                <th>Amount</th>
+                <th>Notes / Order Details</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="stampsTableBody">
+              <tr><td colspan="6" style="text-align:center;color:var(--gray-400);">Loading stamp requests...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- ══════════ VIEW 6: REGISTERED USERS ══════════ -->
       <section class="admin-view" id="view-users">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
           <div>
             <h2 style="font-family:var(--font-heading);margin-bottom:0.25rem;">Registered <span class="gradient-text">Gamers</span></h2>
-            <p style="color:var(--gray-400);font-size:0.9rem;">View customer member directory registered via website.</p>
+            <p style="color:var(--gray-400);font-size:0.9rem;">View customer member directory registered via website with Serial Membership IDs.</p>
           </div>
           <button onclick="loadUsers()" class="btn-secondary" style="font-size:0.85rem;">🔄 Refresh</button>
         </div>
@@ -387,14 +440,16 @@
             <thead>
               <tr>
                 <th>Name</th>
+                <th>Membership ID</th>
                 <th>Email</th>
                 <th>Phone</th>
+                <th>Stamps</th>
                 <th>Role</th>
-                <th>Registered On</th>
+                <th>Quick Actions</th>
               </tr>
             </thead>
             <tbody id="usersTableBody">
-              <tr><td colspan="5" style="text-align:center;color:var(--gray-400);">Loading users...</td></tr>
+              <tr><td colspan="7" style="text-align:center;color:var(--gray-400);">Loading users...</td></tr>
             </tbody>
           </table>
         </div>
@@ -519,6 +574,7 @@
       if (viewId === 'bookings') loadBookings();
       if (viewId === 'cafe') loadCafe();
       if (viewId === 'announcements') loadAnnouncements();
+      if (viewId === 'stamps') loadStamps();
       if (viewId === 'users') loadUsers();
     }
 
@@ -808,24 +864,155 @@
       }
     }
 
+    // ══════════ LOYALTY & STAMPS ══════════
+    async function loadStamps() {
+      const tbody = document.getElementById('stampsTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading stamp requests...</td></tr>';
+      try {
+        const res = await fetch(API_BASE + '/api/admin/stamps', { headers: authHeader() });
+        const list = await res.json();
+        if (!list || list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray-400);">No stamp requests found.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = list.map(s => `
+          <tr>
+            <td>
+              <strong>${s.user_name}</strong>
+              <div style="font-size:0.75rem;color:var(--gray-400);">${s.user_email || ''}</div>
+            </td>
+            <td><code style="color:var(--cyan);font-weight:700;">${s.membership_id}</code></td>
+            <td style="color:#10b981;font-weight:700;">₹${s.bill_amount}</td>
+            <td style="font-size:0.85rem;color:var(--gray-300);">${s.bill_notes || '-'}</td>
+            <td>
+              <span class="status-badge ${s.status === 'approved' ? 'status-confirmed' : (s.status === 'rejected' ? 'status-cancelled' : 'status-pending')}">
+                ${s.status.toUpperCase()}
+              </span>
+            </td>
+            <td>
+              ${s.status === 'pending' ? `
+                <button onclick="approveStamp(${s.id})" class="action-btn btn-feature">✔ Approve &amp; Stamp</button>
+                <button onclick="rejectStamp(${s.id})" class="action-btn btn-delete">✖ Reject</button>
+              ` : `<span style="font-size:0.8rem;color:var(--gray-400);">Processed</span>`}
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;">Error loading stamp requests</td></tr>';
+      }
+    }
+
+    async function approveStamp(id) {
+      try {
+        const res = await fetch(API_BASE + '/api/admin/stamps/approve/' + id, {
+          method: 'POST',
+          headers: authHeader()
+        });
+        const data = await res.json();
+        showToast(data.message || 'Stamp approved!');
+        loadStamps();
+      } catch (e) {
+        showToast('Error approving stamp');
+      }
+    }
+
+    async function rejectStamp(id) {
+      if (!confirm('Reject this stamp request?')) return;
+      try {
+        const res = await fetch(API_BASE + '/api/admin/stamps/reject/' + id, {
+          method: 'POST',
+          headers: authHeader()
+        });
+        const data = await res.json();
+        showToast(data.message || 'Stamp request rejected');
+        loadStamps();
+      } catch (e) {
+        showToast('Error rejecting stamp');
+      }
+    }
+
+    async function handleManualStampSubmit(e) {
+      e.preventDefault();
+      const identifier = document.getElementById('manualStampIdentifier').value;
+      const action = document.getElementById('manualStampAction').value;
+      try {
+        const res = await fetch(API_BASE + '/api/admin/stamps/adjust', {
+          method: 'POST',
+          headers: { ...authHeader(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier, action })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showToast(data.error || 'Failed to update stamps');
+          return;
+        }
+        showToast('✅ ' + data.message);
+        document.getElementById('manualStampIdentifier').value = '';
+        loadUsers();
+        loadStamps();
+      } catch (err) {
+        showToast('Error updating stamps');
+      }
+    }
+
+    async function quickAddStamp(userId) {
+      try {
+        const res = await fetch(API_BASE + '/api/admin/stamps/adjust', {
+          method: 'POST',
+          headers: { ...authHeader(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier: userId, action: 'add' })
+        });
+        const data = await res.json();
+        showToast(data.message || 'Stamp added!');
+        loadUsers();
+      } catch (e) {
+        showToast('Error adding stamp');
+      }
+    }
+
+    async function quickResetStamp(userId) {
+      if (!confirm('Reset this user stamps to 0 (after surprise reward claim)?')) return;
+      try {
+        const res = await fetch(API_BASE + '/api/admin/stamps/adjust', {
+          method: 'POST',
+          headers: { ...authHeader(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier: userId, action: 'reset' })
+        });
+        const data = await res.json();
+        showToast(data.message || 'Stamps reset');
+        loadUsers();
+      } catch (e) {
+        showToast('Error resetting stamps');
+      }
+    }
+
     // ══════════ USERS ══════════
     async function loadUsers() {
       const tbody = document.getElementById('usersTableBody');
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Loading...</td></tr>';
       try {
         const res = await fetch(API_BASE + '/api/admin/users', { headers: authHeader() });
         const list = await res.json();
         tbody.innerHTML = list.map(u => `
           <tr>
             <td><strong>${u.name}</strong></td>
+            <td><code style="color:var(--cyan);font-weight:700;">${u.membership_id}</code></td>
             <td>${u.email}</td>
             <td>${u.phone || '-'}</td>
+            <td>
+              <span style="font-family:var(--font-heading);font-weight:800;color:${u.stamps_count >= 10 ? '#10b981' : 'var(--cyan)'};">
+                ${u.stamps_count || 0} / 10 ${u.stamps_count >= 10 ? '🎁' : ''}
+              </span>
+            </td>
             <td><span class="status-badge ${u.role === 'admin' ? 'status-completed' : 'status-confirmed'}">${u.role.toUpperCase()}</span></td>
-            <td style="font-size:0.8rem;color:var(--gray-400);">${u.created_at || '-'}</td>
+            <td>
+              <button onclick="quickAddStamp(${u.id})" class="action-btn btn-feature" style="font-size:0.75rem;padding:0.25rem 0.5rem;">+1 Stamp</button>
+              <button onclick="quickResetStamp(${u.id})" class="action-btn btn-delete" style="font-size:0.75rem;padding:0.25rem 0.5rem;">Reset</button>
+            </td>
           </tr>
         `).join('');
       } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#ef4444;">Error loading users</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#ef4444;">Error loading users</td></tr>';
       }
     }
 

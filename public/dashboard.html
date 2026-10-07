@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Dashboard &amp; Membership - Virtux Gaming Hub</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .dashboard-page {
+      padding: 3rem 1rem 6rem;
+      min-height: 90vh;
+    }
+    .dash-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ═══ MEMBERSHIP CARD HERO ═══ */
+    .member-card-wrapper {
+      position: relative;
+      background: linear-gradient(135deg, rgba(13, 17, 30, 0.95), rgba(20, 24, 45, 0.95));
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 30px rgba(0,212,255,0.12);
+      overflow: hidden;
+      margin-bottom: 3rem;
+    }
+    .member-card-wrapper::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.15), transparent 70%);
+      pointer-events: none;
+    }
+    .member-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .member-info-group {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .member-avatar {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #000;
+      box-shadow: var(--glow-cyan);
+      flex-shrink: 0;
+    }
+    .member-id-box {
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px dashed var(--cyan);
+      border-radius: var(--radius);
+      padding: 0.85rem 1.4rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.6rem;
+    }
+    .member-id-text {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--cyan);
+      text-shadow: var(--glow-cyan);
+    }
+    .copy-id-btn {
+      background: transparent;
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .copy-id-btn:hover {
+      background: var(--cyan);
+      color: #000;
+    }
+
+    /* Profile Edit Form */
+    .profile-edit-panel {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      display: none;
+    }
+    .profile-edit-panel.active {
+      display: block;
+    }
+
+    /* ═══ SECTION HEADERS ═══ */
+    .section-title-wrap {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .section-title-wrap h2 {
+      font-family: var(--font-heading);
+      font-size: 1.85rem;
+      margin-bottom: 0.5rem;
+    }
+    .section-title-wrap p {
+      color: var(--gray-400);
+      font-size: 0.95rem;
+    }
+
+    /* ═══ 3 MEMBERSHIP SECTIONS ═══ */
+    .memberships-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+    .membership-tier-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+    .membership-tier-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--cyan);
+      box-shadow: 0 12px 30px rgba(0,212,255,0.12);
+    }
+    .membership-tier-card.featured {
+      border-color: var(--purple);
+      background: linear-gradient(180deg, rgba(168,85,247,0.08) 0%, rgba(13,17,30,0.95) 100%);
+    }
+    .tier-badge {
+      position: absolute;
+      top: -12px;
+      right: 20px;
+      background: var(--purple);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .tier-name {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+    .tier-price {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--cyan);
+      margin-bottom: 1.25rem;
+    }
+    .tier-price span {
+      font-size: 0.9rem;
+      color: var(--gray-400);
+      font-weight: 500;
+    }
+    .tier-perks {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem 0;
+      flex-grow: 1;
+    }
+    .tier-perks li {
+      padding: 0.5rem 0;
+      color: var(--gray-300);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .tier-perks li::before {
+      content: '✔';
+      color: var(--cyan);
+      font-weight: 800;
+    }
+
+    /* ═══ 10-STAMP LOYALTY ENVELOPE ═══ */
+    .envelope-card {
+      background: linear-gradient(145deg, #12182b, #0a0e1a);
+      border: 2px solid rgba(0, 212, 255, 0.4);
+      border-radius: 20px;
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.7), 0 0 30px rgba(0,212,255,0.15);
+      margin-bottom: 3.5rem;
+    }
+    .envelope-flap-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .envelope-stamp-logo {
+      display: inline-block;
+      width: 70px;
+      height: 70px;
+      background: radial-gradient(circle, rgba(0,212,255,0.2), transparent);
+      border: 2px dashed var(--cyan);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 1rem;
+      box-shadow: var(--glow-cyan);
+    }
+    .envelope-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1.25rem;
+      max-width: 800px;
+      margin: 0 auto 2.5rem;
+    }
+    @media (max-width: 650px) {
+      .envelope-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .stamp-slot {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 2px dashed rgba(255, 255, 255, 0.25);
+      background: rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all var(--transition);
+      cursor: default;
+    }
+    .stamp-slot-number {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--gray-400);
+    }
+    .stamp-slot-label {
+      font-size: 0.65rem;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    /* Active Stamped Slot */
+    .stamp-slot.stamped {
+      border: 2px solid var(--cyan);
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.25), rgba(168, 85, 247, 0.2));
+      box-shadow: 0 0 15px rgba(0,212,255,0.5);
+      transform: scale(1.04);
+    }
+    .stamp-slot.stamped .stamp-seal {
+      font-size: 1.8rem;
+      animation: stampPulse 2s infinite ease-in-out;
+    }
+    .stamp-slot.stamped .stamp-slot-number {
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    @keyframes stampPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* Surprise Reward Box */
+    .surprise-box {
+      background: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(168, 85, 247, 0.15));
+      border: 2px solid #eab308;
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      text-align: center;
+      margin-top: 1.5rem;
+      box-shadow: 0 0 25px rgba(234, 179, 8, 0.25);
+    }
+    .surprise-box.locked {
+      border-color: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.02);
+      box-shadow: none;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal-backdrop.active {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 520px;
+      padding: 2rem;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="Virtux Gaming Hub Logo" class="logo-img" />
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+        <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+        <li><a href="cafe.html" class="nav-link">Café</a></li>
+        <li><a href="gallery.html" class="nav-link">Gallery</a></li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+        <li><a href="feedback.html" class="nav-link">Feedback</a></li>
+        <li><a href="dashboard.html" class="nav-link active" style="color:var(--cyan);font-weight:700;">My Dashboard</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button onclick="handleLogout()" class="btn-secondary" style="font-size:0.85rem;padding:0.45rem 1rem;">Sign Out</button>
+        <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Customer Dashboard Content -->
+  <main class="dashboard-page">
+    <div class="dash-container">
+
+      <!-- ════ 1. MEMBERSHIP CARD HERO ════ -->
+      <section class="member-card-wrapper" id="memberCardSection">
+        <div class="member-top-row">
+          <div class="member-info-group">
+            <div class="member-avatar" id="dashAvatar">V</div>
+            <div>
+              <div style="display:flex;align-items:center;gap:0.75rem;">
+                <h1 id="dashName" style="font-family:var(--font-heading);font-size:1.75rem;margin:0;">Loading...</h1>
+                <span id="dashRoleBadge" class="tier-badge" style="position:static;">MEMBER</span>
+              </div>
+              <p id="dashEmail" style="color:var(--gray-300);font-size:0.95rem;margin:0.25rem 0 0.5rem;"></p>
+              <p id="dashPhone" style="color:var(--gray-400);font-size:0.85rem;margin:0;"></p>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.75rem;">
+            <button onclick="toggleProfileEdit()" class="btn-secondary" style="font-size:0.85rem;padding:0.45rem 1rem;">
+              ✏️ Edit Profile
+            </button>
+            <a href="admin.html" id="dashAdminLink" class="btn-primary" style="display:none;font-size:0.85rem;padding:0.45rem 1rem;">
+              ⚙️ Open Admin CMS
+            </a>
+          </div>
+        </div>
+
+        <!-- Serial-Wise Membership ID Display -->
+        <div style="margin-top:1.5rem;border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;">
+          <div style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gray-400);margin-bottom:0.4rem;">
+            Official Virtux Membership ID:
+          </div>
+          <div class="member-id-box">
+            <span class="member-id-text" id="dashMembershipId">VIRTUXGAMING000000001</span>
+            <button class="copy-id-btn" onclick="copyMembershipId()">
+              📋 Copy ID
+            </button>
+          </div>
+          <p style="font-size:0.82rem;color:var(--gray-400);margin-top:0.5rem;">
+            Show this Membership ID at the counter when you visit to claim discounts, verify bookings, and earn store visit stamps.
+          </p>
+        </div>
+
+        <!-- Inline Profile Editing Panel -->
+        <div class="profile-edit-panel" id="profileEditPanel">
+          <h3 style="font-family:var(--font-heading);color:var(--cyan);margin-bottom:1rem;">Edit Your Profile Details</h3>
+          <form id="editProfileForm" onsubmit="saveProfileChanges(event)">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1rem;margin-bottom:1.25rem;">
+              <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="editName" required />
+              </div>
+              <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="tel" id="editPhone" placeholder="+91 98765 43210" />
+              </div>
+              <div class="form-group">
+                <label>Gmail / Email Address</label>
+                <input type="email" id="editEmail" required />
+              </div>
+            </div>
+            <div style="display:flex;gap:0.75rem;">
+              <button type="submit" class="btn-primary" style="font-size:0.88rem;">Save Changes</button>
+              <button type="button" onclick="toggleProfileEdit()" class="btn-secondary" style="font-size:0.88rem;">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ════ 2. THREE MEMBERSHIP SECTIONS ════ -->
+      <section style="margin-bottom:4rem;">
+        <div class="section-title-wrap">
+          <h2>Choose Your <span class="gradient-text">Membership Tier</span></h2>
+          <p>Tailored access packages for casual gamers, weekend grinders, and esports champions.</p>
+        </div>
+
+        <div class="memberships-grid">
+          <!-- 1. Hour Basis Membership -->
+          <div class="membership-tier-card">
+            <div class="tier-name">⏱️ Hourly Basis Pass</div>
+            <p style="color:var(--gray-400);font-size:0.85rem;margin-bottom:1rem;">Flexible pay-as-you-play pricing with zero commitment.</p>
+            <div class="tier-price">₹99 <span>/ hour (PC)</span></div>
+            <div style="color:var(--gray-300);font-size:0.9rem;margin-bottom:1.5rem;font-weight:600;">₹149 / hour for PS5 OLED Stations</div>
+            <ul class="tier-perks">
+              <li>High-Refresh 165Hz RTX Gaming Rigs</li>
+              <li>PS5 4K 120Hz Couch Stations</li>
+              <li>Free 15-Minute Advance Seat Hold</li>
+              <li>Full Access to Café Menu</li>
+              <li>Earn Store Stamps on Orders > ₹149</li>
+            </ul>
+            <a href="contact.html" class="btn-secondary" style="text-align:center;width:100%;">Book Hourly Station</a>
+          </div>
+
+          <!-- 2. Weekly Membership -->
+          <div class="membership-tier-card featured">
+            <span class="tier-badge">🔥 Most Popular</span>
+            <div class="tier-name">📅 Weekly Member Pass</div>
+            <p style="color:var(--gray-400);font-size:0.85rem;margin-bottom:1rem;">Ideal for holiday sessions, tournaments, and squad grinds.</p>
+            <div class="tier-price">₹999 <span>/ week</span></div>
+            <div style="color:var(--purple);font-size:0.9rem;margin-bottom:1.5rem;font-weight:600;">Includes 12 Hours of High-End Gaming</div>
+            <ul class="tier-perks">
+              <li>12 Hours Gaming Credit (PS5 or PC)</li>
+              <li>10% Flat Discount on all Café items</li>
+              <li>Complimentary Beverage with 3-hr session</li>
+              <li>Guaranteed Priority Booking window</li>
+              <li>Qualifies for 2 Store Visit Stamps</li>
+            </ul>
+            <a href="contact.html" class="btn-primary" style="text-align:center;width:100%;">Get Weekly Pass</a>
+          </div>
+
+          <!-- 3. Monthly Membership -->
+          <div class="membership-tier-card">
+            <span class="tier-badge" style="background:#eab308;color:#000;">👑 VIP ELITE</span>
+            <div class="tier-name">👑 Monthly Elite VIP</div>
+            <p style="color:var(--gray-400);font-size:0.85rem;margin-bottom:1rem;">The ultimate VIP membership for dedicated pro gamers.</p>
+            <div class="tier-price">₹2,999 <span>/ month</span></div>
+            <div style="color:#eab308;font-size:0.9rem;margin-bottom:1.5rem;font-weight:600;">Includes 45 Hours + Simulator Rig Access</div>
+            <ul class="tier-perks">
+              <li>45 Hours High-End Gaming Access</li>
+              <li>1× Free Racing Simulator Session included</li>
+              <li>15% Flat Discount across Café Menu</li>
+              <li>Free Priority Entry to Weekend Tournaments</li>
+              <li>Exclusive VIP Lounge Seating</li>
+              <li>Instant 3 Store Visit Stamps</li>
+            </ul>
+            <a href="contact.html" class="btn-secondary" style="text-align:center;width:100%;">Claim VIP Access</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ 3. 10-STAMP LOYALTY ENVELOPE CARD ════ -->
+      <section class="envelope-card" id="stampEnvelopeSection">
+        <div class="envelope-flap-header">
+          <div class="envelope-stamp-logo">📮</div>
+          <h2 style="font-family:var(--font-heading);font-size:1.85rem;margin-bottom:0.4rem;">
+            Virtux <span class="gradient-text">Rewards Stamp Envelope</span>
+          </h2>
+          <p style="color:var(--gray-300);max-width:650px;margin:0 auto 1rem;font-size:0.95rem;">
+            Visit our store and spend ₹149 or more on gaming hours or café treats to earn 1 official Store Stamp.
+            Collect all 10 stamps to unlock your <strong style="color:#eab308;">SURPRISE REWARD!</strong>
+          </p>
+          <div style="display:inline-flex;align-items:center;gap:0.75rem;background:rgba(0,0,0,0.4);border:1px solid rgba(0,212,255,0.3);padding:0.5rem 1.25rem;border-radius:30px;">
+            <span style="font-family:var(--font-heading);color:var(--cyan);font-weight:800;font-size:1.1rem;" id="stampCounterText">0 / 10 Stamps</span>
+            <span style="color:var(--gray-400);font-size:0.85rem;">·</span>
+            <span id="stampStatusSubtext" style="color:#10b981;font-size:0.85rem;font-weight:600;">Ready for visits</span>
+          </div>
+        </div>
+
+        <!-- The 10 Circular Stamp Vacant Slots Grid -->
+        <div class="envelope-grid" id="stampSlotsGrid">
+          <!-- Populated dynamically: 10 circles -->
+        </div>
+
+        <!-- Action: Request Stamp -->
+        <div style="text-align:center;margin-bottom:1.5rem;">
+          <button onclick="openStampRequestModal()" class="btn-primary" style="font-size:0.95rem;padding:0.75rem 1.75rem;">
+            📩 Request Stamp (Visited &amp; Shopped &gt; ₹149)
+          </button>
+        </div>
+
+        <!-- Surprise Box Container -->
+        <div class="surprise-box" id="surpriseRewardBox">
+          <div style="font-size:2rem;margin-bottom:0.5rem;" id="surpriseIcon">🎁</div>
+          <h3 style="font-family:var(--font-heading);font-size:1.35rem;margin-bottom:0.5rem;color:#eab308;" id="surpriseTitle">
+            Surprise Milestone (Collect 10 Stamps)
+          </h3>
+          <p style="color:var(--gray-300);font-size:0.9rem;max-width:650px;margin:0 auto;" id="surpriseDesc">
+            Collect all 10 stamps in your envelope to unlock your Mystery Surprise Gift: Free 2-Hour High-End Station Pass + Signature Snack Combo at the counter!
+          </p>
+        </div>
+      </section>
+
+      <!-- ════ 4. MY BOOKINGS / SESSIONS HISTORY ════ -->
+      <section style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;">
+        <h3 style="font-family:var(--font-heading);color:var(--cyan);margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem;">
+          🎮 My Reservations &amp; Inquiries
+        </h3>
+        <div id="dashBookingsList">
+          <p style="color:var(--gray-400);font-size:0.9rem;">Loading your bookings...</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Stamp Request Modal -->
+  <div class="modal-backdrop" id="stampRequestModal">
+    <div class="modal-content">
+      <h3 style="font-family:var(--font-heading);color:var(--cyan);margin-bottom:1rem;">Request Store Visit Stamp</h3>
+      <p style="color:var(--gray-300);font-size:0.85rem;margin-bottom:1.25rem;">
+        Visited our store or café and spent over ₹149? Enter your order or bill details below. Once approved by the store manager, your stamp will appear in your envelope!
+      </p>
+      <form onsubmit="submitStampRequest(event)">
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label>Purchase Amount (Minimum ₹149)</label>
+          <input type="number" id="stampBillAmount" min="149" value="150" required />
+        </div>
+        <div class="form-group" style="margin-bottom:1.5rem;">
+          <label>Bill / Order Notes (Optional)</label>
+          <input type="text" id="stampBillNotes" placeholder="e.g. Counter Bill #104 / Cold Coffee + Peri Peri Fries" />
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <button type="submit" class="btn-primary" style="flex:1;">Submit Request</button>
+          <button type="button" onclick="closeStampRequestModal()" class="btn-secondary">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <div class="container">
+        <p>© 2026 Virtux Gaming Hub. All rights reserved. Designed and developed by The WebDev team <a href="https://github.com/VIRTUXGAMINGHUB444411/Virtuxgaminghub_WebDev_Team/commit/493698b3b8d5cc5c1234457d4f94a9225dc14552" target="_blank" rel="noopener" style="color: var(--cyan); text-decoration: none; font-weight: 700;">VIRTUX GAMING HUB</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="script.js"></script>
+  <script>
+    const API_BASE = (window.location.protocol === 'file:' || (window.location.port && window.location.port !== '3000'))
+      ? 'http://localhost:3000'
+      : '';
+
+    let currentUser = null;
+
+    async function loadDashboard() {
+      const token = localStorage.getItem('virtux_token');
+      if (!token) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/me`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!res.ok) {
+          localStorage.removeItem('virtux_token');
+          localStorage.removeItem('virtux_user');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const data = await res.json();
+        currentUser = data.user;
+
+        // Render User Header
+        document.getElementById('dashName').textContent = currentUser.name;
+        document.getElementById('dashEmail').textContent = currentUser.email;
+        document.getElementById('dashPhone').textContent = currentUser.phone ? '📞 ' + currentUser.phone : '📞 No phone added';
+        document.getElementById('dashAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+
+        // Render Membership ID
+        const memId = currentUser.membership_id || 'VIRTUXGAMING' + String(currentUser.id).padStart(9, '0');
+        document.getElementById('dashMembershipId').textContent = memId;
+
+        // Fill Edit Form Fields
+        document.getElementById('editName').value = currentUser.name;
+        document.getElementById('editPhone').value = currentUser.phone || '';
+        document.getElementById('editEmail').value = currentUser.email;
+
+        // Admin link
+        if (currentUser.role === 'admin') {
+          document.getElementById('dashRoleBadge').textContent = 'ADMIN';
+          document.getElementById('dashRoleBadge').style.background = 'var(--cyan)';
+          document.getElementById('dashRoleBadge').style.color = '#000';
+          document.getElementById('dashAdminLink').style.display = 'inline-block';
+        }
+
+        // Render Stamps Envelope
+        renderStampEnvelope(currentUser.stamps_count || 0);
+
+        // Render Bookings
+        renderBookings(data.bookings || []);
+      } catch (err) {
+        console.error('Error loading dashboard:', err);
+      }
+    }
+
+    function renderStampEnvelope(count) {
+      const totalStamps = 10;
+      const currentStamps = Math.min(totalStamps, count || 0);
+      document.getElementById('stampCounterText').textContent = `${currentStamps} / ${totalStamps} Stamps`;
+
+      const grid = document.getElementById('stampSlotsGrid');
+      grid.innerHTML = '';
+
+      for (let i = 1; i <= totalStamps; i++) {
+        const isStamped = i <= currentStamps;
+        const slot = document.createElement('div');
+        slot.className = `stamp-slot ${isStamped ? 'stamped' : ''}`;
+        
+        if (isStamped) {
+          slot.innerHTML = `
+            <div class="stamp-seal">✨</div>
+            <div class="stamp-slot-number">STAMP #${i}</div>
+          `;
+        } else {
+          slot.innerHTML = `
+            <div class="stamp-slot-number">#${i}</div>
+            <div class="stamp-slot-label">Vacant</div>
+          `;
+        }
+        grid.appendChild(slot);
+      }
+
+      // Surprise reward logic
+      const surpriseBox = document.getElementById('surpriseRewardBox');
+      const surpriseTitle = document.getElementById('surpriseTitle');
+      const surpriseDesc = document.getElementById('surpriseDesc');
+      const surpriseIcon = document.getElementById('surpriseIcon');
+
+      if (currentStamps >= totalStamps) {
+        surpriseBox.classList.remove('locked');
+        surpriseIcon.textContent = '🎉';
+        surpriseTitle.textContent = 'SURPRISE UNLOCKED! CONGRATULATIONS!';
+        surpriseTitle.style.color = '#10b981';
+        surpriseDesc.innerHTML = `
+          <strong>You have completed all 10 store visit stamps!</strong><br />
+          Show your Membership ID (<strong>${currentUser.membership_id}</strong>) at the counter to claim your
+          <span style="color:#eab308;font-weight:700;">FREE 2-Hour High-End Gaming Session + Signature Cafe Combo!</span>
+        `;
+      } else {
+        surpriseBox.classList.add('locked');
+        surpriseIcon.textContent = '🎁';
+        surpriseTitle.textContent = `Surprise Milestone (${totalStamps - currentStamps} Stamps Remaining)`;
+        surpriseDesc.textContent = `Earn ${totalStamps - currentStamps} more visit stamps to unlock your mystery reward gift at the counter!`;
+      }
+    }
+
+    function renderBookings(list) {
+      const container = document.getElementById('dashBookingsList');
+      if (!list || list.length === 0) {
+        container.innerHTML = '<p style="color:var(--gray-400);font-size:0.9rem;">No bookings yet. <a href="contact.html" style="color:var(--cyan);">Book your first gaming session!</a></p>';
+        return;
+      }
+      container.innerHTML = list.map(b => `
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:0.75rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem;">
+            <strong style="color:#fff;font-size:1rem;">${b.service}</strong>
+            <span style="font-size:0.75rem;padding:0.2rem 0.6rem;border-radius:15px;background:rgba(0,212,255,0.15);color:var(--cyan);text-transform:uppercase;">${b.status}</span>
+          </div>
+          <p style="color:var(--gray-400);font-size:0.85rem;margin:0;">
+            📅 ${b.booking_date || 'Date N/A'} · ⏰ ${b.booking_time || 'Time N/A'} · 👥 ${b.guests} Gamer(s)
+          </p>
+        </div>
+      `).join('');
+    }
+
+    function copyMembershipId() {
+      const id = document.getElementById('dashMembershipId').textContent;
+      navigator.clipboard.writeText(id).then(() => {
+        showToast('📋 Membership ID copied: ' + id);
+      }).catch(() => {
+        showToast('Membership ID: ' + id);
+      });
+    }
+
+    function toggleProfileEdit() {
+      const panel = document.getElementById('profileEditPanel');
+      panel.classList.toggle('active');
+    }
+
+    async function saveProfileChanges(e) {
+      e.preventDefault();
+      const name = document.getElementById('editName').value;
+      const phone = document.getElementById('editPhone').value;
+      const email = document.getElementById('editEmail').value;
+      const token = localStorage.getItem('virtux_token');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ name, phone, email })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showToast(data.error || 'Failed to update profile');
+          return;
+        }
+
+        localStorage.setItem('virtux_token', data.token);
+        localStorage.setItem('virtux_user', JSON.stringify(data.user));
+        showToast('✅ Profile updated successfully!');
+        toggleProfileEdit();
+        loadDashboard();
+      } catch (err) {
+        showToast('Error updating profile');
+      }
+    }
+
+    function openStampRequestModal() {
+      document.getElementById('stampRequestModal').classList.add('active');
+    }
+
+    function closeStampRequestModal() {
+      document.getElementById('stampRequestModal').classList.remove('active');
+    }
+
+    async function submitStampRequest(e) {
+      e.preventDefault();
+      const amount = document.getElementById('stampBillAmount').value;
+      const notes = document.getElementById('stampBillNotes').value;
+      const token = localStorage.getItem('virtux_token');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/stamps/request`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ bill_amount: amount, bill_notes: notes })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showToast(data.error || 'Request failed');
+          return;
+        }
+
+        closeStampRequestModal();
+        showToast('📩 Stamp request submitted! Store manager will verify at the counter.');
+      } catch (err) {
+        showToast('Error submitting stamp request');
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('virtux_token');
+      localStorage.removeItem('virtux_user');
+      showToast('Signed out');
+      setTimeout(() => { window.location.href = 'login.html'; }, 400);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+  </script>
+</body>
+</html>

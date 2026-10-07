@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Account &amp; Login - Virtux Gaming Hub</title>
+  <title>Customer Login &amp; Register - Virtux Gaming Hub</title>
   <link rel="icon" type="image/png" href="logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <style>
@@ -59,57 +59,65 @@
     .auth-form.active {
       display: flex;
     }
-    .account-dashboard {
-      display: none;
-    }
-    .account-dashboard.active {
-      display: block;
-    }
-    .profile-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .profile-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
+    .google-btn {
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: #000;
-      box-shadow: var(--glow-cyan);
-    }
-    .booking-item-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: #ffffff;
+      color: #1f2937;
+      border: 1px solid #d1d5db;
       border-radius: var(--radius);
-      padding: 1.25rem;
-      margin-bottom: 1rem;
-      transition: border-color var(--transition);
-    }
-    .booking-item-card:hover {
-      border-color: var(--cyan);
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 0.25rem 0.65rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all var(--transition);
+      margin-top: 0.5rem;
     }
-    .status-pending { background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid #f59e0b; }
-    .status-confirmed { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
-    .status-completed { background: rgba(0,212,255,0.2); color: var(--cyan); border: 1px solid var(--cyan); }
-    .status-cancelled { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; }
+    .google-btn:hover {
+      background: #f3f4f6;
+      box-shadow: 0 4px 15px rgba(255,255,255,0.2);
+    }
+    .divider-or {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 1.25rem 0 0.5rem;
+      color: var(--gray-400);
+      font-size: 0.85rem;
+    }
+    .divider-or::before, .divider-or::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal-backdrop.active {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 440px;
+      padding: 2rem;
+      position: relative;
+    }
   </style>
 </head>
 <body>
@@ -128,6 +136,7 @@
         <li><a href="gallery.html" class="nav-link">Gallery</a></li>
         <li><a href="contact.html" class="nav-link">Contact</a></li>
         <li><a href="feedback.html" class="nav-link">Feedback</a></li>
+        <li><a href="login.html" class="nav-link active">Sign In</a></li>
       </ul>
       <div class="nav-actions">
         <a href="contact.html" class="btn-primary" style="font-size:0.85rem;padding:0.45rem 1rem;">Book a Station</a>
@@ -142,20 +151,33 @@
   <main class="auth-page">
     <div class="container" style="display:flex;justify-content:center;">
 
-      <!-- Login / Register Card (shown when NOT logged in) -->
       <div class="auth-card" id="authCard">
         <div class="modal-logo" style="text-align: center; margin-bottom: 1.5rem;">
           <img src="logo.png" alt="Virtux Gaming Hub" style="height: 58px; width: auto; object-fit: contain; margin: 0 auto; display: block;" />
         </div>
+
         <div class="auth-tabs">
           <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">LOGIN</button>
           <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">CREATE ACCOUNT</button>
         </div>
 
+        <!-- Google Sign-In Button (Available for both Login and Registration) -->
+        <button type="button" class="google-btn" onclick="openGoogleModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.02 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+          Continue with Google
+        </button>
+
+        <div class="divider-or">OR WITH GMAIL &amp; PASSWORD</div>
+
         <!-- Login Form -->
         <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
           <div class="form-group">
-            <label>Email Address</label>
+            <label>Gmail / Email Address</label>
             <input type="email" id="loginEmail" placeholder="yourname@gmail.com" required />
           </div>
           <div class="form-group">
@@ -166,9 +188,9 @@
             <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;color:var(--gray-300);">
               <input type="checkbox" id="rememberMe" checked /> Remember Me
             </label>
-            <span style="color:var(--cyan);font-size:0.82rem;">Default Admin: admin@virtux.com / admin123</span>
+            <span style="color:var(--cyan);font-size:0.82rem;">Admin: admin@virtux.com</span>
           </div>
-          <button type="submit" class="btn-primary" style="margin-top:0.5rem;width:100%;">Sign In</button>
+          <button type="submit" class="btn-primary" style="margin-top:0.5rem;width:100%;">Sign In &amp; Open Dashboard</button>
           <div id="loginError" style="color:#ef4444;font-size:0.85rem;display:none;text-align:center;"></div>
         </form>
 
@@ -176,59 +198,62 @@
         <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
           <div class="form-group">
             <label>Full Name</label>
-            <input type="text" id="regName" placeholder="Gamer Tag or Name" required />
+            <input type="text" id="regName" placeholder="Gamer Tag or Real Name" required />
           </div>
           <div class="form-group">
-            <label>Email Address</label>
-            <input type="email" id="regEmail" placeholder="gamer@gmail.com" required />
+            <label>Mobile Number</label>
+            <input type="tel" id="regPhone" placeholder="+91 98765 43210" required />
           </div>
           <div class="form-group">
-            <label>Phone Number (for booking verification)</label>
-            <input type="tel" id="regPhone" placeholder="+91 98765 43210" />
+            <label>Gmail / Email Address</label>
+            <input type="email" id="regEmail" placeholder="yourname@gmail.com" required />
           </div>
           <div class="form-group">
             <label>Create Password</label>
             <input type="password" id="regPassword" placeholder="Minimum 6 characters" minlength="6" required />
           </div>
-          <button type="submit" class="btn-primary" style="margin-top:0.5rem;width:100%;">Create Account</button>
+          <button type="submit" class="btn-primary" style="margin-top:0.5rem;width:100%;">Register &amp; Get Membership ID</button>
           <div id="regError" style="color:#ef4444;font-size:0.85rem;display:none;text-align:center;"></div>
         </form>
       </div>
 
-      <!-- Account Dashboard (shown when LOGGED IN) -->
-      <div class="auth-card account-dashboard" id="accountDashboard" style="max-width:700px;">
-        <div class="profile-header">
-          <div style="display:flex;align-items:center;gap:1.25rem;">
-            <div class="profile-avatar" id="userAvatar">V</div>
-            <div>
-              <h3 id="userName" style="margin-bottom:0.25rem;">Gamer</h3>
-              <p id="userEmail" style="color:var(--gray-400);font-size:0.88rem;margin:0;"></p>
-              <div id="userBadge" style="margin-top:0.35rem;"></div>
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:0.5rem;align-items:flex-end;">
-            <button onclick="handleLogout()" class="btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.9rem;">Sign Out</button>
-            <a href="admin.html" id="adminPanelLink" class="btn-primary" style="display:none;font-size:0.85rem;padding:0.4rem 0.9rem;">Open Admin Panel ⚙️</a>
-          </div>
-        </div>
-
-        <div style="margin-bottom:2rem;">
-          <h4 style="color:var(--cyan);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
-            🎮 My Station Bookings &amp; Inquiries
-          </h4>
-          <div id="userBookingsList">
-            <p style="color:var(--gray-400);font-size:0.9rem;">Loading your bookings...</p>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
-          <a href="contact.html" class="btn-primary" style="flex:1;text-align:center;">+ Book New Station</a>
-          <a href="feedback.html" class="btn-secondary" style="flex:1;text-align:center;">✍️ Leave Review</a>
-        </div>
-      </div>
-
     </div>
   </main>
+
+  <!-- Google Sign-In Modal -->
+  <div class="modal-backdrop" id="googleModal">
+    <div class="modal-content">
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <svg width="36" height="36" viewBox="0 0 24 24" style="margin:0 auto 0.5rem;display:block;">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.02 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+        </svg>
+        <h3 style="font-family:var(--font-heading);color:#fff;margin:0;">Sign in with Google</h3>
+        <p style="color:var(--gray-400);font-size:0.85rem;margin-top:0.25rem;">Virtux Gaming Hub OAuth</p>
+      </div>
+
+      <form onsubmit="submitGoogleAuth(event)">
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label>Google Account (Gmail)</label>
+          <input type="email" id="googleEmail" placeholder="example@gmail.com" required />
+        </div>
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label>Your Name (as on Google profile)</label>
+          <input type="text" id="googleName" placeholder="Your Name" required />
+        </div>
+        <div class="form-group" style="margin-bottom:1.5rem;">
+          <label>Mobile Number (Optional)</label>
+          <input type="tel" id="googlePhone" placeholder="+91 98765 43210" />
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <button type="submit" class="btn-primary" style="flex:1;">Authorize &amp; Continue</button>
+          <button type="button" onclick="closeGoogleModal()" class="btn-secondary">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="footer">
@@ -266,6 +291,14 @@
       ? 'http://localhost:3000'
       : '';
 
+    // If user is already logged in, redirect straight to dashboard
+    function checkExistingAuth() {
+      const token = localStorage.getItem('virtux_token');
+      if (token) {
+        window.location.href = 'dashboard.html';
+      }
+    }
+
     async function handleLogin(e) {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value;
@@ -290,13 +323,15 @@
         localStorage.setItem('virtux_user', JSON.stringify(data.user));
         showToast('🎮 Welcome back, ' + data.user.name + '!');
 
-        if (data.user.role === 'admin') {
-          setTimeout(() => { window.location.href = 'admin.html'; }, 800);
-        } else {
-          checkAuthState();
-        }
+        setTimeout(() => {
+          if (data.user.role === 'admin') {
+            window.location.href = 'admin.html';
+          } else {
+            window.location.href = 'dashboard.html';
+          }
+        }, 500);
       } catch (err) {
-        errorDiv.textContent = 'Server error. Please ensure the backend server is running.';
+        errorDiv.textContent = 'Server connection issue. Please ensure the backend is running.';
         errorDiv.style.display = 'block';
       }
     }
@@ -325,85 +360,61 @@
 
         localStorage.setItem('virtux_token', data.token);
         localStorage.setItem('virtux_user', JSON.stringify(data.user));
-        showToast('🎉 Account created successfully! Welcome to Virtux!');
-        checkAuthState();
+        showToast('🎉 Account created! Welcome, ' + data.user.name + '!');
+
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 600);
       } catch (err) {
-        errorDiv.textContent = 'Server error. Please ensure the backend server is running.';
+        errorDiv.textContent = 'Server connection issue. Please ensure the backend is running.';
         errorDiv.style.display = 'block';
       }
     }
 
-    async function checkAuthState() {
-      const token = localStorage.getItem('virtux_token');
-      const authCard = document.getElementById('authCard');
-      const accountDashboard = document.getElementById('accountDashboard');
+    function openGoogleModal() {
+      document.getElementById('googleModal').classList.add('active');
+    }
 
-      if (!token) {
-        authCard.style.display = 'block';
-        accountDashboard.classList.remove('active');
-        return;
-      }
+    function closeGoogleModal() {
+      document.getElementById('googleModal').classList.remove('active');
+    }
+
+    async function submitGoogleAuth(e) {
+      e.preventDefault();
+      const email = document.getElementById('googleEmail').value;
+      const name = document.getElementById('googleName').value;
+      const phone = document.getElementById('googlePhone').value;
 
       try {
-        const res = await fetch(`${API_BASE}/api/auth/me`, {
-          headers: { 'Authorization': 'Bearer ' + token }
+        const res = await fetch(`${API_BASE}/api/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, name, phone, googleId: Date.now() })
         });
+        const data = await res.json();
         if (!res.ok) {
-          localStorage.removeItem('virtux_token');
-          localStorage.removeItem('virtux_user');
-          authCard.style.display = 'block';
-          accountDashboard.classList.remove('active');
+          showToast(data.error || 'Google Authentication failed');
           return;
         }
 
-        const data = await res.json();
-        authCard.style.display = 'none';
-        accountDashboard.classList.add('active');
+        closeGoogleModal();
+        localStorage.setItem('virtux_token', data.token);
+        localStorage.setItem('virtux_user', JSON.stringify(data.user));
+        showToast('🎉 Google Sign-in successful!');
 
-        document.getElementById('userName').textContent = data.user.name;
-        document.getElementById('userEmail').textContent = data.user.email + (data.user.phone ? ' · ' + data.user.phone : '');
-        document.getElementById('userAvatar').textContent = data.user.name.charAt(0).toUpperCase();
-
-        if (data.user.role === 'admin') {
-          document.getElementById('userBadge').innerHTML = '<span class="status-badge" style="background:rgba(0,212,255,0.2);color:var(--cyan);border:1px solid var(--cyan);">ADMINISTRATOR</span>';
-          document.getElementById('adminPanelLink').style.display = 'inline-block';
-        } else {
-          document.getElementById('userBadge').innerHTML = '<span class="status-badge status-completed">VERIFIED GAMER</span>';
-          document.getElementById('adminPanelLink').style.display = 'none';
-        }
-
-        // Render bookings
-        const bookingsList = document.getElementById('userBookingsList');
-        if (!data.bookings || data.bookings.length === 0) {
-          bookingsList.innerHTML = '<p style="color:var(--gray-400);font-size:0.9rem;">No bookings yet. <a href="contact.html" style="color:var(--cyan);">Book your first session!</a></p>';
-        } else {
-          bookingsList.innerHTML = data.bookings.map(b => `
-            <div class="booking-item-card">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-                <strong style="color:#fff;font-size:1rem;">${b.service}</strong>
-                <span class="status-badge status-${b.status}">${b.status}</span>
-              </div>
-              <p style="color:var(--gray-400);font-size:0.85rem;margin:0;">
-                📅 ${b.booking_date || 'Date not specified'} · ⏰ ${b.booking_time || 'Time not specified'} · 👥 ${b.guests} Person(s)
-              </p>
-              ${b.notes ? `<p style="color:var(--gray-300);font-size:0.82rem;margin-top:0.35rem;font-style:italic;">"${b.notes}"</p>` : ''}
-            </div>
-          `).join('');
-        }
+        setTimeout(() => {
+          if (data.user.role === 'admin') {
+            window.location.href = 'admin.html';
+          } else {
+            window.location.href = 'dashboard.html';
+          }
+        }, 500);
       } catch (err) {
-        console.error(err);
+        showToast('Server connection error during Google auth');
       }
     }
 
-    function handleLogout() {
-      localStorage.removeItem('virtux_token');
-      localStorage.removeItem('virtux_user');
-      showToast('Logged out successfully');
-      checkAuthState();
-    }
-
-    document.addEventListener('DOMContentLoaded', checkAuthState);
+    document.addEventListener('DOMContentLoaded', checkExistingAuth);
   </script>
 </body>
 </html>
-

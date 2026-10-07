@@ -655,8 +655,8 @@ function updateNavAuth() {
         link.href = 'admin.html';
         link.style.color = 'var(--cyan)';
       } else {
-        link.textContent = '👤 ' + (user.name.split(' ')[0] || 'Account');
-        link.href = 'login.html';
+        link.textContent = '👤 ' + (user.name.split(' ')[0] || 'Dashboard');
+        link.href = 'dashboard.html';
       }
     } else {
       link.textContent = 'Account';
@@ -668,11 +668,11 @@ function updateNavAuth() {
     loginBtns.forEach(btn => {
       btn.innerHTML = `
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span>${user.name.split(' ')[0] || 'Account'}</span>
+        <span>${user.name.split(' ')[0] || 'Dashboard'}</span>
       `;
       btn.onclick = (e) => {
         e.preventDefault();
-        window.location.href = 'login.html';
+        window.location.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
       };
     });
 
