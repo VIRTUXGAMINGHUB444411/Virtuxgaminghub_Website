@@ -11,10 +11,13 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'virtux_cyber_secret_key_2026';
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ifzhczvuenwuvpzvvwph.supabase.co';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_UddVD3JaGmkYolBaDqQuvQ_X-OzaQhg';
+const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY || 'sb_secret_uFnYlqrh4phDpIe02Mh2wA_g0inw3Q8';
 
 let supabase = null;
 try {
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Use Secret Key on server side for full admin access
+  supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY || SUPABASE_ANON_KEY);
+  console.log('⚡ Supabase Admin client connected successfully');
 } catch (e) {
   console.warn('Supabase client init note:', e.message);
 }
