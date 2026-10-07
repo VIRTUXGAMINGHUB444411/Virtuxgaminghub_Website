@@ -296,9 +296,27 @@ function showToast(message, duration = 3500) {
 
 // ═══════════ FORM HANDLERS ═══════════
 // ═══════════ FORM HANDLERS (BACKEND CONNECTED) ═══════════
-const API_BASE = (window.location.protocol === 'file:' || (window.location.port && window.location.port !== '3000'))
-  ? 'http://localhost:3000'
-  : '';
+const LIVE_BACKEND = 'https://virtuxgaminghub-website.vercel.app';
+const API_BASE = (window.location.protocol === 'file:')
+  ? LIVE_BACKEND
+  : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '3000')
+    ? 'http://localhost:3000'
+    : '';
+
+async function apiFetch(endpoint, options = {}) {
+  try {
+    const res = await fetch(`${API_BASE}${endpoint}`, options);
+    return res;
+  } catch (err) {
+    // If local fetch fails (e.g. backend server not started locally), seamlessly fall back to live Vercel backend
+    if (API_BASE !== LIVE_BACKEND) {
+      try {
+        return await fetch(`${LIVE_BACKEND}${endpoint}`, options);
+      } catch (e2) {}
+    }
+    throw err;
+  }
+}
 
 async function handleLogin(event, type) {
   event.preventDefault();
@@ -317,7 +335,7 @@ async function handleLogin(event, type) {
   });
 
   try {
-    const res = await fetch(`${API_BASE}/api/auth/login`, {
+    const res = await apiFetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -344,7 +362,7 @@ async function handleLogin(event, type) {
       }, 1200);
     }
   } catch (err) {
-    showToast('⚠️ Could not connect to server. Ensure backend is running.');
+    showToast('⚠️ Could not connect to server. Please check your internet connection.');
   }
 }
 
@@ -365,7 +383,7 @@ async function handleRegister(event) {
   });
 
   try {
-    const res = await fetch(`${API_BASE}/api/auth/register`, {
+    const res = await apiFetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, phone, password })
@@ -386,7 +404,7 @@ async function handleRegister(event) {
       document.body.style.overflow = '';
     }, 1200);
   } catch (err) {
-    showToast('⚠️ Could not connect to server. Ensure backend is running.');
+    showToast('⚠️ Could not connect to server. Please check your internet connection.');
   }
 }
 
@@ -416,7 +434,7 @@ async function submitFeedback(event) {
   if (token) headers['Authorization'] = 'Bearer ' + token;
 
   try {
-    const res = await fetch(`${API_BASE}/api/feedback`, {
+    const res = await apiFetch('/api/feedback', {
       method: 'POST',
       headers,
       body: JSON.stringify(payload)
@@ -460,7 +478,7 @@ async function submitBooking(event) {
   if (token) headers['Authorization'] = 'Bearer ' + token;
 
   try {
-    const res = await fetch(`${API_BASE}/api/bookings`, {
+    const res = await apiFetch('/api/bookings', {
       method: 'POST',
       headers,
       body: JSON.stringify(payload)

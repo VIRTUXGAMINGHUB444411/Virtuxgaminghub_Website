@@ -379,9 +379,26 @@
       }
     }
 
-    const API_BASE = (window.location.protocol === 'file:' || (window.location.port && window.location.port !== '3000'))
-      ? 'http://localhost:3000'
-      : '';
+    const LIVE_BACKEND = 'https://virtuxgaminghub-website.vercel.app';
+    const API_BASE = (window.location.protocol === 'file:')
+      ? LIVE_BACKEND
+      : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '3000')
+        ? 'http://localhost:3000'
+        : '';
+
+    async function apiFetch(endpoint, options = {}) {
+      try {
+        const res = await fetch(`${API_BASE}${endpoint}`, options);
+        return res;
+      } catch (err) {
+        if (API_BASE !== LIVE_BACKEND) {
+          try {
+            return await fetch(`${LIVE_BACKEND}${endpoint}`, options);
+          } catch (e2) {}
+        }
+        throw err;
+      }
+    }
 
     // Switch between Sign In / Register / Forgot Password tabs
     function switchAuthTab(tab) {
@@ -436,7 +453,7 @@
       hideAlert('loginAlert');
 
       try {
-        const res = await fetch(`${API_BASE}/api/auth/login`, {
+        const res = await apiFetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -459,7 +476,7 @@
           }
         }, 500);
       } catch (err) {
-        showAlert('loginAlert', 'Server connection error. Please try again.', 'error');
+        showAlert('loginAlert', 'Could not connect to server. Please check your internet connection.', 'error');
       }
     }
 
@@ -473,7 +490,7 @@
       hideAlert('regAlert');
 
       try {
-        const res = await fetch(`${API_BASE}/api/auth/register`, {
+        const res = await apiFetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, phone, password })
@@ -492,7 +509,7 @@
           window.location.href = 'dashboard.html';
         }, 600);
       } catch (err) {
-        showAlert('regAlert', 'Server connection issue. Please try again.', 'error');
+        showAlert('regAlert', 'Could not connect to server. Please check your internet connection.', 'error');
       }
     }
 
@@ -508,8 +525,7 @@
       }
 
       try {
-        // Try backend forgot password endpoint
-        const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+        const res = await apiFetch('/api/auth/forgot-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email })
@@ -528,7 +544,7 @@
         showAlert('forgotAlert', data.message || 'Password reset link sent to your email! Please check your inbox.', 'success');
         showToast('✉️ Password recovery sent to ' + email);
       } catch (err) {
-        showAlert('forgotAlert', 'Could not process request. Please contact support at the counter.', 'error');
+        showAlert('forgotAlert', 'Could not process request. Please check your internet connection.', 'error');
       }
     }
 
@@ -548,7 +564,7 @@
       }
 
       try {
-        const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+        const res = await apiFetch('/api/auth/reset-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, newPassword })
@@ -601,7 +617,7 @@
       const phone = document.getElementById('googlePhone').value.trim();
 
       try {
-        const res = await fetch(`${API_BASE}/api/auth/google`, {
+        const res = await apiFetch('/api/auth/google', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, name, phone, googleId: Date.now() })

@@ -645,9 +645,26 @@
 
   <script src="script.js"></script>
   <script>
-    const API_BASE = (window.location.protocol === 'file:' || (window.location.port && window.location.port !== '3000'))
-      ? 'http://localhost:3000'
-      : '';
+    const LIVE_BACKEND = 'https://virtuxgaminghub-website.vercel.app';
+    const API_BASE = (window.location.protocol === 'file:')
+      ? LIVE_BACKEND
+      : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '3000')
+        ? 'http://localhost:3000'
+        : '';
+
+    async function apiFetch(endpoint, options = {}) {
+      try {
+        const res = await fetch(`${API_BASE}${endpoint}`, options);
+        return res;
+      } catch (err) {
+        if (API_BASE !== LIVE_BACKEND) {
+          try {
+            return await fetch(`${LIVE_BACKEND}${endpoint}`, options);
+          } catch (e2) {}
+        }
+        throw err;
+      }
+    }
 
     let currentUser = null;
 
@@ -724,7 +741,7 @@
       // Step 2: Fetch latest data from backend
       if (token) {
         try {
-          const res = await fetch(`${API_BASE}/api/auth/me`, {
+          const res = await apiFetch('/api/auth/me', {
             headers: { 'Authorization': 'Bearer ' + token }
           });
 
@@ -837,7 +854,7 @@
       const token = localStorage.getItem('virtux_token');
 
       try {
-        const res = await fetch(`${API_BASE}/api/auth/profile`, {
+        const res = await apiFetch('/api/auth/profile', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -876,7 +893,7 @@
       const token = localStorage.getItem('virtux_token');
 
       try {
-        const res = await fetch(`${API_BASE}/api/stamps/request`, {
+        const res = await apiFetch('/api/stamps/request', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
