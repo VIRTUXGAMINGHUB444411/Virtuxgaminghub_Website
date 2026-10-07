@@ -744,10 +744,13 @@ function updateNavAuth() {
   }
 }
 
-// Global Google Auth redirect for all modal buttons
+// Global Google Auth redirect for all modal buttons — always show account picker
 function initGoogleAuth() {
   const redirectTo = window.location.origin + '/dashboard.html';
-  const authUrl = 'https://ifzhczvuenwuvpzvvwph.supabase.co/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(redirectTo);
+  const authUrl = 'https://ifzhczvuenwuvpzvvwph.supabase.co/auth/v1/authorize'
+    + '?provider=google'
+    + '&redirect_to=' + encodeURIComponent(redirectTo)
+    + '&prompt=select_account';
   window.location.href = authUrl;
 }
 window.initGoogleAuth = initGoogleAuth;
