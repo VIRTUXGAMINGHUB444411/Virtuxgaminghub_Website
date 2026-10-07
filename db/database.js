@@ -274,21 +274,6 @@ function initDb() {
       console.log('⚡ Default Admin created: admin@virtux.com / admin123');
     }
 
-    // Seed default announcement if none
-    const announcementCheck = db.prepare('SELECT COUNT(*) as count FROM announcements').get();
-    if (!announcementCheck || announcementCheck.count === 0) {
-      db.prepare(`
-        INSERT INTO announcements (title, badge, message, link, is_active)
-        VALUES (?, ?, ?, ?, ?)
-      `).run(
-        'Special Weekend Tournament',
-        '🏆 ESPORTS',
-        'EA FC 24 Weekend Championship happening this Sunday! Register at the counter.',
-        '/contact.html',
-        1
-      );
-    }
-
     // Seed sample cafe items if empty
     const cafeCheck = db.prepare('SELECT COUNT(*) as count FROM cafe_items').get();
     if (!cafeCheck || cafeCheck.count === 0) {

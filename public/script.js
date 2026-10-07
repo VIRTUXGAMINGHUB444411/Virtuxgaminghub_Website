@@ -693,38 +693,9 @@ function updateNavAuth() {
   }
 }
 
-// Load dynamic live banners
-async function loadLiveAnnouncements() {
-  try {
-    const res = await fetch(`${API_BASE}/api/announcements`);
-    if (!res.ok) return;
-    const list = await res.json();
-    if (!list || list.length === 0) return;
-
-    const latest = list[0];
-    if (!latest || !latest.is_active) return;
-
-    const existingBar = document.getElementById('announcementBar');
-    if (existingBar) existingBar.remove();
-
-    const bar = document.createElement('div');
-    bar.id = 'announcementBar';
-    bar.className = 'announcement-bar';
-    bar.innerHTML = `
-      <span class="announcement-badge">${latest.badge || '🔥 NOTICE'}</span>
-      <span class="announcement-text"><strong>${latest.title}</strong> — ${latest.message}</span>
-      ${latest.link ? `<a href="${latest.link}" class="announcement-link">Learn More ↗</a>` : ''}
-    `;
-    document.body.prepend(bar);
-  } catch (e) {
-    // Graceful fallback if backend is offline
-  }
-}
-
 // Auto initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
   updateNavAuth();
-  loadLiveAnnouncements();
 });
 
 

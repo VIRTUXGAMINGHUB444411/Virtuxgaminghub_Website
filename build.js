@@ -31,3 +31,4 @@ staticFiles.forEach(file => {
 });
 
 console.log('Build complete: all static assets synced to public/');
+
