@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .dashboard-page {
       padding: 3rem 1rem 6rem;
@@ -726,7 +727,85 @@
       }
     }
 
+    async function handleOAuthHashCallback() {
+      const hash = window.location.hash;
+      const searchParams = new URLSearchParams(window.location.search);
+      const code = searchParams.get('code');
+
+      if (!code && (!hash || (!hash.includes('access_token=') && !hash.includes('type=')))) {
+        return false;
+      }
+
+      try {
+        const SUPABASE_URL = 'https://ifzhczvuenwuvpzvvwph.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_UddVD3JaGmkYolBaDqQuvQ_X-OzaQhg';
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          let user = null;
+
+          // 1. Handle PKCE code exchange
+          if (code) {
+            try {
+              const { data, error } = await client.auth.exchangeCodeForSession(code);
+              if (data && data.user) user = data.user;
+              else if (data && data.session && data.session.user) user = data.session.user;
+            } catch (err) {
+              console.warn('PKCE exchange:', err);
+            }
+          }
+
+          // 2. Handle Implicit hash token
+          if (!user && hash) {
+            try {
+              const hashParams = new URLSearchParams(hash.substring(1));
+              const accessToken = hashParams.get('access_token');
+              if (accessToken) {
+                const { data, error } = await client.auth.getUser(accessToken);
+                if (data && data.user) user = data.user;
+              }
+            } catch (err) {
+              console.warn('Hash getUser:', err);
+            }
+          }
+
+          // 3. Fallback: check client stored session
+          if (!user) {
+            try {
+              const { data } = await client.auth.getSession();
+              if (data && data.session && data.session.user) user = data.session.user;
+            } catch (err) {}
+          }
+
+          if (user) {
+            const email = user.email;
+            const name = user.user_metadata?.full_name || user.user_metadata?.name || (email ? email.split('@')[0] : 'Gamer');
+            const googleId = user.id;
+
+            const res = await apiFetch('/api/auth/google', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, name, googleId })
+            });
+            const authData = await res.json();
+            if (res.ok) {
+              localStorage.setItem('virtux_token', authData.token);
+              localStorage.setItem('virtux_user', JSON.stringify(authData.user));
+              window.history.replaceState(null, null, window.location.pathname);
+              showToast('🎉 Welcome, ' + authData.user.name + '!');
+              return true;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('OAuth callback handling error:', err);
+      }
+      return false;
+    }
+
     async function loadDashboard() {
+      // Check if arriving from Supabase Google OAuth redirect with hash
+      await handleOAuthHashCallback();
+
       const token = localStorage.getItem('virtux_token');
       const cachedUser = JSON.parse(localStorage.getItem('virtux_user') || 'null');
 

@@ -744,6 +744,12 @@ function updateNavAuth() {
   }
 }
 
+// Global Google Auth redirect for all modal buttons
+function initGoogleAuth() {
+  window.location.href = 'login.html?google=1';
+}
+window.initGoogleAuth = initGoogleAuth;
+
 // Auto initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
   updateNavAuth();

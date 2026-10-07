@@ -457,9 +457,67 @@
       }
     }
 
-    // Auto-detect admin email input to show Security Code field
-    document.addEventListener('DOMContentLoaded', () => {
+    // Auto-detect admin email input & handle incoming OAuth callbacks
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Check for incoming Supabase Google OAuth callback (PKCE code or Implicit hash)
+      const hash = window.location.hash;
+      const searchParams = new URLSearchParams(window.location.search);
+      const code = searchParams.get('code');
+
+      if ((code || (hash && (hash.includes('access_token=') || hash.includes('type=')))) && supabaseClient) {
+        try {
+          let u = null;
+          if (code) {
+            try {
+              const { data } = await supabaseClient.auth.exchangeCodeForSession(code);
+              if (data && data.user) u = data.user;
+              else if (data && data.session && data.session.user) u = data.session.user;
+            } catch (ce) {
+              console.warn('PKCE exchange error:', ce);
+            }
+          }
+
+          if (!u && hash) {
+            try {
+              const params = new URLSearchParams(hash.substring(1));
+              const accessToken = params.get('access_token');
+              if (accessToken) {
+                const { data } = await supabaseClient.auth.getUser(accessToken);
+                if (data && data.user) u = data.user;
+              }
+            } catch (he) {
+              console.warn('Hash getUser error:', he);
+            }
+          }
+
+          if (u) {
+            const email = u.email;
+            const name = u.user_metadata?.full_name || u.user_metadata?.name || (email ? email.split('@')[0] : 'Gamer');
+            const googleId = u.id;
+            const res = await apiFetch('/api/auth/google', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, name, googleId })
+            });
+            const authData = await res.json();
+            if (res.ok) {
+              localStorage.setItem('virtux_token', authData.token);
+              localStorage.setItem('virtux_user', JSON.stringify(authData.user));
+              window.history.replaceState(null, null, window.location.pathname);
+              window.location.href = authData.user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn('OAuth redirect on login page:', e);
+        }
+      }
+
       checkExistingAuth();
+      if (new URLSearchParams(window.location.search).get('google') === '1') {
+        window.history.replaceState(null, null, window.location.pathname);
+        setTimeout(initGoogleAuth, 100);
+      }
       const emailInput = document.getElementById('loginEmail');
       const secGroup = document.getElementById('adminSecurityCodeGroup');
       if (emailInput && secGroup) {
