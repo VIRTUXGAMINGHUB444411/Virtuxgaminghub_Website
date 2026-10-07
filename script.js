@@ -326,13 +326,18 @@ async function handleLogin(event, type) {
   const inputs = form.querySelectorAll('input');
   let email = '';
   let password = '';
+  let securityCode = '';
 
-  inputs.forEach(input => {
-    if (input.type === 'email' || input.placeholder.includes('email') || input.placeholder.includes('admin@')) {
-      email = input.value;
-    }
-    if (input.type === 'password') {
+  inputs.forEach((input, index) => {
+    const val = input.value.trim();
+    if (input.type === 'email' || input.placeholder.toLowerCase().includes('email') || input.placeholder.includes('@') || input.placeholder.toLowerCase().includes('admin')) {
+      email = val;
+    } else if (input.type === 'password' && !password) {
       password = input.value;
+    } else if (input.maxLength === 6 || input.placeholder.toLowerCase().includes('security') || input.placeholder.toLowerCase().includes('code') || input.placeholder.toLowerCase().includes('otp')) {
+      securityCode = val;
+    } else if (index === 2) {
+      securityCode = val;
     }
   });
 
@@ -340,7 +345,7 @@ async function handleLogin(event, type) {
     const res = await apiFetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, securityCode })
     });
     const data = await res.json();
 

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -331,16 +331,16 @@
     <p class="modal-sub">🔒 Restricted — Authorized Personnel Only</p>
     <form onsubmit="handleLogin(event,'admin')">
       <div class="form-group">
-        <label>Admin ID</label>
-        <input type="text" placeholder="admin@virtux.com" value="admin@virtux.com" required />
+        <label>Admin Email</label>
+        <input type="email" placeholder="virtuxgaming.hub@gmail.com" required />
       </div>
       <div class="form-group">
         <label>Admin Password</label>
         <input type="password" placeholder="••••••••" required />
       </div>
       <div class="form-group">
-        <label>Access Code</label>
-        <input type="text" placeholder="6-digit OTP (Optional)" maxlength="6" value="888888" />
+        <label>Security Code</label>
+        <input type="password" placeholder="6-digit Security Code" maxlength="6" required />
       </div>
       <button type="submit" class="btn-admin-submit full-width">Access Dashboard 🔐</button>
     </form>
