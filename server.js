@@ -465,12 +465,16 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`\n==================================================`);
-  console.log(`🚀 Virtux Gaming Hub Server running on: http://localhost:${PORT}`);
-  console.log(`⚡ Admin Panel: http://localhost:${PORT}/admin.html`);
-  console.log(`👤 User Login:  http://localhost:${PORT}/login.html`);
-  console.log(`🔑 Default Admin Credentials: admin@virtux.com / admin123`);
-  console.log(`==================================================\n`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`\n==================================================`);
+    console.log(`🚀 Virtux Gaming Hub Server running on: http://localhost:${PORT}`);
+    console.log(`⚡ Admin Panel: http://localhost:${PORT}/admin.html`);
+    console.log(`👤 User Login:  http://localhost:${PORT}/login.html`);
+    console.log(`🔑 Default Admin Credentials: admin@virtux.com / admin123`);
+    console.log(`==================================================\n`);
+  });
+}
+
+module.exports = app;
 
