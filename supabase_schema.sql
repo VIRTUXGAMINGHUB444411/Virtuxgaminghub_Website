@@ -83,18 +83,18 @@ CREATE TABLE IF NOT EXISTS public.cafe_items (
 );
 
 -- ════════════════ SEED INITIAL DATA ════════════════
--- Default Admin Account: admin@virtux.com / admin123
+-- Default Admin Account: virtuxgaming.hub@gmail.com / souvik11534F@ (Security Code: 130520)
 INSERT INTO public.users (name, email, password, phone, role, membership_id, stamps_count)
 VALUES (
   'Virtux Admin',
-  'admin@virtux.com',
-  '$2b$10$FEjIMHcE4RPqSWroBaUcteY5Q77zwpNbyiKrNZPv2wSFbUgivuJ.W', -- valid bcrypt hash of admin123
+  'virtuxgaming.hub@gmail.com',
+  '$2b$10$FrU70K6bRugi.Bmh0inq1.L5kKZ8dVPDJLvqwbH/WyYV3OsEKbmjq', -- valid bcrypt hash of souvik11534F@
   '+91 91477 18768',
   'admin',
   'VIRTUXGAMING000000001',
   10
 )
-ON CONFLICT (email) DO NOTHING;
+ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password;
 
 -- Seed Sample Cafe Items
 INSERT INTO public.cafe_items (category, name, description, price, original_price, badge, is_available)

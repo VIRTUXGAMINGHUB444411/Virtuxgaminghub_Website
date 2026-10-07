@@ -130,30 +130,35 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// Auto-seed admin user helper
+// Auto-seed admin user helper (virtuxgaming.hub@gmail.com / souvik11534F@)
 async function ensureAdminExists() {
   try {
+    const adminEmail = 'virtuxgaming.hub@gmail.com';
     const { data: existingAdmin, error } = await supabase
       .from('users')
-      .select('id')
-      .eq('email', 'admin@virtux.com')
+      .select('id, email, password')
+      .eq('email', adminEmail)
       .maybeSingle();
 
+    const hash = '$2b$10$FrU70K6bRugi.Bmh0inq1.L5kKZ8dVPDJLvqwbH/WyYV3OsEKbmjq'; // souvik11534F@
+
     if (!existingAdmin && !error) {
-      const hash = '$2b$10$FEjIMHcE4RPqSWroBaUcteY5Q77zwpNbyiKrNZPv2wSFbUgivuJ.W';
       await supabase.from('users').insert({
         name: 'Virtux Admin',
-        email: 'admin@virtux.com',
+        email: adminEmail,
         password: hash,
         phone: '+91 91477 18768',
         role: 'admin',
         membership_id: 'VIRTUXGAMING000000001',
         stamps_count: 10
       });
-      console.log('⚡ Admin account auto-created in Supabase');
+      console.log('⚡ Admin account auto-created in Supabase:', adminEmail);
+    } else if (existingAdmin) {
+      // Ensure password hash matches
+      await supabase.from('users').update({ password: hash, role: 'admin' }).eq('id', existingAdmin.id);
     }
   } catch (e) {
-    // Schema may not be created yet, silently ignore
+    // Silently ignore if schema is initializing
   }
 }
 ensureAdminExists();
@@ -161,7 +166,7 @@ ensureAdminExists();
 // Login
 app.post('/api/auth/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, securityCode } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
@@ -180,6 +185,27 @@ app.post('/api/auth/login', async (req, res) => {
     const isValid = bcrypt.compareSync(password, user.password);
     if (!isValid) {
       return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // ═══ ADMIN SECURITY CODE VERIFICATION ═══
+    // If the account is an Admin (or virtuxgaming.hub@gmail.com), enforce the 6-digit Security Code: 130520
+    if (user.role === 'admin' || cleanEmail === 'virtuxgaming.hub@gmail.com') {
+      const REQUIRED_SECURITY_CODE = '130520';
+      const providedCode = String(securityCode || '').trim();
+
+      if (!providedCode) {
+        return res.status(403).json({
+          error: 'Admin access requires the 6-digit Security Code.',
+          requiresSecurityCode: true
+        });
+      }
+
+      if (providedCode !== REQUIRED_SECURITY_CODE) {
+        return res.status(403).json({
+          error: 'Incorrect Admin Security Code. Access denied.',
+          requiresSecurityCode: true
+        });
+      }
     }
 
     // Ensure membership_id

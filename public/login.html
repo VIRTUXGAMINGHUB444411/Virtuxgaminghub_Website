@@ -209,6 +209,15 @@
           <input type="password" id="loginPassword" placeholder="••••••••" required />
         </div>
 
+        <!-- Admin Security Code field (Reveals for Admin login) -->
+        <div class="form-group" id="adminSecurityCodeGroup" style="display:none;background:rgba(0,212,255,0.06);border:1px dashed var(--cyan);padding:0.85rem;border-radius:var(--radius);margin-bottom:1rem;">
+          <label style="color:var(--cyan);font-weight:700;display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;margin-bottom:0.35rem;">
+            <span>🛡️</span> Admin Security Code (6 Digits)
+          </label>
+          <input type="password" id="loginSecurityCode" placeholder="Enter Security Code (130520)" maxlength="6" style="letter-spacing:4px;font-size:1.15rem;font-weight:700;text-align:center;" />
+          <small style="color:var(--gray-400);font-size:0.75rem;margin-top:0.35rem;display:block;">Required for Virtux Admin CMS access</small>
+        </div>
+
         <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;">
           <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;color:var(--gray-300);">
             <input type="checkbox" id="rememberMe" checked /> Remember Me
@@ -448,21 +457,46 @@
       }
     }
 
+    // Auto-detect admin email input to show Security Code field
+    document.addEventListener('DOMContentLoaded', () => {
+      checkExistingAuth();
+      const emailInput = document.getElementById('loginEmail');
+      const secGroup = document.getElementById('adminSecurityCodeGroup');
+      if (emailInput && secGroup) {
+        emailInput.addEventListener('input', () => {
+          const val = emailInput.value.toLowerCase().trim();
+          if (val === 'virtuxgaming.hub@gmail.com' || val.includes('admin@') || val.includes('admin')) {
+            secGroup.style.display = 'block';
+          } else {
+            // Keep visible if user already typed in security code
+            const secCode = document.getElementById('loginSecurityCode').value;
+            if (!secCode) secGroup.style.display = 'none';
+          }
+        });
+      }
+    });
+
     // Handle Login
     async function handleLogin(e) {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
+      const securityCode = document.getElementById('loginSecurityCode').value.trim();
+      const secGroup = document.getElementById('adminSecurityCodeGroup');
       hideAlert('loginAlert');
 
       try {
         const res = await apiFetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ email, password, securityCode })
         });
         const data = await res.json();
         if (!res.ok) {
+          if (data.requiresSecurityCode && secGroup) {
+            secGroup.style.display = 'block';
+            document.getElementById('loginSecurityCode').focus();
+          }
           showAlert('loginAlert', data.error || 'Login failed. Please check your credentials.', 'error');
           return;
         }
