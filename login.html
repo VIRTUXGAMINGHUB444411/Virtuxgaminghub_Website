@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account &amp; Login - Virtux Gaming Hub</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .auth-page {
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 30px rgba(0,212,255,0.08);
+      position: relative;
+    }
+    .auth-tabs {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    .auth-tab-btn {
+      flex: 1;
+      padding: 0.85rem;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--gray-400);
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .auth-tab-btn.active {
+      color: var(--cyan);
+      border-bottom-color: var(--cyan);
+      text-shadow: var(--glow-cyan);
+    }
+    .auth-form {
+      display: none;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .auth-form.active {
+      display: flex;
+    }
+    .account-dashboard {
+      display: none;
+    }
+    .account-dashboard.active {
+      display: block;
+    }
+    .profile-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .profile-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #000;
+      box-shadow: var(--glow-cyan);
+    }
+    .booking-item-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      transition: border-color var(--transition);
+    }
+    .booking-item-card:hover {
+      border-color: var(--cyan);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-pending { background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+    .status-confirmed { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
+    .status-completed { background: rgba(0,212,255,0.2); color: var(--cyan); border: 1px solid var(--cyan); }
+    .status-cancelled { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="Virtux Gaming Hub Logo" class="logo-img" />
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+        <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+        <li><a href="cafe.html" class="nav-link">Café</a></li>
+        <li><a href="gallery.html" class="nav-link">Gallery</a></li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+        <li><a href="feedback.html" class="nav-link">Feedback</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="contact.html" class="btn-primary" style="font-size:0.85rem;padding:0.45rem 1rem;">Book a Station</a>
+        <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Auth Content Section -->
+  <main class="auth-page">
+    <div class="container" style="display:flex;justify-content:center;">
+
+      <!-- Login / Register Card (shown when NOT logged in) -->
+      <div class="auth-card" id="authCard">
+        <div class="modal-logo" style="text-align: center; margin-bottom: 1.5rem;">
+          <img src="logo.png" alt="Virtux Gaming Hub" style="height: 58px; width: auto; object-fit: contain; margin: 0 auto; display: block;" />
+        </div>
+        <div class="auth-tabs">
+          <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">LOGIN</button>
+          <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">CREATE ACCOUNT</button>
+        </div>
+
+        <!-- Login Form -->
+        <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="loginEmail" placeholder="yourname@gmail.com" required />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" required />
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;">
+            <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;color:var(--gray-300);">
+              <input type="checkbox" id="rememberMe" checked /> Remember Me
+            </label>
+            <span style="color:var(--cyan);font-size:0.82rem;">Default Admin: admin@virtux.com / admin123</span>
+          </div>
+          <button type="submit" class="btn-primary" style="margin-top:0.5rem;width:100%;">Sign In</button>
+          <div id="loginError" style="color:#ef4444;font-size:0.85rem;display:none;text-align:center;"></div>
+        </form>
+
+        <!-- Register Form -->
+        <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="regName" placeholder="Gamer Tag or Name" required />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="regEmail" placeholder="gamer@gmail.com" required />
+          </div>
+          <div class="form-group">
+            <label>Phone Number (for booking verification)</label>
+            <input type="tel" id="regPhone" placeholder="+91 98765 43210" />
+          </div>
+          <div class="form-group">
+            <label>Create Password</label>
+            <input type="password" id="regPassword" placeholder="Minimum 6 characters" minlength="6" required />
+          </div>
+          <button type="submit" class="btn-primary" style="margin-top:0.5rem;width:100%;">Create Account</button>
+          <div id="regError" style="color:#ef4444;font-size:0.85rem;display:none;text-align:center;"></div>
+        </form>
+      </div>
+
+      <!-- Account Dashboard (shown when LOGGED IN) -->
+      <div class="auth-card account-dashboard" id="accountDashboard" style="max-width:700px;">
+        <div class="profile-header">
+          <div style="display:flex;align-items:center;gap:1.25rem;">
+            <div class="profile-avatar" id="userAvatar">V</div>
+            <div>
+              <h3 id="userName" style="margin-bottom:0.25rem;">Gamer</h3>
+              <p id="userEmail" style="color:var(--gray-400);font-size:0.88rem;margin:0;"></p>
+              <div id="userBadge" style="margin-top:0.35rem;"></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;align-items:flex-end;">
+            <button onclick="handleLogout()" class="btn-secondary" style="font-size:0.85rem;padding:0.4rem 0.9rem;">Sign Out</button>
+            <a href="admin.html" id="adminPanelLink" class="btn-primary" style="display:none;font-size:0.85rem;padding:0.4rem 0.9rem;">Open Admin Panel ⚙️</a>
+          </div>
+        </div>
+
+        <div style="margin-bottom:2rem;">
+          <h4 style="color:var(--cyan);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+            🎮 My Station Bookings &amp; Inquiries
+          </h4>
+          <div id="userBookingsList">
+            <p style="color:var(--gray-400);font-size:0.9rem;">Loading your bookings...</p>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <a href="contact.html" class="btn-primary" style="flex:1;text-align:center;">+ Book New Station</a>
+          <a href="feedback.html" class="btn-secondary" style="flex:1;text-align:center;">✍️ Leave Review</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <div class="container">
+        <p>© 2026 Virtux Gaming Hub. All rights reserved. Designed and developed by The WebDev team <a href="https://github.com/VIRTUXGAMINGHUB444411/Virtuxgaminghub_WebDev_Team/commit/493698b3b8d5cc5c1234457d4f94a9225dc14552" target="_blank" rel="noopener" style="color: var(--cyan); text-decoration: none; font-weight: 700;">VIRTUX GAMING HUB</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="script.js"></script>
+  <script>
+    function switchAuthTab(tab) {
+      const loginBtn = document.getElementById('tabLoginBtn');
+      const regBtn = document.getElementById('tabRegisterBtn');
+      const loginForm = document.getElementById('loginForm');
+      const regForm = document.getElementById('registerForm');
+
+      if (tab === 'login') {
+        loginBtn.classList.add('active');
+        regBtn.classList.remove('active');
+        loginForm.classList.add('active');
+        regForm.classList.remove('active');
+      } else {
+        regBtn.classList.add('active');
+        loginBtn.classList.remove('active');
+        regForm.classList.add('active');
+        loginForm.classList.remove('active');
+      }
+    }
+
+    const API_BASE = (window.location.protocol === 'file:' || (window.location.port && window.location.port !== '3000'))
+      ? 'http://localhost:3000'
+      : '';
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const errorDiv = document.getElementById('loginError');
+      errorDiv.style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errorDiv.textContent = data.error || 'Login failed';
+          errorDiv.style.display = 'block';
+          return;
+        }
+
+        localStorage.setItem('virtux_token', data.token);
+        localStorage.setItem('virtux_user', JSON.stringify(data.user));
+        showToast('🎮 Welcome back, ' + data.user.name + '!');
+
+        if (data.user.role === 'admin') {
+          setTimeout(() => { window.location.href = 'admin.html'; }, 800);
+        } else {
+          checkAuthState();
+        }
+      } catch (err) {
+        errorDiv.textContent = 'Server error. Please ensure the backend server is running.';
+        errorDiv.style.display = 'block';
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+      const phone = document.getElementById('regPhone').value;
+      const password = document.getElementById('regPassword').value;
+      const errorDiv = document.getElementById('regError');
+      errorDiv.style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, phone, password })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errorDiv.textContent = data.error || 'Registration failed';
+          errorDiv.style.display = 'block';
+          return;
+        }
+
+        localStorage.setItem('virtux_token', data.token);
+        localStorage.setItem('virtux_user', JSON.stringify(data.user));
+        showToast('🎉 Account created successfully! Welcome to Virtux!');
+        checkAuthState();
+      } catch (err) {
+        errorDiv.textContent = 'Server error. Please ensure the backend server is running.';
+        errorDiv.style.display = 'block';
+      }
+    }
+
+    async function checkAuthState() {
+      const token = localStorage.getItem('virtux_token');
+      const authCard = document.getElementById('authCard');
+      const accountDashboard = document.getElementById('accountDashboard');
+
+      if (!token) {
+        authCard.style.display = 'block';
+        accountDashboard.classList.remove('active');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/me`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) {
+          localStorage.removeItem('virtux_token');
+          localStorage.removeItem('virtux_user');
+          authCard.style.display = 'block';
+          accountDashboard.classList.remove('active');
+          return;
+        }
+
+        const data = await res.json();
+        authCard.style.display = 'none';
+        accountDashboard.classList.add('active');
+
+        document.getElementById('userName').textContent = data.user.name;
+        document.getElementById('userEmail').textContent = data.user.email + (data.user.phone ? ' · ' + data.user.phone : '');
+        document.getElementById('userAvatar').textContent = data.user.name.charAt(0).toUpperCase();
+
+        if (data.user.role === 'admin') {
+          document.getElementById('userBadge').innerHTML = '<span class="status-badge" style="background:rgba(0,212,255,0.2);color:var(--cyan);border:1px solid var(--cyan);">ADMINISTRATOR</span>';
+          document.getElementById('adminPanelLink').style.display = 'inline-block';
+        } else {
+          document.getElementById('userBadge').innerHTML = '<span class="status-badge status-completed">VERIFIED GAMER</span>';
+          document.getElementById('adminPanelLink').style.display = 'none';
+        }
+
+        // Render bookings
+        const bookingsList = document.getElementById('userBookingsList');
+        if (!data.bookings || data.bookings.length === 0) {
+          bookingsList.innerHTML = '<p style="color:var(--gray-400);font-size:0.9rem;">No bookings yet. <a href="contact.html" style="color:var(--cyan);">Book your first session!</a></p>';
+        } else {
+          bookingsList.innerHTML = data.bookings.map(b => `
+            <div class="booking-item-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+                <strong style="color:#fff;font-size:1rem;">${b.service}</strong>
+                <span class="status-badge status-${b.status}">${b.status}</span>
+              </div>
+              <p style="color:var(--gray-400);font-size:0.85rem;margin:0;">
+                📅 ${b.booking_date || 'Date not specified'} · ⏰ ${b.booking_time || 'Time not specified'} · 👥 ${b.guests} Person(s)
+              </p>
+              ${b.notes ? `<p style="color:var(--gray-300);font-size:0.82rem;margin-top:0.35rem;font-style:italic;">"${b.notes}"</p>` : ''}
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('virtux_token');
+      localStorage.removeItem('virtux_user');
+      showToast('Logged out successfully');
+      checkAuthState();
+    }
+
+    document.addEventListener('DOMContentLoaded', checkAuthState);
+  </script>
+</body>
+</html>
+

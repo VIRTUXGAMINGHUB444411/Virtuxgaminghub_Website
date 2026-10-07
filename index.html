@@ -1,0 +1,356 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Virtux Gaming Hub – Play. Eat. Chill.</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ═══════════════════════════ LOADING SCREEN ═══════════════════════════ -->
+<div id="loaderOverlay">
+  <div class="loader-bg-grid"></div>
+
+  <!-- Animated corner accents -->
+  <div class="loader-corner tl"></div>
+  <div class="loader-corner tr"></div>
+  <div class="loader-corner bl"></div>
+  <div class="loader-corner br"></div>
+
+  <div class="loader-content">
+    <!-- Logo with glow rings -->
+    <div class="loader-logo-wrap">
+      <div class="loader-ring ring-1"></div>
+      <div class="loader-ring ring-2"></div>
+      <div class="loader-ring ring-3"></div>
+      <div class="loader-logo-circle">
+        <img src="logo.png" alt="Virtux Gaming Hub" class="loader-logo" />
+      </div>
+    </div>
+
+    <!-- Tagline -->
+    <div class="loader-tagline">
+      <span class="tag-word" style="--i:0">PLAY</span>
+      <span class="tag-dot" style="--i:1">·</span>
+      <span class="tag-word" style="--i:2">EAT</span>
+      <span class="tag-dot" style="--i:3">·</span>
+      <span class="tag-word" style="--i:4">CHILL</span>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="loader-bar-track">
+      <div class="loader-bar-fill" id="loaderBar"></div>
+    </div>
+    <p class="loader-percent" id="loaderPercent">0%</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ PARTICLES BACKGROUND ═══════════════════════════ -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- ═══════════════════════════ NAVIGATION ═══════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">
+      <img src="logo.png" alt="Virtux Gaming Hub Logo" class="logo-img" />
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="nav-link active">Home</a></li>
+      <li><a href="about.html" class="nav-link">About</a></li>
+      <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+      <li><a href="cafe.html" class="nav-link">Café</a></li>
+      <li><a href="gallery.html" class="nav-link">Gallery</a></li>
+      <li><a href="contact.html" class="nav-link">Contact</a></li>
+      <li><a href="feedback.html" class="nav-link">Feedback</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn-login" onclick="openModal('customerLoginModal')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Login
+      </button>
+      <button class="btn-admin" onclick="openModal('adminLoginModal')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Admin
+      </button>
+      <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ HERO SECTION ═══════════════════════════ -->
+<section id="home" class="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">⚡ Ranaghat's first Premium Gaming Hub</div>
+    <h1 class="hero-title">
+      <span class="gradient-text">VIRTUX</span>
+      <br />Gaming Hub
+    </h1>
+    <p class="hero-subtitle">PLAY . EAT . CHILL</p>
+    <p class="hero-desc">Ranaghat's most immersive entertainment destination — featuring PlayStation 5 consoles, RTX liquid-cooled Gaming PCs, Logitech Motion Simulators, Movie Experience, Free wifi and a full-service Gourmet Café.</p>
+    <div class="hero-cta">
+      <a href="pricing.html" class="btn-primary">View Pricing Plans</a>
+      <a href="cafe.html" class="btn-outline">Explore Café Menu</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">10+</span><span class="stat-label">PS5 Stations</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">2+</span><span class="stat-label">Gaming PCs</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">200+</span><span class="stat-label">Active Gamers</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">4.8★</span><span class="stat-label">Rating</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ HUB PORTALS HIGHLIGHTS ═══════════════════════════ -->
+<section class="section about-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Explore The Hub</span>
+      <h2 class="section-title">What Awaits You at <span class="gradient-text">Virtux</span></h2>
+      <p class="section-desc">Click any category below to open its dedicated section with complete details and pricing.</p>
+    </div>
+
+    <div class="about-grid">
+      <!-- Portal 1: About -->
+      <div class="about-card" data-aos>
+        <div class="about-icon">⚡</div>
+        <h3>About Virtux</h3>
+        <p>Discover our story, mission, hygienic standards, esports community culture, and tournament infrastructure.</p>
+        <div style="margin-top: 1.5rem;">
+          <a href="about.html" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Learn More &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Portal 2: Pricing -->
+      <div class="about-card" data-aos style="border-color: rgba(0, 212, 255, 0.35);">
+        <div class="price-badge">Live Rates</div>
+        <div class="about-icon">💰</div>
+        <h3>Gaming &amp; Cinema Pricing</h3>
+        <p>Hourly sessions &amp; 30-day shareable hour packs for PS5, Extra Controllers, Gaming PCs, Cinema OTT screening, and Simulators.</p>
+        <div style="margin-top: 1.5rem;">
+          <a href="pricing.html" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">View Pricing &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Portal 3: Cafe -->
+      <div class="about-card" data-aos style="border-color: rgba(139, 0, 255, 0.35);">
+        <div class="price-badge" style="background: linear-gradient(135deg, #10b981, #059669);">Fresh Bites</div>
+        <div class="about-icon">☕</div>
+        <h3>Gamer Café Lounge</h3>
+        <p>Hot brews, cold energy boosters, loaded fries, burgers, milkshakes, artisan cake slices, and budget gamer combos.</p>
+        <div style="margin-top: 1.5rem;">
+          <a href="cafe.html" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">See Full Menu &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Portal 4: Gallery -->
+      <div class="about-card" data-aos>
+        <div class="about-icon">📸</div>
+        <h3>Arena Gallery</h3>
+        <p>Tour our glowing neon interior, console bays, PC pods, racing simulator cockpits, and private screening rooms.</p>
+        <div style="margin-top: 1.5rem;">
+          <a href="gallery.html" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Tour Arena &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Portal 5: Contact -->
+      <div class="about-card" data-aos>
+        <div class="about-icon">📍</div>
+        <h3>Contact &amp; Location</h3>
+        <p>Get directions to our Ranaghat hub, phone numbers, WhatsApp reservation line, and submit pre-booking inquiries.</p>
+        <div style="margin-top: 1.5rem;">
+          <a href="contact.html" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Find Location &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Portal 6: Feedback -->
+      <div class="about-card" data-aos>
+        <div class="about-icon">⭐</div>
+        <h3>Feedback &amp; Reviews</h3>
+        <p>Read verified reviews from regular gamers or drop your rating to share your experience with the community.</p>
+        <div style="margin-top: 1.5rem;">
+          <a href="feedback.html" class="btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Read Reviews &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ CALL TO ACTION BANNER ═══════════════════════════ -->
+<section class="section" style="padding: 4rem 0; background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(139, 0, 255, 0.08)); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="container" style="text-align: center;">
+    <h2 style="font-family: var(--font-heading); font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 1rem;">
+      Ready to Level Up Your Game?
+    </h2>
+    <p style="color: var(--gray-200); max-width: 600px; margin: 0 auto 2rem; font-size: 1.1rem;">
+      Drop in today or reserve your battle station in advance. Play hard, refuel at the café, and chill with your friends.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="contact.html" class="btn-primary">Reserve A Station Now</a>
+      <a href="pricing.html" class="btn-outline">Compare Pricing</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+<footer class="footer">
+  <div class="footer-top">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="logo.png" alt="Virtux Gaming Hub" class="footer-logo" />
+          <p>Ranaghat's #1 Premium Gaming Hub. Play, relax, and dominate in style.</p>
+          <div class="footer-social">
+            <a href="#" title="Instagram">📸</a>
+            <a href="#" title="YouTube">▶️</a>
+            <a href="#" title="Discord">💬</a>
+            <a href="#" title="Twitter">𝕏</a>
+          </div>
+        </div>
+        <div class="footer-links">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="cafe.html">Café Menu</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="feedback.html">Feedback</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h5>Gaming Services</h5>
+          <ul>
+            <li><a href="pricing.html">PS5 Gaming</a></li>
+            <li><a href="pricing.html">Gaming PC</a></li>
+            <li><a href="pricing.html">Movie Screening</a></li>
+            <li><a href="pricing.html">Racing Simulator</a></li>
+            <li><a href="about.html">Tournaments</a></li>
+            <li><a href="pricing.html">VIP Membership</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact-info">
+          <h5>Contact Us</h5>
+          <p>📍 Srimanta Kundu Lane , Nearby Brojoballav Mandir, Ghotokpara, Ranaghat, Nadia, West Bengal, Pin - 741201</p>
+          <p>📞 +91 91477 18768 / +91 62947 13465</p>
+          <p>📧 consumersupport.virtuxgaminghub@gmail.com</p>
+          <p>🕐 Open Daily: 10:00 am - 9:30 pm</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container">
+      <p>© 2026 Virtux Gaming Hub. All rights reserved. Designed and developed by The WebDev team <a href="https://github.com/VIRTUXGAMINGHUB444411/Virtuxgaminghub_WebDev_Team/commit/493698b3b8d5cc5c1234457d4f94a9225dc14552" target="_blank" rel="noopener" style="color: var(--cyan); text-decoration: none; font-weight: 700;">VIRTUX GAMING HUB</a></p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════ CUSTOMER LOGIN MODAL ═══════════════════════════ -->
+<div class="modal-overlay" id="customerLoginModal" onclick="closeModalOutside(event,'customerLoginModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('customerLoginModal')">✕</button>
+    <div class="modal-logo">
+      <img src="logo.png" alt="Virtux" />
+    </div>
+    <h2 class="modal-title">Player Login</h2>
+    <p class="modal-sub">Access your gaming profile & bookings</p>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchModalTab(this,'loginTab','customerLoginModal')">Login</button>
+      <button class="modal-tab" onclick="switchModalTab(this,'registerTab','customerLoginModal')">Register</button>
+    </div>
+    <div class="modal-tab-content active" id="loginTab">
+      <form onsubmit="handleLogin(event,'customer')">
+        <div class="form-group">
+          <label>Email / Username</label>
+          <input type="text" placeholder="your@email.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="••••••••" required />
+        </div>
+        <div class="form-check">
+          <label><input type="checkbox" /> Remember me</label>
+          <a href="#" class="forgot-link">Forgot Password?</a>
+        </div>
+        <button type="submit" class="btn-primary full-width">Login to Play 🎮</button>
+        <div class="divider"><span>or</span></div>
+        <button type="button" class="btn-social">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
+      </form>
+    </div>
+    <div class="modal-tab-content" id="registerTab">
+      <form onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="Your Name" required />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="your@email.com" required />
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" placeholder="+91 XXXXX XXXXX" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="Min 8 characters" required />
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn-primary full-width">Create Account 🚀</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ ADMIN LOGIN MODAL ═══════════════════════════ -->
+<div class="modal-overlay" id="adminLoginModal" onclick="closeModalOutside(event,'adminLoginModal')">
+  <div class="modal admin-modal">
+    <button class="modal-close" onclick="closeModal('adminLoginModal')">✕</button>
+    <div class="modal-logo">
+      <img src="logo.png" alt="Virtux" />
+    </div>
+    <h2 class="modal-title">Admin Access</h2>
+    <p class="modal-sub">🔒 Restricted — Authorized Personnel Only</p>
+    <form onsubmit="handleLogin(event,'admin')">
+      <div class="form-group">
+        <label>Admin ID</label>
+        <input type="text" placeholder="admin@virtux.com" value="admin@virtux.com" required />
+      </div>
+      <div class="form-group">
+        <label>Admin Password</label>
+        <input type="password" placeholder="••••••••" required />
+      </div>
+      <div class="form-group">
+        <label>Access Code</label>
+        <input type="text" placeholder="6-digit OTP (Optional)" maxlength="6" value="888888" />
+      </div>
+      <button type="submit" class="btn-admin-submit full-width">Access Dashboard 🔐</button>
+    </form>
+    <p class="admin-warning">⚠️ Unauthorized access attempts are logged and reported.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ TOAST NOTIFICATION ═══════════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
