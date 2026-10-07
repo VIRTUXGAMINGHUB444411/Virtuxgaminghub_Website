@@ -15,6 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static frontend files
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname)));
 
 // ════════════════ AUTH MIDDLEWARE ════════════════
@@ -462,6 +463,11 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
 
 // Fallback to index.html for unknown routes if needed
 app.get('/', (req, res) => {
+  const fs = require('fs');
+  const pubPath = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(pubPath)) {
+    return res.sendFile(pubPath);
+  }
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
