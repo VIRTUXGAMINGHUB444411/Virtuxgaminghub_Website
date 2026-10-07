@@ -54,18 +54,26 @@
       gap: 1.25rem;
     }
     .member-avatar {
-      width: 74px;
-      height: 74px;
+      width: 78px;
+      height: 78px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.25), #0a0e1a);
+      border: 2px solid var(--cyan);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: #000;
-      box-shadow: var(--glow-cyan);
+      box-shadow: 0 0 22px rgba(0, 212, 255, 0.45);
       flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .member-avatar img {
+      width: 82%;
+      height: 82%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
+      pointer-events: none;
+      user-select: none;
     }
     .member-id-box {
       background: rgba(0, 212, 255, 0.08);
@@ -362,7 +370,9 @@
         <li><a href="dashboard.html" class="nav-link active" style="color:var(--cyan);font-weight:700;">My Dashboard</a></li>
       </ul>
       <div class="nav-actions">
-        <button onclick="handleLogout()" class="btn-secondary" style="font-size:0.85rem;padding:0.45rem 1rem;">Sign Out</button>
+        <button onclick="handleLogout()" class="btn-secondary" style="font-size:0.85rem;padding:0.45rem 1.1rem;border-color:rgba(239,68,68,0.6);color:#fca5a5;background:rgba(239,68,68,0.12);font-weight:700;display:inline-flex;align-items:center;gap:0.4rem;cursor:pointer;">
+          🚪 Log Out
+        </button>
         <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
@@ -378,20 +388,28 @@
       <section class="member-card-wrapper" id="memberCardSection">
         <div class="member-top-row">
           <div class="member-info-group">
-            <div class="member-avatar" id="dashAvatar">V</div>
+            <div class="member-avatar" id="dashAvatar" title="Official Virtux Gaming Hub Avatar (Non-changeable)">
+              <img src="logo.png" alt="Virtux Gaming Hub Avatar" />
+            </div>
             <div>
-              <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
                 <h1 id="dashName" style="font-family:var(--font-heading);font-size:1.75rem;margin:0;">Loading...</h1>
                 <span id="dashRoleBadge" class="tier-badge" style="position:static;">MEMBER</span>
               </div>
-              <p id="dashEmail" style="color:var(--gray-300);font-size:0.95rem;margin:0.25rem 0 0.5rem;"></p>
-              <p id="dashPhone" style="color:var(--gray-400);font-size:0.85rem;margin:0;"></p>
+              <p id="dashEmail" style="color:var(--gray-300);font-size:0.95rem;margin:0.35rem 0 0.25rem;display:flex;align-items:center;gap:0.4rem;"></p>
+              <p id="dashPhone" style="color:var(--gray-400);font-size:0.88rem;margin:0;display:flex;align-items:center;gap:0.4rem;"></p>
+              <div style="margin-top:0.35rem;font-size:0.72rem;color:var(--cyan);text-transform:uppercase;letter-spacing:1px;font-weight:600;">
+                🛡️ Official Virtux Avatar Verified
+              </div>
             </div>
           </div>
 
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.75rem;">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:0.75rem;">
             <button onclick="toggleProfileEdit()" class="btn-secondary" style="font-size:0.85rem;padding:0.45rem 1rem;">
               ✏️ Edit Profile
+            </button>
+            <button onclick="handleLogout()" class="btn-secondary" style="font-size:0.85rem;padding:0.45rem 1rem;border-color:rgba(239,68,68,0.6);color:#fca5a5;background:rgba(239,68,68,0.12);font-weight:700;">
+              🚪 Log Out
             </button>
             <a href="admin.html" id="dashAdminLink" class="btn-primary" style="display:none;font-size:0.85rem;padding:0.45rem 1rem;">
               ⚙️ Open Admin CMS
@@ -622,11 +640,11 @@
         const data = await res.json();
         currentUser = data.user;
 
-        // Render User Header
+        // Render User Header (Name, Phone, Email - Avatar remains official Virtux logo)
         document.getElementById('dashName').textContent = currentUser.name;
-        document.getElementById('dashEmail').textContent = currentUser.email;
-        document.getElementById('dashPhone').textContent = currentUser.phone ? '📞 ' + currentUser.phone : '📞 No phone added';
-        document.getElementById('dashAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+        document.getElementById('dashEmail').innerHTML = '✉️ ' + currentUser.email;
+        document.getElementById('dashPhone').innerHTML = currentUser.phone ? '📞 ' + currentUser.phone : '📞 No mobile number added';
+        // Note: Avatar is permanently locked to Virtux Gaming Hub official logo image
 
         // Render Membership ID
         const memId = currentUser.membership_id || 'VIRTUXGAMING' + String(currentUser.id).padStart(9, '0');

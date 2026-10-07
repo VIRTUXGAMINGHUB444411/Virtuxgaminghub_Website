@@ -690,6 +690,30 @@ function updateNavAuth() {
         btn.style.color = 'var(--cyan)';
       });
     }
+
+    // Top Right Log Out Button in Navbar for all pages
+    const navActions = document.querySelector('.nav-actions');
+    if (navActions && !document.getElementById('globalNavLogoutBtn')) {
+      const logoutBtn = document.createElement('button');
+      logoutBtn.id = 'globalNavLogoutBtn';
+      logoutBtn.className = 'btn-secondary';
+      logoutBtn.style.cssText = 'font-size:0.82rem;padding:0.4rem 0.9rem;border-color:rgba(239,68,68,0.6);color:#fca5a5;background:rgba(239,68,68,0.12);font-weight:700;display:inline-flex;align-items:center;gap:0.35rem;cursor:pointer;margin-left:0.5rem;';
+      logoutBtn.innerHTML = '🚪 Log Out';
+      logoutBtn.title = 'Sign out of your Virtux account';
+      logoutBtn.onclick = (e) => {
+        e.preventDefault();
+        localStorage.removeItem('virtux_token');
+        localStorage.removeItem('virtux_user');
+        if (typeof showToast === 'function') showToast('Signed out successfully');
+        setTimeout(() => { window.location.href = 'login.html'; }, 300);
+      };
+      const hamburger = navActions.querySelector('.hamburger');
+      if (hamburger) {
+        navActions.insertBefore(logoutBtn, hamburger);
+      } else {
+        navActions.appendChild(logoutBtn);
+      }
+    }
   }
 }
 

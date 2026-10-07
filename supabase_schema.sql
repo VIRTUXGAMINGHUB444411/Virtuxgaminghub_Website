@@ -123,3 +123,4 @@ CREATE POLICY "Allow public all on feedback" ON public.feedback FOR ALL USING (t
 CREATE POLICY "Allow public all on bookings" ON public.bookings FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow public all on announcements" ON public.announcements FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow public all on cafe_items" ON public.cafe_items FOR ALL USING (true) WITH CHECK (true);
+
