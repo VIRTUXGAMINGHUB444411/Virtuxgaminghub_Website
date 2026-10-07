@@ -313,19 +313,36 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       .eq('email', cleanEmail)
       .maybeSingle();
 
-    // Trigger Supabase auth reset email
+    if (!user) {
+      return res.status(404).json({ error: 'No account registered with this email address' });
+    }
+
+    // Ensure user exists in Supabase Auth so resetPasswordForEmail can send email
     try {
-      await supabase.auth.resetPasswordForEmail(cleanEmail, {
-        redirectTo: `https://virtuxgaminghub-website.vercel.app/reset-password.html`
-      });
-    } catch (e) {
-      console.warn('Supabase resetPassword note:', e.message);
+      const { data: authUsers } = await supabase.auth.admin.listUsers();
+      const existingAuth = authUsers?.users?.find(u => u.email?.toLowerCase() === cleanEmail);
+      if (!existingAuth) {
+        await supabase.auth.admin.createUser({
+          email: cleanEmail,
+          password: 'temp_' + Math.random().toString(36).substring(2) + '!Virtux9',
+          email_confirm: true
+        });
+      }
+    } catch (adminErr) {
+      console.warn('Auth user sync note:', adminErr.message);
+    }
+
+    // Trigger Supabase auth reset email to their inbox
+    const { error: resetErr } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+      redirectTo: `https://virtuxgaminghub-website.vercel.app/reset-password.html`
+    });
+
+    if (resetErr) {
+      console.warn('Supabase resetPassword note:', resetErr.message);
     }
 
     res.json({
-      message: user
-        ? `Password recovery instructions have been sent to ${cleanEmail}. Check your inbox.`
-        : 'If an account is associated with this email, recovery instructions have been sent.'
+      message: `Password recovery email sent to ${cleanEmail}! Please check your inbox and spam folder.`
     });
   } catch (err) {
     console.error('Forgot password error:', err);
@@ -351,6 +368,15 @@ app.post('/api/auth/reset-password', async (req, res) => {
 
     const hashedPassword = bcrypt.hashSync(newPassword, 10);
     await supabase.from('users').update({ password: hashedPassword }).eq('id', user.id);
+
+    // Also sync password in Supabase Auth if user exists there
+    try {
+      const { data: authUsers } = await supabase.auth.admin.listUsers();
+      const authUser = authUsers?.users?.find(u => u.email?.toLowerCase() === cleanEmail);
+      if (authUser) {
+        await supabase.auth.admin.updateUserById(authUser.id, { password: newPassword });
+      }
+    } catch (e) {}
 
     res.json({ message: 'Password has been updated successfully! You can now sign in.' });
   } catch (err) {
