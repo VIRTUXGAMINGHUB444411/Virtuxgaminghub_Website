@@ -53,8 +53,14 @@ function authenticateToken(req, res, next) {
 
 function requireAdmin(req, res, next) {
   authenticateToken(req, res, () => {
-    if (req.user && req.user.role === 'admin') next();
-    else res.status(403).json({ error: 'Admin access required' });
+    if (req.user && req.user.role === 'admin') {
+      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+      next();
+    } else {
+      res.status(403).json({ error: 'Admin access required' });
+    }
   });
 }
 

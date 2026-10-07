@@ -169,6 +169,62 @@
       .admin-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; overflow-x: auto; }
       .admin-content { padding: 1.5rem; }
     }
+    .live-sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.3rem 0.75rem;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #10b981;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+    .live-sync-badge.syncing {
+      border-color: rgba(0, 212, 255, 0.5);
+      background: rgba(0, 212, 255, 0.15);
+      color: var(--cyan);
+    }
+    .live-sync-badge.error {
+      border-color: rgba(239, 68, 68, 0.5);
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulseLive 1.5s infinite;
+    }
+    @keyframes pulseLive {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .stat-num.updated {
+      animation: flashCyan 1s ease-out;
+    }
+    @keyframes flashCyan {
+      0% { color: #fff; transform: scale(1.15); text-shadow: 0 0 20px var(--cyan); }
+      100% { transform: scale(1); }
+    }
+    .auth-banner-alert {
+      display: none;
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.1));
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      color: #fca5a5;
+      padding: 0.85rem 1.25rem;
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -180,7 +236,14 @@
         <img src="logo.png" alt="Virtux Gaming Hub Logo" class="logo-img" />
         <span class="brand-text">VIRTUX <span class="brand-sub">ADMIN CMS</span></span>
       </a>
-      <div style="display:flex;align-items:center;gap:1rem;">
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+        <div id="liveSyncBadge" class="live-sync-badge" title="Live data synchronization status">
+          <span class="live-dot"></span>
+          <span id="liveSyncText">LIVE SYNC</span>
+        </div>
+        <button onclick="triggerManualSync()" class="btn-secondary" style="font-size:0.82rem;padding:0.4rem 0.85rem;display:inline-flex;align-items:center;gap:0.35rem;" title="Force immediate database refresh">
+          <span id="overviewSyncIcon">🔄</span> <span>Sync Now</span>
+        </button>
         <span style="color:var(--gray-300);font-size:0.9rem;" id="adminWelcome">Admin</span>
         <a href="index.html" class="btn-secondary" style="font-size:0.82rem;padding:0.4rem 0.85rem;" target="_blank">View Live Website ↗</a>
         <button onclick="adminLogout()" class="btn-primary" style="font-size:0.82rem;padding:0.4rem 0.85rem;">Logout</button>
@@ -218,10 +281,25 @@
     <!-- Main Content Panel -->
     <main class="admin-content">
 
+      <!-- Auth Expired Banner -->
+      <div id="authBannerAlert" class="auth-banner-alert">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <span style="font-size:1.4rem;">⚠️</span>
+          <div>
+            <strong style="color:#fff;">Admin Session Expired or Not Logged In</strong>
+            <div style="font-size:0.85rem;">Please log in with your admin credentials to load live statistics and database records.</div>
+          </div>
+        </div>
+        <a href="login.html" class="btn-primary" style="font-size:0.85rem;padding:0.4rem 0.9rem;white-space:nowrap;">Log In Now 🔐</a>
+      </div>
+
       <!-- ══════════ VIEW 1: OVERVIEW ══════════ -->
       <section class="admin-view active" id="view-overview">
-        <h2 style="font-family:var(--font-heading);margin-bottom:0.5rem;">Dashboard <span class="gradient-text">Overview</span></h2>
-        <p style="color:var(--gray-400);margin-bottom:2rem;">Welcome to the Virtux Gaming Hub Content Management System.</p>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;gap:0.5rem;">
+          <h2 style="font-family:var(--font-heading);margin:0;">Dashboard <span class="gradient-text">Overview</span></h2>
+          <span id="lastSyncLabel" style="font-size:0.8rem;color:var(--gray-400);">Live Supabase sync • <span id="lastSyncTime">Auto-refreshing</span></span>
+        </div>
+        <p style="color:var(--gray-400);margin-bottom:2rem;">Welcome to the Virtux Gaming Hub Content Management System. Live-synced with database.</p>
 
         <div class="stat-cards-grid">
           <div class="stat-box">
@@ -541,21 +619,82 @@
     const API_BASE = window.location.hostname.includes('vercel.app')
       ? ''
       : (window.location.port === '3000' ? 'http://localhost:3000' : LIVE_BACKEND);
-    const token = localStorage.getItem('virtux_token');
-    const user = JSON.parse(localStorage.getItem('virtux_user') || 'null');
 
-    // Security check: must be logged in as admin
+    let token = localStorage.getItem('virtux_token');
+    let user = null;
+    try {
+      user = JSON.parse(localStorage.getItem('virtux_user') || 'null');
+    } catch (e) {
+      user = null;
+    }
+
+    // Security check: verify admin role in localStorage
     if (!token || !user || user.role !== 'admin') {
-      window.location.href = 'login.html';
+      const banner = document.getElementById('authBannerAlert');
+      if (banner) banner.style.display = 'flex';
+      setTimeout(() => { window.location.href = 'login.html'; }, 2000);
     } else {
-      document.getElementById('adminWelcome').textContent = 'Admin: ' + user.name;
+      const welcome = document.getElementById('adminWelcome');
+      if (welcome) welcome.textContent = 'Admin: ' + (user.name || user.email || 'Root');
     }
 
     function authHeader() {
       return {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Authorization': 'Bearer ' + (token || '')
       };
+    }
+
+    function handleAuthError() {
+      const banner = document.getElementById('authBannerAlert');
+      if (banner) banner.style.display = 'flex';
+      updateLiveSyncBadge('error');
+    }
+
+    // Smart Admin Fetch with fallback and aggressive cache-busting
+    async function adminFetch(endpoint, options = {}) {
+      token = localStorage.getItem('virtux_token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Authorization': 'Bearer ' + (token || '')
+      };
+
+      const mergedOptions = {
+        ...options,
+        headers: { ...headers, ...(options.headers || {}) }
+      };
+
+      const candidates = [];
+      if (window.location.hostname.includes('vercel.app') || window.location.port === '3000') {
+        candidates.push(endpoint);
+      }
+      candidates.push(LIVE_BACKEND + endpoint);
+      candidates.push('http://localhost:3000' + endpoint);
+      if (!candidates.includes(endpoint)) candidates.push(endpoint);
+
+      let lastError = null;
+      for (const url of candidates) {
+        try {
+          // Add timestamp cache buster query parameter for GET requests
+          const separator = url.includes('?') ? '&' : '?';
+          const fetchUrl = (options.method && options.method !== 'GET') ? url : (url + separator + '_t=' + Date.now());
+          const res = await fetch(fetchUrl, mergedOptions);
+          if (res.status === 401 || res.status === 403) {
+            handleAuthError();
+            return res;
+          }
+          if (res.ok) return res;
+        } catch (err) {
+          lastError = err;
+        }
+      }
+      throw lastError || new Error('Network error');
     }
 
     function adminLogout() {
@@ -564,53 +703,98 @@
       window.location.href = 'login.html';
     }
 
+    let currentTab = 'overview';
     function switchAdminTab(viewId, btn) {
+      currentTab = viewId;
       document.querySelectorAll('.admin-nav-item').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.admin-view').forEach(v => v.classList.remove('active'));
       btn.classList.add('active');
-      document.getElementById('view-' + viewId).classList.add('active');
+      const targetView = document.getElementById('view-' + viewId);
+      if (targetView) targetView.classList.add('active');
 
-      if (viewId === 'overview') loadOverviewStats();
-      if (viewId === 'feedback') loadFeedback();
-      if (viewId === 'bookings') loadBookings();
-      if (viewId === 'cafe') loadCafe();
-      if (viewId === 'announcements') loadAnnouncements();
-      if (viewId === 'stamps') loadStamps();
-      if (viewId === 'users') loadUsers();
+      // Trigger immediate load
+      if (viewId === 'overview') loadOverviewStats(false);
+      else if (viewId === 'feedback') loadFeedback(false);
+      else if (viewId === 'bookings') loadBookings(false);
+      else if (viewId === 'cafe') loadCafe(false);
+      else if (viewId === 'announcements') loadAnnouncements(false);
+      else if (viewId === 'stamps') loadStamps(false);
+      else if (viewId === 'users') loadUsers(false);
+    }
+
+    function updateStat(id, newVal) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const currentVal = el.textContent.trim();
+      const nextVal = String(newVal !== undefined && newVal !== null ? newVal : 0);
+      if (currentVal !== nextVal) {
+        el.textContent = nextVal;
+        el.classList.remove('updated');
+        void el.offsetWidth;
+        el.classList.add('updated');
+      }
+    }
+
+    function updateLiveSyncBadge(state) {
+      const badge = document.getElementById('liveSyncBadge');
+      const text = document.getElementById('liveSyncText');
+      if (!badge || !text) return;
+      if (state === 'active') {
+        badge.className = 'live-sync-badge';
+        text.textContent = 'LIVE SYNC';
+      } else if (state === 'syncing') {
+        badge.className = 'live-sync-badge syncing';
+        text.textContent = 'SYNCING...';
+      } else if (state === 'error') {
+        badge.className = 'live-sync-badge error';
+        text.textContent = 'OFFLINE / RE-LOGIN';
+      }
+    }
+
+    function updateSyncTime() {
+      const el = document.getElementById('lastSyncTime');
+      if (el) {
+        const now = new Date();
+        el.textContent = 'Updated ' + now.toLocaleTimeString();
+      }
     }
 
     // ══════════ OVERVIEW ══════════
-    async function loadOverviewStats() {
+    async function loadOverviewStats(silent = false) {
       try {
-        const res = await fetch(API_BASE + '/api/admin/stats', { headers: authHeader() });
-        if (res.ok) {
+        const res = await adminFetch('/api/admin/stats');
+        if (res && res.ok) {
           const stats = await res.json();
-          document.getElementById('statUsers').textContent = stats.totalUsers;
-          document.getElementById('statBookings').textContent = stats.pendingBookings;
-          document.getElementById('statFeedback').textContent = stats.totalFeedback;
-          document.getElementById('statCafe').textContent = stats.totalCafeItems;
+          updateStat('statUsers', stats.totalUsers);
+          updateStat('statBookings', stats.pendingBookings);
+          updateStat('statFeedback', stats.totalFeedback);
+          updateStat('statCafe', stats.totalCafeItems);
+          updateSyncTime();
         }
-      } catch (e) { console.error(e); }
+      } catch (e) {
+        if (!silent) console.error('Stats fetch error:', e);
+      }
     }
 
     // ══════════ FEEDBACK ══════════
-    async function loadFeedback() {
+    async function loadFeedback(silent = false) {
       const tbody = document.getElementById('feedbackTableBody');
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Loading...</td></tr>';
+      if (!silent) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Loading feedback...</td></tr>';
       try {
-        const res = await fetch(API_BASE + '/api/admin/feedback', { headers: authHeader() });
+        const res = await adminFetch('/api/admin/feedback');
+        if (!res.ok) return;
         const list = await res.json();
         if (list.length === 0) {
           tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray-400);">No feedback submitted yet.</td></tr>';
           return;
         }
-        tbody.innerHTML = list.map(item => `
+        const html = list.map(item => `
           <tr>
             <td><strong>${item.name}</strong><br><span style="font-size:0.8rem;color:var(--gray-400);">${item.email || 'No email'}</span></td>
-            <td>${'⭐'.repeat(item.rating)}</td>
-            <td><span style="font-size:0.85rem;color:var(--cyan);">${item.service}</span></td>
+            <td>${'⭐'.repeat(item.rating || 5)}</td>
+            <td><span style="font-size:0.85rem;color:var(--cyan);">${item.service || 'General'}</span></td>
             <td style="max-width:300px;font-size:0.88rem;">${item.comment}</td>
-            <td style="font-size:0.8rem;color:var(--gray-400);">${item.created_at ? item.created_at.split(' ')[0] : ''}</td>
+            <td style="font-size:0.8rem;color:var(--gray-400);">${item.created_at ? item.created_at.split('T')[0] : ''}</td>
             <td>
               <button onclick="toggleFeatureFeedback(${item.id})" class="action-btn btn-feature">
                 ${item.is_featured ? '⭐ Featured' : '☆ Standard'}
@@ -621,46 +805,48 @@
             </td>
           </tr>
         `).join('');
+        if (tbody.innerHTML !== html) tbody.innerHTML = html;
       } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#ef4444;">Error loading feedback</td></tr>';
+        if (!silent) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#ef4444;">Error loading feedback</td></tr>';
       }
     }
 
     async function toggleFeatureFeedback(id) {
-      const res = await fetch(API_BASE + '/api/admin/feedback/' + id + '/feature', { method: 'PUT', headers: authHeader() });
-      if (res.ok) {
+      const res = await adminFetch('/api/admin/feedback/' + id + '/feature', { method: 'PUT' });
+      if (res && res.ok) {
         showToast('Updated featured status');
-        loadFeedback();
+        loadFeedback(false);
       }
     }
 
     async function deleteFeedback(id) {
       if (!confirm('Are you sure you want to delete this feedback review?')) return;
-      const res = await fetch(API_BASE + '/api/admin/feedback/' + id, { method: 'DELETE', headers: authHeader() });
-      if (res.ok) {
+      const res = await adminFetch('/api/admin/feedback/' + id, { method: 'DELETE' });
+      if (res && res.ok) {
         showToast('Feedback deleted');
-        loadFeedback();
+        loadFeedback(false);
       }
     }
 
     // ══════════ BOOKINGS ══════════
-    async function loadBookings() {
+    async function loadBookings(silent = false) {
       const tbody = document.getElementById('bookingsTableBody');
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Loading...</td></tr>';
+      if (!silent) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Loading bookings...</td></tr>';
       try {
-        const res = await fetch(API_BASE + '/api/admin/bookings', { headers: authHeader() });
+        const res = await adminFetch('/api/admin/bookings');
+        if (!res.ok) return;
         const list = await res.json();
         if (list.length === 0) {
           tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--gray-400);">No bookings yet.</td></tr>';
           return;
         }
-        tbody.innerHTML = list.map(b => `
+        const html = list.map(b => `
           <tr>
             <td><strong>${b.name}</strong></td>
             <td><a href="tel:${b.phone}" style="color:var(--cyan);text-decoration:none;font-weight:600;">${b.phone}</a></td>
             <td>${b.service}</td>
             <td style="font-size:0.85rem;">📅 ${b.booking_date || 'N/A'}<br>⏰ ${b.booking_time || 'N/A'}</td>
-            <td>${b.guests}</td>
+            <td>${b.guests || 1}</td>
             <td style="font-size:0.85rem;max-width:180px;">${b.notes || '-'}</td>
             <td>
               <select onchange="updateBookingStatus(${b.id}, this.value)" class="status-select">
@@ -675,41 +861,42 @@
             </td>
           </tr>
         `).join('');
+        if (tbody.innerHTML !== html) tbody.innerHTML = html;
       } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#ef4444;">Error loading bookings</td></tr>';
+        if (!silent) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#ef4444;">Error loading bookings</td></tr>';
       }
     }
 
     async function updateBookingStatus(id, status) {
-      const res = await fetch(API_BASE + '/api/admin/bookings/' + id + '/status', {
+      const res = await adminFetch('/api/admin/bookings/' + id + '/status', {
         method: 'PUT',
-        headers: authHeader(),
         body: JSON.stringify({ status })
       });
-      if (res.ok) showToast('Booking status updated to ' + status);
+      if (res && res.ok) showToast('Booking status updated to ' + status);
     }
 
     async function deleteBooking(id) {
       if (!confirm('Are you sure you want to delete this reservation?')) return;
-      const res = await fetch(API_BASE + '/api/admin/bookings/' + id, { method: 'DELETE', headers: authHeader() });
-      if (res.ok) {
+      const res = await adminFetch('/api/admin/bookings/' + id, { method: 'DELETE' });
+      if (res && res.ok) {
         showToast('Booking deleted');
-        loadBookings();
+        loadBookings(false);
       }
     }
 
     // ══════════ CAFE CMS ══════════
-    async function loadCafe() {
+    async function loadCafe(silent = false) {
       const tbody = document.getElementById('cafeTableBody');
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Loading...</td></tr>';
+      if (!silent) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Loading menu items...</td></tr>';
       try {
-        const res = await fetch(API_BASE + '/api/admin/cafe', { headers: authHeader() });
+        const res = await adminFetch('/api/admin/cafe');
+        if (!res.ok) return;
         const list = await res.json();
         if (list.length === 0) {
           tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--gray-400);">No menu items added.</td></tr>';
           return;
         }
-        tbody.innerHTML = list.map(item => `
+        const html = list.map(item => `
           <tr>
             <td><span class="status-badge status-completed">${item.category}</span></td>
             <td><strong>${item.name}</strong></td>
@@ -724,8 +911,9 @@
             </td>
           </tr>
         `).join('');
+        if (tbody.innerHTML !== html) tbody.innerHTML = html;
       } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#ef4444;">Error loading menu items</td></tr>';
+        if (!silent) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#ef4444;">Error loading menu items</td></tr>';
       }
     }
 
@@ -773,12 +961,12 @@
       const url = id ? '/api/admin/cafe/' + id : '/api/admin/cafe';
       const method = id ? 'PUT' : 'POST';
 
-      const res = await fetch(url, { method, headers: authHeader(), body: JSON.stringify(payload) });
-      if (res.ok) {
+      const res = await adminFetch(url, { method, body: JSON.stringify(payload) });
+      if (res && res.ok) {
         showToast('Menu item saved successfully!');
         closeCafeModal();
-        loadCafe();
-        loadOverviewStats();
+        loadCafe(false);
+        loadOverviewStats(true);
       } else {
         showToast('Error saving item');
       }
@@ -786,26 +974,27 @@
 
     async function deleteCafeItem(id) {
       if (!confirm('Are you sure you want to delete this menu item?')) return;
-      const res = await fetch(API_BASE + '/api/admin/cafe/' + id, { method: 'DELETE', headers: authHeader() });
-      if (res.ok) {
+      const res = await adminFetch('/api/admin/cafe/' + id, { method: 'DELETE' });
+      if (res && res.ok) {
         showToast('Menu item deleted');
-        loadCafe();
-        loadOverviewStats();
+        loadCafe(false);
+        loadOverviewStats(true);
       }
     }
 
     // ══════════ ANNOUNCEMENTS CMS ══════════
-    async function loadAnnouncements() {
+    async function loadAnnouncements(silent = false) {
       const tbody = document.getElementById('announcementsTableBody');
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
+      if (!silent) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
       try {
-        const res = await fetch(API_BASE + '/api/admin/announcements', { headers: authHeader() });
+        const res = await adminFetch('/api/admin/announcements');
+        if (!res.ok) return;
         const list = await res.json();
         if (list.length === 0) {
           tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray-400);">No banners published yet.</td></tr>';
           return;
         }
-        tbody.innerHTML = list.map(item => `
+        const html = list.map(item => `
           <tr>
             <td><span class="status-badge" style="background:rgba(245,158,11,0.2);color:#f59e0b;border:1px solid #f59e0b;">${item.badge}</span></td>
             <td><strong>${item.title}</strong></td>
@@ -817,8 +1006,9 @@
             </td>
           </tr>
         `).join('');
+        if (tbody.innerHTML !== html) tbody.innerHTML = html;
       } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;">Error loading banners</td></tr>';
+        if (!silent) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;">Error loading banners</td></tr>';
       }
     }
 
@@ -844,39 +1034,39 @@
         link: document.getElementById('annLink').value,
         is_active: 1
       };
-      const res = await fetch(API_BASE + '/api/admin/announcements', {
+      const res = await adminFetch('/api/admin/announcements', {
         method: 'POST',
-        headers: authHeader(),
         body: JSON.stringify(payload)
       });
-      if (res.ok) {
+      if (res && res.ok) {
         showToast('Banner published live to the website!');
         closeAnnouncementModal();
-        loadAnnouncements();
+        loadAnnouncements(false);
       }
     }
 
     async function deleteAnnouncement(id) {
       if (!confirm('Are you sure you want to delete this live banner?')) return;
-      const res = await fetch(API_BASE + '/api/admin/announcements/' + id, { method: 'DELETE', headers: authHeader() });
-      if (res.ok) {
+      const res = await adminFetch('/api/admin/announcements/' + id, { method: 'DELETE' });
+      if (res && res.ok) {
         showToast('Banner deleted');
-        loadAnnouncements();
+        loadAnnouncements(false);
       }
     }
 
     // ══════════ LOYALTY & STAMPS ══════════
-    async function loadStamps() {
+    async function loadStamps(silent = false) {
       const tbody = document.getElementById('stampsTableBody');
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading stamp requests...</td></tr>';
+      if (!silent) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading stamp requests...</td></tr>';
       try {
-        const res = await fetch(API_BASE + '/api/admin/stamps', { headers: authHeader() });
+        const res = await adminFetch('/api/admin/stamps');
+        if (!res.ok) return;
         const list = await res.json();
         if (!list || list.length === 0) {
           tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray-400);">No stamp requests found.</td></tr>';
           return;
         }
-        tbody.innerHTML = list.map(s => `
+        const html = list.map(s => `
           <tr>
             <td>
               <strong>${s.user_name}</strong>
@@ -898,20 +1088,18 @@
             </td>
           </tr>
         `).join('');
+        if (tbody.innerHTML !== html) tbody.innerHTML = html;
       } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;">Error loading stamp requests</td></tr>';
+        if (!silent) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;">Error loading stamp requests</td></tr>';
       }
     }
 
     async function approveStamp(id) {
       try {
-        const res = await fetch(API_BASE + '/api/admin/stamps/approve/' + id, {
-          method: 'POST',
-          headers: authHeader()
-        });
+        const res = await adminFetch('/api/admin/stamps/approve/' + id, { method: 'POST' });
         const data = await res.json();
         showToast(data.message || 'Stamp approved!');
-        loadStamps();
+        loadStamps(false);
       } catch (e) {
         showToast('Error approving stamp');
       }
@@ -920,13 +1108,10 @@
     async function rejectStamp(id) {
       if (!confirm('Reject this stamp request?')) return;
       try {
-        const res = await fetch(API_BASE + '/api/admin/stamps/reject/' + id, {
-          method: 'POST',
-          headers: authHeader()
-        });
+        const res = await adminFetch('/api/admin/stamps/reject/' + id, { method: 'POST' });
         const data = await res.json();
         showToast(data.message || 'Stamp request rejected');
-        loadStamps();
+        loadStamps(false);
       } catch (e) {
         showToast('Error rejecting stamp');
       }
@@ -937,9 +1122,8 @@
       const identifier = document.getElementById('manualStampIdentifier').value;
       const action = document.getElementById('manualStampAction').value;
       try {
-        const res = await fetch(API_BASE + '/api/admin/stamps/adjust', {
+        const res = await adminFetch('/api/admin/stamps/adjust', {
           method: 'POST',
-          headers: { ...authHeader(), 'Content-Type': 'application/json' },
           body: JSON.stringify({ identifier, action })
         });
         const data = await res.json();
@@ -949,8 +1133,8 @@
         }
         showToast('✅ ' + data.message);
         document.getElementById('manualStampIdentifier').value = '';
-        loadUsers();
-        loadStamps();
+        loadUsers(false);
+        loadStamps(false);
       } catch (err) {
         showToast('Error updating stamps');
       }
@@ -958,14 +1142,13 @@
 
     async function quickAddStamp(userId) {
       try {
-        const res = await fetch(API_BASE + '/api/admin/stamps/adjust', {
+        const res = await adminFetch('/api/admin/stamps/adjust', {
           method: 'POST',
-          headers: { ...authHeader(), 'Content-Type': 'application/json' },
           body: JSON.stringify({ identifier: userId, action: 'add' })
         });
         const data = await res.json();
         showToast(data.message || 'Stamp added!');
-        loadUsers();
+        loadUsers(false);
       } catch (e) {
         showToast('Error adding stamp');
       }
@@ -974,27 +1157,31 @@
     async function quickResetStamp(userId) {
       if (!confirm('Reset this user stamps to 0 (after surprise reward claim)?')) return;
       try {
-        const res = await fetch(API_BASE + '/api/admin/stamps/adjust', {
+        const res = await adminFetch('/api/admin/stamps/adjust', {
           method: 'POST',
-          headers: { ...authHeader(), 'Content-Type': 'application/json' },
           body: JSON.stringify({ identifier: userId, action: 'reset' })
         });
         const data = await res.json();
         showToast(data.message || 'Stamps reset');
-        loadUsers();
+        loadUsers(false);
       } catch (e) {
         showToast('Error resetting stamps');
       }
     }
 
     // ══════════ USERS ══════════
-    async function loadUsers() {
+    async function loadUsers(silent = false) {
       const tbody = document.getElementById('usersTableBody');
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Loading...</td></tr>';
+      if (!silent) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Loading users...</td></tr>';
       try {
-        const res = await fetch(API_BASE + '/api/admin/users', { headers: authHeader() });
+        const res = await adminFetch('/api/admin/users');
+        if (!res.ok) return;
         const list = await res.json();
-        tbody.innerHTML = list.map(u => `
+        if (!list || list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray-400);">No registered users yet.</td></tr>';
+          return;
+        }
+        const html = list.map(u => `
           <tr>
             <td><strong>${u.name}</strong></td>
             <td><code style="color:var(--cyan);font-weight:700;">${u.membership_id}</code></td>
@@ -1012,13 +1199,75 @@
             </td>
           </tr>
         `).join('');
+        if (tbody.innerHTML !== html) tbody.innerHTML = html;
       } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#ef4444;">Error loading users</td></tr>';
+        if (!silent) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#ef4444;">Error loading users</td></tr>';
       }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      loadOverviewStats();
+    // ══════════ REAL-TIME LIVE SYNC ENGINE ══════════
+    let isSyncing = false;
+    let liveSyncTimer = null;
+
+    async function runLiveSync() {
+      if (isSyncing) return;
+      isSyncing = true;
+      try {
+        // Always refresh overview stats silently
+        await loadOverviewStats(true);
+
+        // Refresh whichever tab is active
+        if (currentTab === 'feedback') await loadFeedback(true);
+        else if (currentTab === 'bookings') await loadBookings(true);
+        else if (currentTab === 'cafe') await loadCafe(true);
+        else if (currentTab === 'announcements') await loadAnnouncements(true);
+        else if (currentTab === 'stamps') await loadStamps(true);
+        else if (currentTab === 'users') await loadUsers(true);
+
+        updateLiveSyncBadge('active');
+      } catch (err) {
+        updateLiveSyncBadge('error');
+      } finally {
+        isSyncing = false;
+      }
+    }
+
+    function startLivePolling() {
+      if (liveSyncTimer) clearInterval(liveSyncTimer);
+      // Run immediately
+      runLiveSync();
+      // Poll every 3.5 seconds
+      liveSyncTimer = setInterval(runLiveSync, 3500);
+    }
+
+    async function triggerManualSync() {
+      const icon = document.getElementById('overviewSyncIcon');
+      if (icon) icon.style.animation = 'spin 0.6s linear';
+      updateLiveSyncBadge('syncing');
+      showToast('⚡ Syncing latest database data...');
+      await runLiveSync();
+      setTimeout(() => {
+        if (icon) icon.style.animation = '';
+        showToast('✅ Live database sync complete');
+      }, 500);
+    }
+
+    // Immediate Boot: works whether DOMContentLoaded has fired or not
+    function bootAdminPanel() {
+      loadOverviewStats(false);
+      startLivePolling();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootAdminPanel);
+    } else {
+      bootAdminPanel();
+    }
+
+    // Instant Resync when user refocuses or opens tab
+    window.addEventListener('focus', () => { runLiveSync(); });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) runLiveSync();
     });
   </script>
 </body>
