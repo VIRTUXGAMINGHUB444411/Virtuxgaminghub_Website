@@ -316,7 +316,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     // Trigger Supabase auth reset email
     try {
       await supabase.auth.resetPasswordForEmail(cleanEmail, {
-        redirectTo: `https://virtuxgaminghub-website.vercel.app/login.html`
+        redirectTo: `https://virtuxgaminghub-website.vercel.app/reset-password.html`
       });
     } catch (e) {
       console.warn('Supabase resetPassword note:', e.message);
