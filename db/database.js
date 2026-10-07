@@ -11,16 +11,19 @@ function generateMembershipId(serialNumber) {
 
 let db;
 
-try {
-  const Database = require('better-sqlite3');
-  db = new Database(dbPath);
-  if (!isVercel) {
-    try { db.pragma('journal_mode = WAL'); } catch (e) {}
-  }
-  try { db.pragma('foreign_keys = ON'); } catch (e) {}
-} catch (err) {
-  console.warn('⚠️ better-sqlite3 native binary could not be loaded; using in-memory store for serverless:', err.message);
+if (isVercel) {
+  // On Vercel serverless, skip native C++ binary to guarantee 0 crash rate
   db = createInMemoryStore();
+} else {
+  try {
+    const Database = require('better-sqlite3');
+    db = new Database(dbPath);
+    try { db.pragma('journal_mode = WAL'); } catch (e) {}
+    try { db.pragma('foreign_keys = ON'); } catch (e) {}
+  } catch (err) {
+    console.warn('⚠️ better-sqlite3 native binary could not be loaded; using in-memory store:', err.message);
+    db = createInMemoryStore();
+  }
 }
 
 function createInMemoryStore() {

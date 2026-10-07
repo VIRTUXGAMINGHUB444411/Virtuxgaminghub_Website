@@ -29,22 +29,24 @@
     }
     .auth-tabs {
       display: flex;
-      gap: 1rem;
+      gap: 0.5rem;
       border-bottom: 1px solid var(--border);
       margin-bottom: 2rem;
     }
     .auth-tab-btn {
       flex: 1;
-      padding: 0.85rem;
+      padding: 0.85rem 0.5rem;
       background: transparent;
       border: none;
       border-bottom: 2px solid transparent;
       color: var(--gray-400);
       font-family: var(--font-heading);
-      font-size: 1.05rem;
+      font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
       transition: all var(--transition);
+      text-align: center;
+      white-space: nowrap;
     }
     .auth-tab-btn.active {
       color: var(--cyan);
@@ -118,7 +120,27 @@
       padding: 2rem;
       position: relative;
     }
+    .auth-alert {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      display: none;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .auth-alert.error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+    }
+    .auth-alert.success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+      color: #6ee7b7;
+    }
   </style>
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -139,88 +161,164 @@
         <li><a href="login.html" class="nav-link active">Sign In</a></li>
       </ul>
       <div class="nav-actions">
-        <a href="contact.html" class="btn-primary" style="font-size:0.85rem;padding:0.45rem 1rem;">Book a Station</a>
-        <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
+        <a href="dashboard.html" class="btn-primary" style="padding:0.4rem 0.9rem;font-size:0.85rem;">My Dashboard</a>
       </div>
     </div>
   </nav>
 
-  <!-- Auth Content Section -->
+  <!-- Main Auth Page Content -->
   <main class="auth-page">
-    <div class="container" style="display:flex;justify-content:center;">
+    <div class="auth-card">
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <h1 style="font-family:var(--font-heading);font-size:1.75rem;margin:0 0 0.5rem;color:#fff;">
+          VIRTUX <span style="color:var(--cyan);text-shadow:var(--glow-cyan);">GAMER ACCESS</span>
+        </h1>
+        <p style="color:var(--gray-400);font-size:0.9rem;margin:0;">
+          Unlock your automatic Serial Membership ID &amp; 10-Stamp Envelope
+        </p>
+      </div>
 
-      <div class="auth-card" id="authCard">
-        <div class="modal-logo" style="text-align: center; margin-bottom: 1.5rem;">
-          <img src="logo.png" alt="Virtux Gaming Hub" style="height: 58px; width: auto; object-fit: contain; margin: 0 auto; display: block;" />
-        </div>
+      <!-- Navigation Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">Sign In</button>
+        <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">Register</button>
+        <button class="auth-tab-btn" id="tabForgotBtn" onclick="switchAuthTab('forgot')">Forgot Password</button>
+      </div>
 
-        <div class="auth-tabs">
-          <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">LOGIN</button>
-          <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">CREATE ACCOUNT</button>
-        </div>
-
-        <!-- Google Sign-In Button (Available for both Login and Registration) -->
-        <button type="button" class="google-btn" onclick="openGoogleModal()">
+      <!-- ════════ FORM 1: LOGIN ════════ -->
+      <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+        <!-- Google OAuth Button -->
+        <button type="button" class="google-btn" onclick="initGoogleAuth()">
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
             <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
             <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.02 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
             <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
           </svg>
-          Continue with Google
+          Continue with Google Account
         </button>
 
-        <div class="divider-or">OR WITH GMAIL &amp; PASSWORD</div>
+        <div class="divider-or">or sign in with email</div>
 
-        <!-- Login Form -->
-        <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
-          <div class="form-group">
-            <label>Gmail / Email Address</label>
-            <input type="email" id="loginEmail" placeholder="yourname@gmail.com" required />
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="loginPassword" placeholder="••••••••" required />
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;">
-            <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;color:var(--gray-300);">
-              <input type="checkbox" id="rememberMe" checked /> Remember Me
-            </label>
-            <span style="color:var(--cyan);font-size:0.82rem;">Admin: admin@virtux.com</span>
-          </div>
-          <button type="submit" class="btn-primary" style="margin-top:0.5rem;width:100%;">Sign In &amp; Open Dashboard</button>
-          <div id="loginError" style="color:#ef4444;font-size:0.85rem;display:none;text-align:center;"></div>
-        </form>
+        <div class="form-group">
+          <label>Gmail / Email Address</label>
+          <input type="email" id="loginEmail" placeholder="yourname@gmail.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required />
+        </div>
 
-        <!-- Register Form -->
-        <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
-          <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="regName" placeholder="Gamer Tag or Real Name" required />
-          </div>
-          <div class="form-group">
-            <label>Mobile Number</label>
-            <input type="tel" id="regPhone" placeholder="+91 98765 43210" required />
-          </div>
-          <div class="form-group">
-            <label>Gmail / Email Address</label>
-            <input type="email" id="regEmail" placeholder="yourname@gmail.com" required />
-          </div>
-          <div class="form-group">
-            <label>Create Password</label>
-            <input type="password" id="regPassword" placeholder="Minimum 6 characters" minlength="6" required />
-          </div>
-          <button type="submit" class="btn-primary" style="margin-top:0.5rem;width:100%;">Register &amp; Get Membership ID</button>
-          <div id="regError" style="color:#ef4444;font-size:0.85rem;display:none;text-align:center;"></div>
-        </form>
-      </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;">
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;color:var(--gray-300);">
+            <input type="checkbox" id="rememberMe" checked /> Remember Me
+          </label>
+          <a href="javascript:void(0)" onclick="switchAuthTab('forgot')" style="color:var(--cyan);text-decoration:none;font-weight:600;">
+            Forgot Password?
+          </a>
+        </div>
 
+        <button type="submit" class="btn-primary" style="margin-top:0.5rem;width:100%;">
+          Sign In &amp; Open Dashboard
+        </button>
+
+        <div id="loginAlert" class="auth-alert"></div>
+
+        <div style="text-align:center;font-size:0.85rem;color:var(--gray-400);margin-top:0.5rem;">
+          New gamer? <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color:var(--cyan);font-weight:700;text-decoration:none;">Create account</a>
+        </div>
+      </form>
+
+      <!-- ════════ FORM 2: REGISTER ════════ -->
+      <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+        <!-- Google Quick Registration Button -->
+        <button type="button" class="google-btn" onclick="initGoogleAuth()">
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.02 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+          Quick Register with Google
+        </button>
+
+        <div class="divider-or">or enter details manually</div>
+
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="regName" placeholder="Gamer Tag or Full Name" required />
+        </div>
+        <div class="form-group">
+          <label>Mobile Number</label>
+          <input type="tel" id="regPhone" placeholder="+91 98765 43210" required />
+        </div>
+        <div class="form-group">
+          <label>Gmail / Email Address</label>
+          <input type="email" id="regEmail" placeholder="yourname@gmail.com" required />
+        </div>
+        <div class="form-group">
+          <label>Create Password</label>
+          <input type="password" id="regPassword" placeholder="Minimum 6 characters" minlength="6" required />
+        </div>
+
+        <div style="background:rgba(0,212,255,0.06);border:1px dashed var(--cyan);border-radius:var(--radius);padding:0.75rem;font-size:0.8rem;color:var(--gray-300);line-height:1.4;">
+          ⚡ <strong>Automatic Membership ID:</strong> Upon registration, you will receive a serial ID (<span style="color:var(--cyan);font-family:var(--font-heading);">VIRTUXGAMINGXXXXXXXXX</span>) and your 10-stamp loyalty envelope!
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top:0.25rem;width:100%;">
+          Register &amp; Get Membership ID
+        </button>
+
+        <div id="regAlert" class="auth-alert"></div>
+
+        <div style="text-align:center;font-size:0.85rem;color:var(--gray-400);margin-top:0.5rem;">
+          Already registered? <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color:var(--cyan);font-weight:700;text-decoration:none;">Sign In here</a>
+        </div>
+      </form>
+
+      <!-- ════════ FORM 3: FORGOT PASSWORD ════════ -->
+      <form class="auth-form" id="forgotForm" onsubmit="handleForgotPassword(event)">
+        <div style="text-align:center;margin-bottom:0.5rem;">
+          <h3 style="font-family:var(--font-heading);color:#fff;font-size:1.15rem;margin:0 0 0.4rem;">
+            Reset Your Password
+          </h3>
+          <p style="color:var(--gray-400);font-size:0.85rem;margin:0;">
+            Enter your registered email address to receive password reset instructions.
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label>Registered Gmail / Email Address</label>
+          <input type="email" id="forgotEmail" placeholder="yourname@gmail.com" required />
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%;margin-top:0.5rem;">
+          Send Reset Instructions
+        </button>
+
+        <div id="forgotAlert" class="auth-alert"></div>
+
+        <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:0.5rem;">
+          <p style="font-size:0.82rem;color:var(--gray-400);text-align:center;margin:0 0 0.75rem;">
+            Or reset your password directly below:
+          </p>
+          <div class="form-group" style="margin-bottom:0.75rem;">
+            <label>New Password (Min. 6 chars)</label>
+            <input type="password" id="resetNewPassword" placeholder="New secure password" minlength="6" />
+          </div>
+          <button type="button" onclick="handleDirectReset()" class="btn-secondary" style="width:100%;">
+            Set New Password Now
+          </button>
+        </div>
+
+        <div style="text-align:center;font-size:0.85rem;color:var(--gray-400);margin-top:0.5rem;">
+          Remembered your password? <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color:var(--cyan);font-weight:700;text-decoration:none;">Back to Sign In</a>
+        </div>
+      </form>
     </div>
   </main>
 
-  <!-- Google Sign-In Modal -->
+  <!-- Google Sign-In Fallback Modal -->
   <div class="modal-backdrop" id="googleModal">
     <div class="modal-content">
       <div style="text-align:center;margin-bottom:1.5rem;">
@@ -268,22 +366,16 @@
 
   <script src="script.js"></script>
   <script>
-    function switchAuthTab(tab) {
-      const loginBtn = document.getElementById('tabLoginBtn');
-      const regBtn = document.getElementById('tabRegisterBtn');
-      const loginForm = document.getElementById('loginForm');
-      const regForm = document.getElementById('registerForm');
+    // ════════ SUPABASE CLIENT INITIALIZATION ════════
+    const SUPABASE_URL = 'https://ifzhczvuenwuvpzvvwph.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_UddVD3JaGmkYolBaDqQuvQ_X-OzaQhg';
+    let supabaseClient = null;
 
-      if (tab === 'login') {
-        loginBtn.classList.add('active');
-        regBtn.classList.remove('active');
-        loginForm.classList.add('active');
-        regForm.classList.remove('active');
-      } else {
-        regBtn.classList.add('active');
-        loginBtn.classList.remove('active');
-        regForm.classList.add('active');
-        loginForm.classList.remove('active');
+    if (window.supabase && typeof window.supabase.createClient === 'function') {
+      try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } catch (e) {
+        console.warn('Supabase client init note:', e.message);
       }
     }
 
@@ -291,7 +383,44 @@
       ? 'http://localhost:3000'
       : '';
 
-    // If user is already logged in, redirect straight to dashboard
+    // Switch between Sign In / Register / Forgot Password tabs
+    function switchAuthTab(tab) {
+      const loginBtn = document.getElementById('tabLoginBtn');
+      const regBtn = document.getElementById('tabRegisterBtn');
+      const forgotBtn = document.getElementById('tabForgotBtn');
+      const loginForm = document.getElementById('loginForm');
+      const regForm = document.getElementById('registerForm');
+      const forgotForm = document.getElementById('forgotForm');
+
+      [loginBtn, regBtn, forgotBtn].forEach(b => b.classList.remove('active'));
+      [loginForm, regForm, forgotForm].forEach(f => f.classList.remove('active'));
+
+      if (tab === 'login') {
+        loginBtn.classList.add('active');
+        loginForm.classList.add('active');
+      } else if (tab === 'register') {
+        regBtn.classList.add('active');
+        regForm.classList.add('active');
+      } else if (tab === 'forgot') {
+        forgotBtn.classList.add('active');
+        forgotForm.classList.add('active');
+      }
+    }
+
+    function showAlert(elementId, message, type = 'error') {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      el.textContent = message;
+      el.className = 'auth-alert ' + type;
+      el.style.display = 'block';
+    }
+
+    function hideAlert(elementId) {
+      const el = document.getElementById(elementId);
+      if (el) el.style.display = 'none';
+    }
+
+    // Auto-redirect if user already logged in
     function checkExistingAuth() {
       const token = localStorage.getItem('virtux_token');
       if (token) {
@@ -299,12 +428,12 @@
       }
     }
 
+    // Handle Login
     async function handleLogin(e) {
       e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
+      const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
-      const errorDiv = document.getElementById('loginError');
-      errorDiv.style.display = 'none';
+      hideAlert('loginAlert');
 
       try {
         const res = await fetch(`${API_BASE}/api/auth/login`, {
@@ -314,8 +443,7 @@
         });
         const data = await res.json();
         if (!res.ok) {
-          errorDiv.textContent = data.error || 'Login failed';
-          errorDiv.style.display = 'block';
+          showAlert('loginAlert', data.error || 'Login failed. Please check your credentials.', 'error');
           return;
         }
 
@@ -331,19 +459,18 @@
           }
         }, 500);
       } catch (err) {
-        errorDiv.textContent = 'Server connection issue. Please ensure the backend is running.';
-        errorDiv.style.display = 'block';
+        showAlert('loginAlert', 'Server connection error. Please try again.', 'error');
       }
     }
 
+    // Handle Registration
     async function handleRegister(e) {
       e.preventDefault();
-      const name = document.getElementById('regName').value;
-      const email = document.getElementById('regEmail').value;
-      const phone = document.getElementById('regPhone').value;
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
       const password = document.getElementById('regPassword').value;
-      const errorDiv = document.getElementById('regError');
-      errorDiv.style.display = 'none';
+      hideAlert('regAlert');
 
       try {
         const res = await fetch(`${API_BASE}/api/auth/register`, {
@@ -353,8 +480,7 @@
         });
         const data = await res.json();
         if (!res.ok) {
-          errorDiv.textContent = data.error || 'Registration failed';
-          errorDiv.style.display = 'block';
+          showAlert('regAlert', data.error || 'Registration failed.', 'error');
           return;
         }
 
@@ -366,9 +492,98 @@
           window.location.href = 'dashboard.html';
         }, 600);
       } catch (err) {
-        errorDiv.textContent = 'Server connection issue. Please ensure the backend is running.';
-        errorDiv.style.display = 'block';
+        showAlert('regAlert', 'Server connection issue. Please try again.', 'error');
       }
+    }
+
+    // Handle Forgot Password
+    async function handleForgotPassword(e) {
+      e.preventDefault();
+      const email = document.getElementById('forgotEmail').value.trim();
+      hideAlert('forgotAlert');
+
+      if (!email) {
+        showAlert('forgotAlert', 'Please enter your registered email address.', 'error');
+        return;
+      }
+
+      try {
+        // Try backend forgot password endpoint
+        const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+
+        // Also attempt Supabase Auth reset if available
+        if (supabaseClient) {
+          try {
+            await supabaseClient.auth.resetPasswordForEmail(email, {
+              redirectTo: window.location.origin + '/login.html'
+            });
+          } catch (e) {}
+        }
+
+        showAlert('forgotAlert', data.message || 'Password reset link sent to your email! Please check your inbox.', 'success');
+        showToast('✉️ Password recovery sent to ' + email);
+      } catch (err) {
+        showAlert('forgotAlert', 'Could not process request. Please contact support at the counter.', 'error');
+      }
+    }
+
+    // Handle Direct Password Reset
+    async function handleDirectReset() {
+      const email = document.getElementById('forgotEmail').value.trim();
+      const newPassword = document.getElementById('resetNewPassword').value;
+      hideAlert('forgotAlert');
+
+      if (!email) {
+        showAlert('forgotAlert', 'Please enter your email above.', 'error');
+        return;
+      }
+      if (!newPassword || newPassword.length < 6) {
+        showAlert('forgotAlert', 'New password must be at least 6 characters.', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, newPassword })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showAlert('forgotAlert', data.error || 'Failed to update password.', 'error');
+          return;
+        }
+
+        showAlert('forgotAlert', '🎉 Password updated successfully! You can now Sign In.', 'success');
+        showToast('🎉 Password reset successful!');
+        setTimeout(() => switchAuthTab('login'), 1500);
+      } catch (err) {
+        showAlert('forgotAlert', 'Connection error. Please try again.', 'error');
+      }
+    }
+
+    // Initiate Google Authentication
+    async function initGoogleAuth() {
+      if (supabaseClient) {
+        try {
+          const { error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: window.location.origin + '/dashboard.html'
+            }
+          });
+          if (!error) return;
+        } catch (e) {
+          console.log('Direct Supabase Google Auth fallback:', e.message);
+        }
+      }
+      // Fallback modal for Google email input
+      openGoogleModal();
     }
 
     function openGoogleModal() {
@@ -381,9 +596,9 @@
 
     async function submitGoogleAuth(e) {
       e.preventDefault();
-      const email = document.getElementById('googleEmail').value;
-      const name = document.getElementById('googleName').value;
-      const phone = document.getElementById('googlePhone').value;
+      const email = document.getElementById('googleEmail').value.trim();
+      const name = document.getElementById('googleName').value.trim();
+      const phone = document.getElementById('googlePhone').value.trim();
 
       try {
         const res = await fetch(`${API_BASE}/api/auth/google`, {

@@ -3,11 +3,21 @@ const cors = require('cors');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { createClient } = require('@supabase/supabase-js');
 const db = require('./db/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'virtux_cyber_secret_key_2026';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ifzhczvuenwuvpzvvwph.supabase.co';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_UddVD3JaGmkYolBaDqQuvQ_X-OzaQhg';
+
+let supabase = null;
+try {
+  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (e) {
+  console.warn('Supabase client init note:', e.message);
+}
 
 // Middleware
 app.use(cors());
@@ -206,6 +216,70 @@ app.post('/api/auth/google', (req, res) => {
   } catch (err) {
     console.error('Google auth error:', err);
     res.status(500).json({ error: 'Server error during Google authentication' });
+  }
+});
+
+// Forgot Password
+app.post('/api/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email address is required' });
+    }
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Check if user exists in database
+    const user = db.prepare('SELECT id, name, email FROM users WHERE email = ?').get(cleanEmail);
+
+    // Also trigger Supabase Auth reset email if Supabase client is available
+    if (supabase) {
+      try {
+        await supabase.auth.resetPasswordForEmail(cleanEmail, {
+          redirectTo: `${req.protocol}://${req.get('host')}/login.html`
+        });
+      } catch (e) {
+        console.warn('Supabase resetPassword error:', e.message);
+      }
+    }
+
+    if (!user) {
+      return res.json({ 
+        message: 'If an account is associated with this email, recovery instructions have been sent.' 
+      });
+    }
+
+    res.json({
+      message: `Password recovery instructions have been sent to ${cleanEmail}. Check your inbox or contact counter support with your Membership ID.`
+    });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ error: 'Could not process password recovery request' });
+  }
+});
+
+// Direct Password Reset
+app.post('/api/auth/reset-password', (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
+      return res.status(400).json({ error: 'Email and new password are required' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+    const cleanEmail = email.toLowerCase().trim();
+    const user = db.prepare('SELECT id FROM users WHERE email = ?').get(cleanEmail);
+    if (!user) {
+      return res.status(404).json({ error: 'No account found with this email address' });
+    }
+
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
+    db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashedPassword, user.id);
+
+    res.json({ message: 'Password has been updated successfully! You can now sign in.' });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ error: 'Could not reset password' });
   }
 });
 
