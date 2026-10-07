@@ -393,7 +393,7 @@
             </div>
             <div>
               <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
-                <h1 id="dashName" style="font-family:var(--font-heading);font-size:1.75rem;margin:0;">Loading...</h1>
+                <h1 id="dashName" style="font-family:var(--font-heading);font-size:1.75rem;margin:0;">—</h1>
                 <span id="dashRoleBadge" class="tier-badge" style="position:static;">MEMBER</span>
               </div>
               <p id="dashEmail" style="color:var(--gray-300);font-size:0.95rem;margin:0.35rem 0 0.25rem;display:flex;align-items:center;gap:0.4rem;"></p>
@@ -428,7 +428,7 @@
                 Gamer Name
               </div>
               <div id="dashNameDetail" style="font-family:var(--font-heading);font-size:1.15rem;font-weight:700;color:#fff;">
-                Loading...
+                —
               </div>
             </div>
             <div style="background:rgba(255,255,255,0.02);padding:0.85rem;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.05);">
@@ -436,7 +436,7 @@
                 📞 Mobile Number
               </div>
               <div id="dashPhoneDetail" style="font-family:var(--font-body);font-size:1.1rem;font-weight:700;color:var(--cyan);">
-                Loading...
+                —
               </div>
             </div>
             <div style="background:rgba(255,255,255,0.02);padding:0.85rem;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.05);">
@@ -444,7 +444,7 @@
                 ✉️ Email Address / Gmail
               </div>
               <div id="dashEmailDetail" style="font-family:var(--font-body);font-size:1.05rem;font-weight:600;color:#fff;word-break:break-all;">
-                Loading...
+                —
               </div>
             </div>
           </div>
@@ -456,7 +456,7 @@
             Official Virtux Membership ID:
           </div>
           <div class="member-id-box">
-            <span class="member-id-text" id="dashMembershipId">VIRTUXGAMING000000001</span>
+            <span class="member-id-text" id="dashMembershipId">--------</span>
             <button class="copy-id-btn" onclick="copyMembershipId()">
               📋 Copy ID
             </button>
@@ -646,22 +646,25 @@
   <script src="script.js"></script>
   <script>
     const LIVE_BACKEND = 'https://virtuxgaminghub-website.vercel.app';
-    const API_BASE = (window.location.protocol === 'file:')
-      ? LIVE_BACKEND
-      : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '3000')
-        ? 'http://localhost:3000'
-        : '';
 
     async function apiFetch(endpoint, options = {}) {
+      const isVercel = window.location.hostname.includes('vercel.app');
+      if (isVercel) {
+        return await fetch(endpoint, options);
+      }
+
+      // If running on local server port 3000
+      if (window.location.port === '3000') {
+        try {
+          const localRes = await fetch(`http://localhost:3000${endpoint}`, options);
+          if (localRes.ok || localRes.status < 500) return localRes;
+        } catch (e) {}
+      }
+
+      // For Live Server (e.g. port 5500), file://, or offline local backend:
       try {
-        const res = await fetch(`${API_BASE}${endpoint}`, options);
-        return res;
+        return await fetch(`${LIVE_BACKEND}${endpoint}`, options);
       } catch (err) {
-        if (API_BASE !== LIVE_BACKEND) {
-          try {
-            return await fetch(`${LIVE_BACKEND}${endpoint}`, options);
-          } catch (e2) {}
-        }
         throw err;
       }
     }
@@ -727,38 +730,43 @@
       const token = localStorage.getItem('virtux_token');
       const cachedUser = JSON.parse(localStorage.getItem('virtux_user') || 'null');
 
-      if (!token && !cachedUser) {
+      if (!token) {
         window.location.href = 'login.html';
         return;
       }
 
-      // Step 1: Render immediately from localStorage (instant 0ms display!)
-      if (cachedUser) {
+      // Step 1: Render immediately from localStorage if available
+      if (cachedUser && (cachedUser.name || cachedUser.email)) {
         renderUserData(cachedUser);
         renderStampEnvelope(cachedUser.stamps_count || 0);
       }
 
-      // Step 2: Fetch latest data from backend
-      if (token) {
-        try {
-          const res = await apiFetch('/api/auth/me', {
-            headers: { 'Authorization': 'Bearer ' + token }
-          });
+      // Step 2: Fetch latest verified profile from backend
+      try {
+        const res = await apiFetch('/api/auth/me', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
 
-          if (res.ok) {
-            const data = await res.json();
-            if (data.user) {
-              localStorage.setItem('virtux_user', JSON.stringify(data.user));
-              renderUserData(data.user);
-              renderStampEnvelope(data.user.stamps_count || 0);
-            }
-            if (data.bookings) {
-              renderBookings(data.bookings);
-            }
-          }
-        } catch (err) {
-          console.warn('Backend sync note:', err.message);
+        if (res.status === 401 || res.status === 403) {
+          localStorage.removeItem('virtux_token');
+          localStorage.removeItem('virtux_user');
+          window.location.href = 'login.html';
+          return;
         }
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            localStorage.setItem('virtux_user', JSON.stringify(data.user));
+            renderUserData(data.user);
+            renderStampEnvelope(data.user.stamps_count || 0);
+          }
+          if (data.bookings) {
+            renderBookings(data.bookings);
+          }
+        }
+      } catch (err) {
+        console.warn('Backend sync note:', err.message);
       }
     }
 

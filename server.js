@@ -84,6 +84,20 @@ app.post('/api/auth/register', async (req, res) => {
 
     const hashedPassword = bcrypt.hashSync(password, 10);
 
+    // Calculate sequential membership ID strictly by registration order (1, 2, 3, 4...)
+    const { count: userCount } = await supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true });
+
+    let nextSeq = (userCount || 0) + 1;
+    let membership_id = formatMembershipId(nextSeq);
+    while (true) {
+      const { data: dup } = await supabase.from('users').select('id').eq('membership_id', membership_id).maybeSingle();
+      if (!dup) break;
+      nextSeq++;
+      membership_id = formatMembershipId(nextSeq);
+    }
+
     const { data: newUser, error: insertError } = await supabase
       .from('users')
       .insert({
@@ -92,6 +106,7 @@ app.post('/api/auth/register', async (req, res) => {
         password: hashedPassword,
         phone: phone ? phone.trim() : null,
         role: 'user',
+        membership_id: membership_id,
         stamps_count: 0
       })
       .select()
@@ -105,11 +120,7 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(500).json({ error: 'Could not create account: ' + insertError.message });
     }
 
-    // Assign membership_id using the new row's id
-    const membership_id = formatMembershipId(newUser.id);
-    await supabase.from('users').update({ membership_id }).eq('id', newUser.id);
-
-    const payload = makeUserPayload({ ...newUser, membership_id });
+    const payload = makeUserPayload(newUser);
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({ message: 'Account registered successfully', user: payload, token });
@@ -214,6 +225,21 @@ app.post('/api/auth/google', async (req, res) => {
 
     // New Google user
     const dummyPassword = bcrypt.hashSync('google_' + (googleId || Date.now()) + Math.random(), 10);
+
+    // Calculate sequential membership ID strictly by registration order (1, 2, 3, 4...)
+    const { count: userCount } = await supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true });
+
+    let nextSeq = (userCount || 0) + 1;
+    let membership_id = formatMembershipId(nextSeq);
+    while (true) {
+      const { data: dup } = await supabase.from('users').select('id').eq('membership_id', membership_id).maybeSingle();
+      if (!dup) break;
+      nextSeq++;
+      membership_id = formatMembershipId(nextSeq);
+    }
+
     const { data: newUser, error: insertError } = await supabase
       .from('users')
       .insert({
@@ -222,6 +248,7 @@ app.post('/api/auth/google', async (req, res) => {
         password: dummyPassword,
         phone: phone ? phone.trim() : null,
         role: 'user',
+        membership_id: membership_id,
         stamps_count: 0
       })
       .select()
@@ -231,10 +258,7 @@ app.post('/api/auth/google', async (req, res) => {
       return res.status(500).json({ error: 'Could not register Google account: ' + insertError.message });
     }
 
-    const membership_id = formatMembershipId(newUser.id);
-    await supabase.from('users').update({ membership_id }).eq('id', newUser.id);
-
-    const payload = makeUserPayload({ ...newUser, membership_id });
+    const payload = makeUserPayload(newUser);
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({ message: 'Google account registered successfully', user: payload, token });

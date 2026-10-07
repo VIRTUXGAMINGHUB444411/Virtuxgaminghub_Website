@@ -380,22 +380,25 @@
     }
 
     const LIVE_BACKEND = 'https://virtuxgaminghub-website.vercel.app';
-    const API_BASE = (window.location.protocol === 'file:')
-      ? LIVE_BACKEND
-      : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '3000')
-        ? 'http://localhost:3000'
-        : '';
 
     async function apiFetch(endpoint, options = {}) {
+      const isVercel = window.location.hostname.includes('vercel.app');
+      if (isVercel) {
+        return await fetch(endpoint, options);
+      }
+
+      // If running on local server port 3000
+      if (window.location.port === '3000') {
+        try {
+          const localRes = await fetch(`http://localhost:3000${endpoint}`, options);
+          if (localRes.ok || localRes.status < 500) return localRes;
+        } catch (e) {}
+      }
+
+      // For Live Server (e.g. port 5500), file://, or offline local backend:
       try {
-        const res = await fetch(`${API_BASE}${endpoint}`, options);
-        return res;
+        return await fetch(`${LIVE_BACKEND}${endpoint}`, options);
       } catch (err) {
-        if (API_BASE !== LIVE_BACKEND) {
-          try {
-            return await fetch(`${LIVE_BACKEND}${endpoint}`, options);
-          } catch (e2) {}
-        }
         throw err;
       }
     }
