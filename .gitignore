@@ -4,3 +4,4 @@ node_modules/
 *.sqlite-wal
 *.log
 .env
+push_now.bat
