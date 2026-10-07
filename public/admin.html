@@ -613,8 +613,17 @@
 
   <div id="toast" class="toast"></div>
 
-  <script src="script.js"></script>
   <script>
+    // ══════════ TOAST NOTIFICATION (Self-contained) ══════════
+    function showToast(message, duration = 3500) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, duration);
+    }
+    window.showToast = showToast;
+
     const LIVE_BACKEND = 'https://virtuxgaminghub-website.vercel.app';
     const API_BASE = window.location.hostname.includes('vercel.app')
       ? ''
@@ -629,13 +638,16 @@
     }
 
     // Security check: verify admin role in localStorage
-    if (!token || !user || user.role !== 'admin') {
+    const isAdmin = token && user && (String(user.role || '').toLowerCase() === 'admin' || String(user.email || '').toLowerCase() === 'virtuxgaming.hub@gmail.com');
+    if (!isAdmin) {
       const banner = document.getElementById('authBannerAlert');
       if (banner) banner.style.display = 'flex';
-      setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+      if (!token) {
+        setTimeout(() => { window.location.href = 'login.html'; }, 3000);
+      }
     } else {
       const welcome = document.getElementById('adminWelcome');
-      if (welcome) welcome.textContent = 'Admin: ' + (user.name || user.email || 'Root');
+      if (welcome) welcome.textContent = 'Admin: ' + (user.name || user.email || 'Virtux Admin');
     }
 
     function authHeader() {
@@ -1269,6 +1281,36 @@
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) runLiveSync();
     });
+
+    // Explicit Window Object Attachments (ensures inline onclicks NEVER fail)
+    window.switchAdminTab = switchAdminTab;
+    window.triggerManualSync = triggerManualSync;
+    window.adminLogout = adminLogout;
+    window.showToast = showToast;
+    window.openCafeModal = openCafeModal;
+    window.closeCafeModal = closeCafeModal;
+    window.saveCafeItem = saveCafeItem;
+    window.deleteCafeItem = deleteCafeItem;
+    window.openAnnouncementModal = openAnnouncementModal;
+    window.closeAnnouncementModal = closeAnnouncementModal;
+    window.saveAnnouncement = saveAnnouncement;
+    window.deleteAnnouncement = deleteAnnouncement;
+    window.approveStamp = approveStamp;
+    window.rejectStamp = rejectStamp;
+    window.handleManualStampSubmit = handleManualStampSubmit;
+    window.quickAddStamp = quickAddStamp;
+    window.quickResetStamp = quickResetStamp;
+    window.updateBookingStatus = updateBookingStatus;
+    window.deleteBooking = deleteBooking;
+    window.toggleFeatureFeedback = toggleFeatureFeedback;
+    window.deleteFeedback = deleteFeedback;
+    window.loadUsers = loadUsers;
+    window.loadFeedback = loadFeedback;
+    window.loadBookings = loadBookings;
+    window.loadCafe = loadCafe;
+    window.loadAnnouncements = loadAnnouncements;
+    window.loadStamps = loadStamps;
+    window.loadOverviewStats = loadOverviewStats;
   </script>
 </body>
 </html>

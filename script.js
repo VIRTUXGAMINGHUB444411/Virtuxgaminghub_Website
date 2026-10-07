@@ -51,6 +51,7 @@
 // ═══════════ PARTICLE SYSTEM ═══════════
 (function initParticles() {
   const canvas = document.getElementById('particleCanvas');
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let particles = [];
   let animId;
@@ -128,6 +129,7 @@
 // ═══════════ NAVBAR SCROLL & ACTIVE LINK ═══════════
 (function initNavbar() {
   const navbar = document.getElementById('navbar');
+  if (!navbar) return;
   const navLinks = document.querySelectorAll('.nav-link');
 
   window.addEventListener('scroll', () => {
