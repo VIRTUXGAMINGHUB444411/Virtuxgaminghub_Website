@@ -746,7 +746,9 @@ function updateNavAuth() {
 
 // Global Google Auth redirect for all modal buttons
 function initGoogleAuth() {
-  window.location.href = 'login.html?google=1';
+  const redirectTo = window.location.origin + '/dashboard.html';
+  const authUrl = 'https://ifzhczvuenwuvpzvvwph.supabase.co/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(redirectTo);
+  window.location.href = authUrl;
 }
 window.initGoogleAuth = initGoogleAuth;
 
