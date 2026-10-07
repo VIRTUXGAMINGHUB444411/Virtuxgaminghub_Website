@@ -332,17 +332,38 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       console.warn('Auth user sync note:', adminErr.message);
     }
 
-    // Trigger Supabase auth reset email to their inbox
-    const { error: resetErr } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
-      redirectTo: `https://virtuxgaminghub-website.vercel.app/reset-password.html`
-    });
+    // Generate Supabase recovery action link
+    let actionLink = null;
+    try {
+      const { data: linkData } = await supabase.auth.admin.generateLink({
+        type: 'recovery',
+        email: cleanEmail,
+        options: {
+          redirectTo: `https://virtuxgaminghub-website.vercel.app/reset-password.html`
+        }
+      });
+      if (linkData?.properties?.action_link) {
+        actionLink = linkData.properties.action_link;
+      }
+    } catch (linkErr) {
+      console.warn('Generate link note:', linkErr.message);
+    }
 
-    if (resetErr) {
+    // Trigger Supabase auth reset email to their inbox
+    try {
+      await supabase.auth.resetPasswordForEmail(cleanEmail, {
+        redirectTo: `https://virtuxgaminghub-website.vercel.app/reset-password.html`
+      });
+    } catch (resetErr) {
       console.warn('Supabase resetPassword note:', resetErr.message);
     }
 
+    const fallbackUrl = `/reset-password.html?email=${encodeURIComponent(cleanEmail)}`;
+
     res.json({
-      message: `Password recovery email sent to ${cleanEmail}! Please check your inbox and spam folder.`
+      message: `Password recovery initiated for ${cleanEmail}!`,
+      directResetUrl: actionLink || fallbackUrl,
+      fallbackUrl: fallbackUrl
     });
   } catch (err) {
     console.error('Forgot password error:', err);
