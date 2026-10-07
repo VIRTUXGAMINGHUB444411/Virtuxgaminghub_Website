@@ -214,7 +214,7 @@
           <label style="color:var(--cyan);font-weight:700;display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;margin-bottom:0.35rem;">
             <span>🛡️</span> Admin Security Code (6 Digits)
           </label>
-          <input type="password" id="loginSecurityCode" placeholder="Enter Security Code (130520)" maxlength="6" style="letter-spacing:4px;font-size:1.15rem;font-weight:700;text-align:center;" />
+          <input type="password" id="loginSecurityCode" placeholder="••••••" maxlength="6" autocomplete="off" style="letter-spacing:4px;font-size:1.15rem;font-weight:700;text-align:center;" />
           <small style="color:var(--gray-400);font-size:0.75rem;margin-top:0.35rem;display:block;">Required for Virtux Admin CMS access</small>
         </div>
 
@@ -465,7 +465,7 @@
       if (emailInput && secGroup) {
         emailInput.addEventListener('input', () => {
           const val = emailInput.value.toLowerCase().trim();
-          if (val === 'virtuxgaming.hub@gmail.com' || val.includes('admin@') || val.includes('admin')) {
+          if (val.includes('admin') || val.includes('virtux')) {
             secGroup.style.display = 'block';
           } else {
             // Keep visible if user already typed in security code
