@@ -327,7 +327,21 @@ app.put('/api/auth/profile', authenticateToken, (req, res) => {
 // Get Current User Profile + User Bookings + Stamps
 app.get('/api/auth/me', authenticateToken, (req, res) => {
   try {
-    const user = db.prepare('SELECT id, name, email, phone, role, membership_id, stamps_count, created_at FROM users WHERE id = ?').get(req.user.id);
+    let user = db.prepare('SELECT id, name, email, phone, role, membership_id, stamps_count, created_at FROM users WHERE id = ?').get(req.user.id);
+
+    // Robust serverless fallback: if container memory was recycled, use authenticated JWT payload
+    if (!user && req.user) {
+      user = {
+        id: req.user.id,
+        name: req.user.name || 'Gamer',
+        email: req.user.email,
+        phone: req.user.phone || '',
+        role: req.user.role || 'user',
+        membership_id: req.user.membership_id || formatMembershipId(req.user.id),
+        stamps_count: req.user.stamps_count || 0
+      };
+    }
+
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     if (!user.membership_id) {
@@ -337,9 +351,15 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
       } catch (e) {}
     }
 
-    const bookings = db.prepare('SELECT * FROM bookings WHERE user_id = ? OR phone = ? ORDER BY id DESC').all(user.id, user.phone || '');
-    const myFeedback = db.prepare('SELECT * FROM feedback WHERE user_id = ? OR email = ? ORDER BY id DESC').all(user.id, user.email);
+    let bookings = [];
+    let myFeedback = [];
     let stampRequests = [];
+    try {
+      bookings = db.prepare('SELECT * FROM bookings WHERE user_id = ? OR phone = ? ORDER BY id DESC').all(user.id, user.phone || '');
+    } catch (e) {}
+    try {
+      myFeedback = db.prepare('SELECT * FROM feedback WHERE user_id = ? OR email = ? ORDER BY id DESC').all(user.id, user.email);
+    } catch (e) {}
     try {
       stampRequests = db.prepare('SELECT * FROM stamp_requests WHERE user_id = ? ORDER BY id DESC').all(user.id);
     } catch (e) {}

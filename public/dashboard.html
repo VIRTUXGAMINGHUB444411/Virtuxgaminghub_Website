@@ -417,6 +417,39 @@
           </div>
         </div>
 
+        <!-- ════ PROMINENT USER PROFILE DETAILS DISPLAY ════ -->
+        <div style="margin-top:1.5rem;background:rgba(0,0,0,0.45);border:1px solid rgba(0,212,255,0.3);border-radius:var(--radius);padding:1.25rem 1.5rem;box-shadow:inset 0 0 25px rgba(0,212,255,0.06);">
+          <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--cyan);font-weight:800;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+            <span style="font-size:1rem;">👤</span> USER PROFILE DETAILS
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1.25rem;">
+            <div style="background:rgba(255,255,255,0.02);padding:0.85rem;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.05);">
+              <div style="font-size:0.75rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:0.35rem;">
+                Gamer Name
+              </div>
+              <div id="dashNameDetail" style="font-family:var(--font-heading);font-size:1.15rem;font-weight:700;color:#fff;">
+                Loading...
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);padding:0.85rem;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.05);">
+              <div style="font-size:0.75rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:0.35rem;">
+                📞 Mobile Number
+              </div>
+              <div id="dashPhoneDetail" style="font-family:var(--font-body);font-size:1.1rem;font-weight:700;color:var(--cyan);">
+                Loading...
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);padding:0.85rem;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.05);">
+              <div style="font-size:0.75rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:0.35rem;">
+                ✉️ Email Address / Gmail
+              </div>
+              <div id="dashEmailDetail" style="font-family:var(--font-body);font-size:1.05rem;font-weight:600;color:#fff;word-break:break-all;">
+                Loading...
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Serial-Wise Membership ID Display -->
         <div style="margin-top:1.5rem;border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;">
           <div style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gray-400);margin-bottom:0.4rem;">
@@ -618,58 +651,97 @@
 
     let currentUser = null;
 
+    function renderUserData(user) {
+      if (!user) return;
+      currentUser = user;
+      const name = user.name || 'Gamer';
+      const email = user.email || '—';
+      const phone = user.phone || '';
+      const memId = user.membership_id || ('VIRTUXGAMING' + String(user.id || 1).padStart(9, '0'));
+
+      // Header display
+      const nameEl = document.getElementById('dashName');
+      if (nameEl) nameEl.textContent = name;
+
+      const emailEl = document.getElementById('dashEmail');
+      if (emailEl) emailEl.innerHTML = '✉️ ' + email;
+
+      const phoneEl = document.getElementById('dashPhone');
+      if (phoneEl) phoneEl.innerHTML = phone ? ('📞 ' + phone) : '📞 No mobile number added';
+
+      // Dedicated Profile Details Grid
+      const nameDetail = document.getElementById('dashNameDetail');
+      if (nameDetail) nameDetail.textContent = name;
+
+      const phoneDetail = document.getElementById('dashPhoneDetail');
+      if (phoneDetail) phoneDetail.textContent = phone ? phone : 'Not provided yet';
+
+      const emailDetail = document.getElementById('dashEmailDetail');
+      if (emailDetail) emailDetail.textContent = email;
+
+      // Membership ID
+      const memIdEl = document.getElementById('dashMembershipId');
+      if (memIdEl) memIdEl.textContent = memId;
+
+      // Fill Edit Form Fields
+      const editName = document.getElementById('editName');
+      if (editName) editName.value = user.name || '';
+
+      const editPhone = document.getElementById('editPhone');
+      if (editPhone) editPhone.value = user.phone || '';
+
+      const editEmail = document.getElementById('editEmail');
+      if (editEmail) editEmail.value = user.email || '';
+
+      // Admin role badge
+      if (user.role === 'admin') {
+        const badge = document.getElementById('dashRoleBadge');
+        if (badge) {
+          badge.textContent = 'ADMIN';
+          badge.style.background = 'var(--cyan)';
+          badge.style.color = '#000';
+        }
+        const adminLink = document.getElementById('dashAdminLink');
+        if (adminLink) adminLink.style.display = 'inline-block';
+      }
+    }
+
     async function loadDashboard() {
       const token = localStorage.getItem('virtux_token');
-      if (!token) {
+      const cachedUser = JSON.parse(localStorage.getItem('virtux_user') || 'null');
+
+      if (!token && !cachedUser) {
         window.location.href = 'login.html';
         return;
       }
 
-      try {
-        const res = await fetch(`${API_BASE}/api/auth/me`, {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
+      // Step 1: Render immediately from localStorage (instant 0ms display!)
+      if (cachedUser) {
+        renderUserData(cachedUser);
+        renderStampEnvelope(cachedUser.stamps_count || 0);
+      }
 
-        if (!res.ok) {
-          localStorage.removeItem('virtux_token');
-          localStorage.removeItem('virtux_user');
-          window.location.href = 'login.html';
-          return;
+      // Step 2: Fetch latest data from backend
+      if (token) {
+        try {
+          const res = await fetch(`${API_BASE}/api/auth/me`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data.user) {
+              localStorage.setItem('virtux_user', JSON.stringify(data.user));
+              renderUserData(data.user);
+              renderStampEnvelope(data.user.stamps_count || 0);
+            }
+            if (data.bookings) {
+              renderBookings(data.bookings);
+            }
+          }
+        } catch (err) {
+          console.warn('Backend sync note:', err.message);
         }
-
-        const data = await res.json();
-        currentUser = data.user;
-
-        // Render User Header (Name, Phone, Email - Avatar remains official Virtux logo)
-        document.getElementById('dashName').textContent = currentUser.name;
-        document.getElementById('dashEmail').innerHTML = '✉️ ' + currentUser.email;
-        document.getElementById('dashPhone').innerHTML = currentUser.phone ? '📞 ' + currentUser.phone : '📞 No mobile number added';
-        // Note: Avatar is permanently locked to Virtux Gaming Hub official logo image
-
-        // Render Membership ID
-        const memId = currentUser.membership_id || 'VIRTUXGAMING' + String(currentUser.id).padStart(9, '0');
-        document.getElementById('dashMembershipId').textContent = memId;
-
-        // Fill Edit Form Fields
-        document.getElementById('editName').value = currentUser.name;
-        document.getElementById('editPhone').value = currentUser.phone || '';
-        document.getElementById('editEmail').value = currentUser.email;
-
-        // Admin link
-        if (currentUser.role === 'admin') {
-          document.getElementById('dashRoleBadge').textContent = 'ADMIN';
-          document.getElementById('dashRoleBadge').style.background = 'var(--cyan)';
-          document.getElementById('dashRoleBadge').style.color = '#000';
-          document.getElementById('dashAdminLink').style.display = 'inline-block';
-        }
-
-        // Render Stamps Envelope
-        renderStampEnvelope(currentUser.stamps_count || 0);
-
-        // Render Bookings
-        renderBookings(data.bookings || []);
-      } catch (err) {
-        console.error('Error loading dashboard:', err);
       }
     }
 
