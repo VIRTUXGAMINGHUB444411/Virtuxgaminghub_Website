@@ -4,42 +4,46 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { createClient } = require('@supabase/supabase-js');
-const db = require('./db/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'virtux_cyber_secret_key_2026';
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ifzhczvuenwuvpzvvwph.supabase.co';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_UddVD3JaGmkYolBaDqQuvQ_X-OzaQhg';
 const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY || 'sb_secret_uFnYlqrh4phDpIe02Mh2wA_g0inw3Q8';
 
-let supabase = null;
-try {
-  // Use Secret Key on server side for full admin access
-  supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY || SUPABASE_ANON_KEY);
-  console.log('⚡ Supabase Admin client connected successfully');
-} catch (e) {
-  console.warn('Supabase client init note:', e.message);
-}
+// ─── Supabase Admin Client (service role — bypasses RLS) ──────────────────────
+const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
+console.log('⚡ Supabase Admin client initialized');
 
-// Middleware
+// ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve static frontend files
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname)));
 
-// ════════════════ AUTH MIDDLEWARE ════════════════
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function formatMembershipId(id) {
+  return 'VIRTUXGAMING' + String(id).padStart(9, '0');
+}
+
+function makeUserPayload(u) {
+  return {
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    role: u.role || 'user',
+    phone: u.phone || '',
+    membership_id: u.membership_id || formatMembershipId(u.id),
+    stamps_count: u.stamps_count || 0
+  };
+}
+
+// ─── Auth Middleware ───────────────────────────────────────────────────────────
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: 'Access token required' });
-  }
-
+  if (!token) return res.status(401).json({ error: 'Access token required' });
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ error: 'Invalid or expired token' });
     req.user = user;
@@ -49,78 +53,116 @@ function authenticateToken(req, res, next) {
 
 function requireAdmin(req, res, next) {
   authenticateToken(req, res, () => {
-    if (req.user && req.user.role === 'admin') {
-      next();
-    } else {
-      res.status(403).json({ error: 'Admin access required' });
-    }
+    if (req.user && req.user.role === 'admin') next();
+    else res.status(403).json({ error: 'Admin access required' });
   });
 }
 
-// ════════════════ AUTH ROUTES ════════════════
-function formatMembershipId(id) {
-  return 'VIRTUXGAMING' + String(id).padStart(9, '0');
-}
+// ════════════════════════════════════════════════════════════════════════════
+// AUTH ROUTES — All data stored in Supabase
+// ════════════════════════════════════════════════════════════════════════════
 
 // Register
-app.post('/api/auth/register', (req, res) => {
+app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, password, phone } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Name, email, and password are required' });
     }
-
     const cleanEmail = email.toLowerCase().trim();
-    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(cleanEmail);
+
+    // Check existing user
+    const { data: existing } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', cleanEmail)
+      .maybeSingle();
+
     if (existing) {
       return res.status(400).json({ error: 'An account with this email already exists' });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const tempId = ((db.prepare('SELECT COUNT(*) as count FROM users').get() || {}).count || 0) + 1;
-    const initialMemId = formatMembershipId(tempId);
 
-    const stmt = db.prepare(`
-      INSERT INTO users (name, email, password, phone, role, membership_id, stamps_count)
-      VALUES (?, ?, ?, ?, 'user', ?, 0)
-    `);
-    const result = stmt.run(name.trim(), cleanEmail, hashedPassword, phone ? phone.trim() : null, initialMemId, 0);
+    const { data: newUser, error: insertError } = await supabase
+      .from('users')
+      .insert({
+        name: name.trim(),
+        email: cleanEmail,
+        password: hashedPassword,
+        phone: phone ? phone.trim() : null,
+        role: 'user',
+        stamps_count: 0
+      })
+      .select()
+      .single();
 
-    const actualId = result.lastInsertRowid || tempId;
-    const finalMemId = formatMembershipId(actualId);
-    try {
-      db.prepare('UPDATE users SET membership_id = ? WHERE id = ?').run(finalMemId, actualId);
-    } catch (e) {}
+    if (insertError) {
+      console.error('Register insert error:', insertError);
+      if (insertError.code === 'PGRST205') {
+        return res.status(500).json({ error: 'Supabase database tables are not initialized yet. Please execute supabase_schema.sql in the Supabase SQL Editor.' });
+      }
+      return res.status(500).json({ error: 'Could not create account: ' + insertError.message });
+    }
 
-    const newUser = {
-      id: actualId,
-      name: name.trim(),
-      email: cleanEmail,
-      role: 'user',
-      phone: phone || '',
-      membership_id: finalMemId,
-      stamps_count: 0
-    };
-    const token = jwt.sign(newUser, JWT_SECRET, { expiresIn: '7d' });
+    // Assign membership_id using the new row's id
+    const membership_id = formatMembershipId(newUser.id);
+    await supabase.from('users').update({ membership_id }).eq('id', newUser.id);
 
-    res.status(201).json({ message: 'Account registered successfully', user: newUser, token });
+    const payload = makeUserPayload({ ...newUser, membership_id });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+
+    res.status(201).json({ message: 'Account registered successfully', user: payload, token });
   } catch (err) {
     console.error('Registration error:', err);
     res.status(500).json({ error: 'Server error during registration' });
   }
 });
 
+// Auto-seed admin user helper
+async function ensureAdminExists() {
+  try {
+    const { data: existingAdmin, error } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', 'admin@virtux.com')
+      .maybeSingle();
+
+    if (!existingAdmin && !error) {
+      const hash = '$2b$10$FEjIMHcE4RPqSWroBaUcteY5Q77zwpNbyiKrNZPv2wSFbUgivuJ.W';
+      await supabase.from('users').insert({
+        name: 'Virtux Admin',
+        email: 'admin@virtux.com',
+        password: hash,
+        phone: '+91 91477 18768',
+        role: 'admin',
+        membership_id: 'VIRTUXGAMING000000001',
+        stamps_count: 10
+      });
+      console.log('⚡ Admin account auto-created in Supabase');
+    }
+  } catch (e) {
+    // Schema may not be created yet, silently ignore
+  }
+}
+ensureAdminExists();
+
 // Login
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
-
     const cleanEmail = email.toLowerCase().trim();
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(cleanEmail);
-    if (!user) {
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', cleanEmail)
+      .maybeSingle();
+
+    if (error || !user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
@@ -129,93 +171,73 @@ app.post('/api/auth/login', (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    let membership_id = user.membership_id;
-    if (!membership_id) {
-      membership_id = formatMembershipId(user.id);
-      try {
-        db.prepare('UPDATE users SET membership_id = ? WHERE id = ?').run(membership_id, user.id);
-      } catch (e) {}
+    // Ensure membership_id
+    if (!user.membership_id) {
+      const membership_id = formatMembershipId(user.id);
+      await supabase.from('users').update({ membership_id }).eq('id', user.id);
+      user.membership_id = membership_id;
     }
 
-    const userData = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      phone: user.phone || '',
-      membership_id,
-      stamps_count: user.stamps_count || 0
-    };
-    const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '7d' });
+    const payload = makeUserPayload(user);
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
-    res.json({ message: 'Login successful', user: userData, token });
+    res.json({ message: 'Login successful', user: payload, token });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Server error during login' });
   }
 });
 
-// Google Authentication (Sign In & Sign Up)
-app.post('/api/auth/google', (req, res) => {
+// Google Auth
+app.post('/api/auth/google', async (req, res) => {
   try {
     const { email, name, phone, googleId } = req.body;
-    if (!email) {
-      return res.status(400).json({ error: 'Google account email is required' });
-    }
-
+    if (!email) return res.status(400).json({ error: 'Google account email is required' });
     const cleanEmail = email.toLowerCase().trim();
-    let user = db.prepare('SELECT * FROM users WHERE email = ?').get(cleanEmail);
 
-    if (user) {
-      let membership_id = user.membership_id;
-      if (!membership_id) {
-        membership_id = formatMembershipId(user.id);
-        try {
-          db.prepare('UPDATE users SET membership_id = ? WHERE id = ?').run(membership_id, user.id);
-        } catch (e) {}
+    const { data: existing } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', cleanEmail)
+      .maybeSingle();
+
+    if (existing) {
+      if (!existing.membership_id) {
+        const membership_id = formatMembershipId(existing.id);
+        await supabase.from('users').update({ membership_id }).eq('id', existing.id);
+        existing.membership_id = membership_id;
       }
-
-      const userData = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        phone: user.phone || '',
-        membership_id,
-        stamps_count: user.stamps_count || 0
-      };
-      const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '7d' });
-      return res.json({ message: 'Google sign-in successful', user: userData, token });
+      const payload = makeUserPayload(existing);
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+      return res.json({ message: 'Google sign-in successful', user: payload, token });
     }
 
-    // Register new user via Google
+    // New Google user
     const dummyPassword = bcrypt.hashSync('google_' + (googleId || Date.now()) + Math.random(), 10);
-    const tempId = ((db.prepare('SELECT COUNT(*) as count FROM users').get() || {}).count || 0) + 1;
-    const initialMemId = formatMembershipId(tempId);
+    const { data: newUser, error: insertError } = await supabase
+      .from('users')
+      .insert({
+        name: name ? name.trim() : 'Google Gamer',
+        email: cleanEmail,
+        password: dummyPassword,
+        phone: phone ? phone.trim() : null,
+        role: 'user',
+        stamps_count: 0
+      })
+      .select()
+      .single();
 
-    const result = db.prepare(`
-      INSERT INTO users (name, email, password, phone, role, membership_id, stamps_count)
-      VALUES (?, ?, ?, ?, 'user', ?, 0)
-    `).run(name ? name.trim() : 'Google Gamer', cleanEmail, dummyPassword, phone ? phone.trim() : null, initialMemId, 0);
+    if (insertError) {
+      return res.status(500).json({ error: 'Could not register Google account: ' + insertError.message });
+    }
 
-    const actualId = result.lastInsertRowid || tempId;
-    const finalMemId = formatMembershipId(actualId);
-    try {
-      db.prepare('UPDATE users SET membership_id = ? WHERE id = ?').run(finalMemId, actualId);
-    } catch (e) {}
+    const membership_id = formatMembershipId(newUser.id);
+    await supabase.from('users').update({ membership_id }).eq('id', newUser.id);
 
-    const newUser = {
-      id: actualId,
-      name: name ? name.trim() : 'Google Gamer',
-      email: cleanEmail,
-      role: 'user',
-      phone: phone || '',
-      membership_id: finalMemId,
-      stamps_count: 0
-    };
-    const token = jwt.sign(newUser, JWT_SECRET, { expiresIn: '7d' });
+    const payload = makeUserPayload({ ...newUser, membership_id });
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
-    res.status(201).json({ message: 'Google account registered successfully', user: newUser, token });
+    res.status(201).json({ message: 'Google account registered successfully', user: payload, token });
   } catch (err) {
     console.error('Google auth error:', err);
     res.status(500).json({ error: 'Server error during Google authentication' });
@@ -226,33 +248,28 @@ app.post('/api/auth/google', (req, res) => {
 app.post('/api/auth/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ error: 'Email address is required' });
-    }
+    if (!email) return res.status(400).json({ error: 'Email address is required' });
     const cleanEmail = email.toLowerCase().trim();
 
-    // Check if user exists in database
-    const user = db.prepare('SELECT id, name, email FROM users WHERE email = ?').get(cleanEmail);
+    const { data: user } = await supabase
+      .from('users')
+      .select('id, name, email')
+      .eq('email', cleanEmail)
+      .maybeSingle();
 
-    // Also trigger Supabase Auth reset email if Supabase client is available
-    if (supabase) {
-      try {
-        await supabase.auth.resetPasswordForEmail(cleanEmail, {
-          redirectTo: `${req.protocol}://${req.get('host')}/login.html`
-        });
-      } catch (e) {
-        console.warn('Supabase resetPassword error:', e.message);
-      }
-    }
-
-    if (!user) {
-      return res.json({ 
-        message: 'If an account is associated with this email, recovery instructions have been sent.' 
+    // Trigger Supabase auth reset email
+    try {
+      await supabase.auth.resetPasswordForEmail(cleanEmail, {
+        redirectTo: `https://virtuxgaminghub-website.vercel.app/login.html`
       });
+    } catch (e) {
+      console.warn('Supabase resetPassword note:', e.message);
     }
 
     res.json({
-      message: `Password recovery instructions have been sent to ${cleanEmail}. Check your inbox or contact counter support with your Membership ID.`
+      message: user
+        ? `Password recovery instructions have been sent to ${cleanEmail}. Check your inbox.`
+        : 'If an account is associated with this email, recovery instructions have been sent.'
     });
   } catch (err) {
     console.error('Forgot password error:', err);
@@ -261,23 +278,23 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 });
 
 // Direct Password Reset
-app.post('/api/auth/reset-password', (req, res) => {
+app.post('/api/auth/reset-password', async (req, res) => {
   try {
     const { email, newPassword } = req.body;
-    if (!email || !newPassword) {
-      return res.status(400).json({ error: 'Email and new password are required' });
-    }
-    if (newPassword.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters' });
-    }
+    if (!email || !newPassword) return res.status(400).json({ error: 'Email and new password are required' });
+    if (newPassword.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
     const cleanEmail = email.toLowerCase().trim();
-    const user = db.prepare('SELECT id FROM users WHERE email = ?').get(cleanEmail);
-    if (!user) {
-      return res.status(404).json({ error: 'No account found with this email address' });
-    }
+
+    const { data: user } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', cleanEmail)
+      .maybeSingle();
+
+    if (!user) return res.status(404).json({ error: 'No account found with this email address' });
 
     const hashedPassword = bcrypt.hashSync(newPassword, 10);
-    db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashedPassword, user.id);
+    await supabase.from('users').update({ password: hashedPassword }).eq('id', user.id);
 
     res.json({ message: 'Password has been updated successfully! You can now sign in.' });
   } catch (err) {
@@ -286,53 +303,16 @@ app.post('/api/auth/reset-password', (req, res) => {
   }
 });
 
-// Update Profile (Name, Phone, Email)
-app.put('/api/auth/profile', authenticateToken, (req, res) => {
+// Get Current User Profile
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
   try {
-    const { name, phone, email } = req.body;
-    if (!name || !email) {
-      return res.status(400).json({ error: 'Name and email are required' });
-    }
+    let { data: user } = await supabase
+      .from('users')
+      .select('id, name, email, phone, role, membership_id, stamps_count, created_at')
+      .eq('id', req.user.id)
+      .maybeSingle();
 
-    const cleanEmail = email.toLowerCase().trim();
-    // Ensure email is not occupied by another user
-    const existing = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(cleanEmail, req.user.id);
-    if (existing) {
-      return res.status(400).json({ error: 'This email is already associated with another account' });
-    }
-
-    db.prepare('UPDATE users SET name = ?, phone = ?, email = ? WHERE id = ?')
-      .run(name.trim(), phone ? phone.trim() : null, cleanEmail, req.user.id);
-
-    const updated = db.prepare('SELECT id, name, email, phone, role, membership_id, stamps_count, created_at FROM users WHERE id = ?').get(req.user.id);
-    if (updated && !updated.membership_id) {
-      updated.membership_id = formatMembershipId(updated.id);
-    }
-
-    // Refresh JWT with updated details
-    const token = jwt.sign({
-      id: updated.id,
-      name: updated.name,
-      email: updated.email,
-      role: updated.role,
-      phone: updated.phone || '',
-      membership_id: updated.membership_id,
-      stamps_count: updated.stamps_count || 0
-    }, JWT_SECRET, { expiresIn: '7d' });
-
-    res.json({ message: 'Profile updated successfully!', user: updated, token });
-  } catch (err) {
-    console.error('Update profile error:', err);
-    res.status(500).json({ error: 'Could not update profile' });
-  }
-});
-
-// Get Current User Profile + User Bookings + Stamps
-app.get('/api/auth/me', authenticateToken, (req, res) => {
-  try {
-    let user = db.prepare('SELECT id, name, email, phone, role, membership_id, stamps_count, created_at FROM users WHERE id = ?').get(req.user.id);
-
-    // Robust serverless fallback: if container memory was recycled, use authenticated JWT payload
+    // Serverless fallback: use JWT payload if DB lookup missed
     if (!user && req.user) {
       user = {
         id: req.user.id,
@@ -349,29 +329,21 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
 
     if (!user.membership_id) {
       user.membership_id = formatMembershipId(user.id);
-      try {
-        db.prepare('UPDATE users SET membership_id = ? WHERE id = ?').run(user.membership_id, user.id);
-      } catch (e) {}
+      await supabase.from('users').update({ membership_id: user.membership_id }).eq('id', user.id);
     }
 
-    let bookings = [];
-    let myFeedback = [];
-    let stampRequests = [];
-    try {
-      bookings = db.prepare('SELECT * FROM bookings WHERE user_id = ? OR phone = ? ORDER BY id DESC').all(user.id, user.phone || '');
-    } catch (e) {}
-    try {
-      myFeedback = db.prepare('SELECT * FROM feedback WHERE user_id = ? OR email = ? ORDER BY id DESC').all(user.id, user.email);
-    } catch (e) {}
-    try {
-      stampRequests = db.prepare('SELECT * FROM stamp_requests WHERE user_id = ? ORDER BY id DESC').all(user.id);
-    } catch (e) {}
+    // Fetch related data
+    const [{ data: bookings }, { data: myFeedback }, { data: stampRequests }] = await Promise.all([
+      supabase.from('bookings').select('*').eq('user_id', user.id).order('id', { ascending: false }),
+      supabase.from('feedback').select('*').eq('user_id', user.id).order('id', { ascending: false }),
+      supabase.from('stamp_requests').select('*').eq('user_id', user.id).order('id', { ascending: false })
+    ]);
 
     res.json({
       user,
-      bookings,
-      feedback: myFeedback,
-      stamp_requests: stampRequests,
+      bookings: bookings || [],
+      feedback: myFeedback || [],
+      stamp_requests: stampRequests || [],
       stamps_count: user.stamps_count || 0
     });
   } catch (err) {
@@ -380,32 +352,83 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
   }
 });
 
-// ════════════════ LOYALTY STAMPS ROUTES ════════════════
-// Customer: Request a Stamp (for store visits / purchases > ₹149)
-app.post('/api/stamps/request', authenticateToken, (req, res) => {
+// Update Profile
+app.put('/api/auth/profile', authenticateToken, async (req, res) => {
   try {
-    const user = db.prepare('SELECT id, name, email, membership_id, stamps_count FROM users WHERE id = ?').get(req.user.id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    const { name, phone, email } = req.body;
+    if (!name || !email) return res.status(400).json({ error: 'Name and email are required' });
+    const cleanEmail = email.toLowerCase().trim();
 
+    const { data: existing } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', cleanEmail)
+      .neq('id', req.user.id)
+      .maybeSingle();
+
+    if (existing) return res.status(400).json({ error: 'This email is already associated with another account' });
+
+    const { data: updated } = await supabase
+      .from('users')
+      .update({ name: name.trim(), phone: phone ? phone.trim() : null, email: cleanEmail })
+      .eq('id', req.user.id)
+      .select()
+      .single();
+
+    if (!updated.membership_id) {
+      updated.membership_id = formatMembershipId(updated.id);
+    }
+
+    const token = jwt.sign(makeUserPayload(updated), JWT_SECRET, { expiresIn: '7d' });
+    res.json({ message: 'Profile updated successfully!', user: updated, token });
+  } catch (err) {
+    console.error('Update profile error:', err);
+    res.status(500).json({ error: 'Could not update profile' });
+  }
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// LOYALTY STAMPS ROUTES
+// ════════════════════════════════════════════════════════════════════════════
+
+// Customer: Request a Stamp
+app.post('/api/stamps/request', authenticateToken, async (req, res) => {
+  try {
+    const { data: user } = await supabase
+      .from('users')
+      .select('id, name, email, membership_id, stamps_count')
+      .eq('id', req.user.id)
+      .maybeSingle();
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
     if ((user.stamps_count || 0) >= 10) {
       return res.status(400).json({ error: 'You have completed all 10 stamps! Show your Membership ID at the counter to claim your surprise reward!' });
     }
 
     const { bill_amount, bill_notes } = req.body;
     const amount = Number(bill_amount) || 150;
-    if (amount < 149) {
-      return res.status(400).json({ error: 'Visit purchase must be ₹149 or higher to qualify for a stamp.' });
-    }
+    if (amount < 149) return res.status(400).json({ error: 'Visit purchase must be ₹149 or higher to qualify for a stamp.' });
 
     const memId = user.membership_id || formatMembershipId(user.id);
-    const result = db.prepare(`
-      INSERT INTO stamp_requests (user_id, membership_id, user_name, user_email, bill_amount, bill_notes, status)
-      VALUES (?, ?, ?, ?, ?, ?, 'pending')
-    `).run(user.id, memId, user.name, user.email, amount, bill_notes ? String(bill_notes).trim() : 'Store visit over ₹149');
+    const { data: result, error } = await supabase
+      .from('stamp_requests')
+      .insert({
+        user_id: user.id,
+        membership_id: memId,
+        user_name: user.name,
+        user_email: user.email,
+        bill_amount: amount,
+        bill_notes: bill_notes ? String(bill_notes).trim() : 'Store visit over ₹149',
+        status: 'pending'
+      })
+      .select()
+      .single();
+
+    if (error) return res.status(500).json({ error: 'Could not submit stamp request: ' + error.message });
 
     res.status(201).json({
       message: 'Stamp request submitted! Once approved by the store manager, your stamp will appear in your envelope.',
-      requestId: result.lastInsertRowid
+      requestId: result.id
     });
   } catch (err) {
     console.error('Stamp request error:', err);
@@ -413,23 +436,29 @@ app.post('/api/stamps/request', authenticateToken, (req, res) => {
   }
 });
 
-// Customer: Get Stamp Envelope Status
-app.get('/api/stamps/status', authenticateToken, (req, res) => {
+// Customer: Get Stamp Status
+app.get('/api/stamps/status', authenticateToken, async (req, res) => {
   try {
-    const user = db.prepare('SELECT id, name, membership_id, stamps_count FROM users WHERE id = ?').get(req.user.id);
+    const { data: user } = await supabase
+      .from('users')
+      .select('id, name, membership_id, stamps_count')
+      .eq('id', req.user.id)
+      .maybeSingle();
+
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    let requests = [];
-    try {
-      requests = db.prepare('SELECT * FROM stamp_requests WHERE user_id = ? ORDER BY id DESC').all(user.id);
-    } catch (e) {}
+    const { data: requests } = await supabase
+      .from('stamp_requests')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('id', { ascending: false });
 
     res.json({
       membership_id: user.membership_id || formatMembershipId(user.id),
       stamps_count: user.stamps_count || 0,
       max_stamps: 10,
       surprise_unlocked: (user.stamps_count || 0) >= 10,
-      requests
+      requests: requests || []
     });
   } catch (err) {
     res.status(500).json({ error: 'Could not fetch stamp status' });
@@ -437,56 +466,65 @@ app.get('/api/stamps/status', authenticateToken, (req, res) => {
 });
 
 // Admin: Get All Stamp Requests
-app.get('/api/admin/stamps', requireAdmin, (req, res) => {
+app.get('/api/admin/stamps', requireAdmin, async (req, res) => {
   try {
-    const list = db.prepare('SELECT * FROM stamp_requests ORDER BY id DESC').all();
-    res.json(list);
+    const { data: list } = await supabase.from('stamp_requests').select('*').order('id', { ascending: false });
+    res.json(list || []);
   } catch (err) {
     res.status(500).json({ error: 'Could not fetch stamp requests' });
   }
 });
 
 // Admin: Approve Stamp Request
-app.post('/api/admin/stamps/approve/:id', requireAdmin, (req, res) => {
+app.post('/api/admin/stamps/approve/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const request = db.prepare('SELECT * FROM stamp_requests WHERE id = ?').get(id);
+    const { data: request } = await supabase.from('stamp_requests').select('*').eq('id', id).maybeSingle();
     if (!request) return res.status(404).json({ error: 'Request not found' });
 
-    const user = db.prepare('SELECT id, stamps_count FROM users WHERE id = ?').get(request.user_id);
+    const { data: user } = await supabase.from('users').select('id, stamps_count').eq('id', request.user_id).maybeSingle();
     const newCount = Math.min(10, ((user ? user.stamps_count : 0) || 0) + 1);
 
-    if (user) {
-      db.prepare('UPDATE users SET stamps_count = ? WHERE id = ?').run(newCount, user.id);
-    }
-    db.prepare("UPDATE stamp_requests SET status = 'approved' WHERE id = ?").run(id);
+    if (user) await supabase.from('users').update({ stamps_count: newCount }).eq('id', user.id);
+    await supabase.from('stamp_requests').update({ status: 'approved' }).eq('id', id);
 
-    res.json({ message: 'Stamp approved! Customer now has ' + newCount + '/10 stamps.', stamps_count: newCount });
+    res.json({ message: `Stamp approved! Customer now has ${newCount}/10 stamps.`, stamps_count: newCount });
   } catch (err) {
     res.status(500).json({ error: 'Could not approve stamp' });
   }
 });
 
 // Admin: Reject Stamp Request
-app.post('/api/admin/stamps/reject/:id', requireAdmin, (req, res) => {
+app.post('/api/admin/stamps/reject/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    db.prepare("UPDATE stamp_requests SET status = 'rejected' WHERE id = ?").run(id);
+    await supabase.from('stamp_requests').update({ status: 'rejected' }).eq('id', id);
     res.json({ message: 'Stamp request rejected' });
   } catch (err) {
     res.status(500).json({ error: 'Could not reject stamp request' });
   }
 });
 
-// Admin: Manually Add / Subtract / Reset Stamps
-app.post('/api/admin/stamps/adjust', requireAdmin, (req, res) => {
+// Admin: Adjust Stamps
+app.post('/api/admin/stamps/adjust', requireAdmin, async (req, res) => {
   try {
-    const { identifier, action } = req.body; // action: 'add' | 'subtract' | 'reset'
+    const { identifier, action } = req.body;
     if (!identifier) return res.status(400).json({ error: 'User identifier required' });
-
     const cleanId = String(identifier).trim();
-    const user = db.prepare('SELECT id, name, membership_id, stamps_count FROM users WHERE membership_id = ? OR email = ? OR id = ?')
-      .get(cleanId, cleanId.toLowerCase(), Number(cleanId) || -1);
+
+    let { data: user } = await supabase
+      .from('users')
+      .select('id, name, membership_id, stamps_count')
+      .or(`membership_id.eq.${cleanId},email.eq.${cleanId.toLowerCase()}`)
+      .maybeSingle();
+
+    if (!user) {
+      const numId = parseInt(cleanId);
+      if (!isNaN(numId)) {
+        const { data: u2 } = await supabase.from('users').select('id, name, membership_id, stamps_count').eq('id', numId).maybeSingle();
+        user = u2;
+      }
+    }
 
     if (!user) return res.status(404).json({ error: 'User not found' });
 
@@ -495,184 +533,190 @@ app.post('/api/admin/stamps/adjust', requireAdmin, (req, res) => {
     else if (action === 'reset') count = 0;
     else count = Math.min(10, count + 1);
 
-    db.prepare('UPDATE users SET stamps_count = ? WHERE id = ?').run(count, user.id);
+    await supabase.from('users').update({ stamps_count: count }).eq('id', user.id);
     res.json({ message: `Stamps updated for ${user.name}: ${count}/10`, stamps_count: count });
   } catch (err) {
     res.status(500).json({ error: 'Could not adjust stamps' });
   }
 });
 
-// ════════════════ FEEDBACK ROUTES ════════════════
-// Public: Submit Feedback
-app.post('/api/feedback', (req, res) => {
+// ════════════════════════════════════════════════════════════════════════════
+// FEEDBACK ROUTES
+// ════════════════════════════════════════════════════════════════════════════
+
+app.post('/api/feedback', async (req, res) => {
   try {
     const { name, email, rating, service, comment } = req.body;
-    if (!name || !comment) {
-      return res.status(400).json({ error: 'Name and comment are required' });
-    }
+    if (!name || !comment) return res.status(400).json({ error: 'Name and comment are required' });
 
     let userId = null;
     const authHeader = req.headers['authorization'];
     if (authHeader) {
-      const token = authHeader.split(' ')[1];
-      try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        userId = decoded.id;
-      } catch (e) { /* ignore optional token */ }
+      try { userId = jwt.verify(authHeader.split(' ')[1], JWT_SECRET).id; } catch (e) {}
     }
 
-    const stmt = db.prepare(`
-      INSERT INTO feedback (user_id, name, email, rating, service, comment)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
-    const result = stmt.run(
-      userId,
-      name.trim(),
-      email ? email.trim() : null,
-      parseInt(rating) || 5,
-      service || 'General Gaming',
-      comment.trim()
-    );
+    const { data: result, error } = await supabase
+      .from('feedback')
+      .insert({
+        user_id: userId,
+        name: name.trim(),
+        email: email ? email.trim() : null,
+        rating: parseInt(rating) || 5,
+        service: service || 'General Gaming',
+        comment: comment.trim()
+      })
+      .select()
+      .single();
 
-    res.status(201).json({ message: 'Feedback submitted successfully!', id: result.lastInsertRowid });
+    if (error) return res.status(500).json({ error: 'Could not submit feedback: ' + error.message });
+    res.status(201).json({ message: 'Feedback submitted successfully!', id: result.id });
   } catch (err) {
     console.error('Feedback submit error:', err);
     res.status(500).json({ error: 'Could not submit feedback' });
   }
 });
 
-// Public: Get Recent or Featured Feedback
-app.get('/api/feedback', (req, res) => {
+app.get('/api/feedback', async (req, res) => {
   try {
-    const list = db.prepare(`
-      SELECT id, name, rating, service, comment, is_featured, created_at 
-      FROM feedback 
-      ORDER BY is_featured DESC, id DESC 
-      LIMIT 20
-    `).all();
-    res.json(list);
+    const { data: list } = await supabase
+      .from('feedback')
+      .select('id, name, rating, service, comment, is_featured, created_at')
+      .order('is_featured', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(20);
+    res.json(list || []);
   } catch (err) {
     res.status(500).json({ error: 'Could not fetch reviews' });
   }
 });
 
-// ════════════════ BOOKING / RESERVATION ROUTES ════════════════
-// Public: Submit Reservation Request
-app.post('/api/bookings', (req, res) => {
+// ════════════════════════════════════════════════════════════════════════════
+// BOOKING / RESERVATION ROUTES
+// ════════════════════════════════════════════════════════════════════════════
+
+app.post('/api/bookings', async (req, res) => {
   try {
     const { name, phone, service, booking_date, booking_time, duration, guests, notes } = req.body;
-    if (!name || !phone || !service) {
-      return res.status(400).json({ error: 'Name, phone, and service are required' });
-    }
+    if (!name || !phone || !service) return res.status(400).json({ error: 'Name, phone, and service are required' });
 
     let userId = null;
     const authHeader = req.headers['authorization'];
     if (authHeader) {
-      const token = authHeader.split(' ')[1];
-      try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        userId = decoded.id;
-      } catch (e) { /* ignore */ }
+      try { userId = jwt.verify(authHeader.split(' ')[1], JWT_SECRET).id; } catch (e) {}
     }
 
-    const stmt = db.prepare(`
-      INSERT INTO bookings (user_id, name, phone, service, booking_date, booking_time, duration, guests, notes, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-    `);
-    const result = stmt.run(
-      userId,
-      name.trim(),
-      phone.trim(),
-      service.trim(),
-      booking_date || null,
-      booking_time || null,
-      duration || null,
-      parseInt(guests) || 1,
-      notes ? notes.trim() : null
-    );
+    const { data: result, error } = await supabase
+      .from('bookings')
+      .insert({
+        user_id: userId,
+        name: name.trim(),
+        phone: phone.trim(),
+        service: service.trim(),
+        booking_date: booking_date || null,
+        booking_time: booking_time || null,
+        duration: duration || null,
+        guests: parseInt(guests) || 1,
+        notes: notes ? notes.trim() : null,
+        status: 'pending'
+      })
+      .select()
+      .single();
 
-    res.status(201).json({
-      message: 'Reservation request submitted! Our crew will contact you shortly.',
-      id: result.lastInsertRowid
-    });
+    if (error) return res.status(500).json({ error: 'Could not submit reservation: ' + error.message });
+    res.status(201).json({ message: 'Reservation request submitted! Our crew will contact you shortly.', id: result.id });
   } catch (err) {
     console.error('Booking error:', err);
     res.status(500).json({ error: 'Could not submit reservation' });
   }
 });
 
-// ════════════════ ANNOUNCEMENTS & BANNERS ════════════════
-// Public: Get Active Announcements
-app.get('/api/announcements', (req, res) => {
+// ════════════════════════════════════════════════════════════════════════════
+// ANNOUNCEMENTS & BANNERS
+// ════════════════════════════════════════════════════════════════════════════
+
+app.get('/api/announcements', async (req, res) => {
   try {
-    const list = db.prepare('SELECT * FROM announcements WHERE is_active = 1 ORDER BY id DESC').all();
-    res.json(list);
+    const { data: list } = await supabase
+      .from('announcements')
+      .select('*')
+      .eq('is_active', 1)
+      .order('id', { ascending: false });
+    res.json(list || []);
   } catch (err) {
     res.status(500).json({ error: 'Could not load announcements' });
   }
 });
 
-// ════════════════ CAFE ITEMS ════════════════
-// Public: Get Cafe Menu & Combos
-app.get('/api/cafe', (req, res) => {
+// ════════════════════════════════════════════════════════════════════════════
+// CAFE ITEMS
+// ════════════════════════════════════════════════════════════════════════════
+
+app.get('/api/cafe', async (req, res) => {
   try {
-    const items = db.prepare('SELECT * FROM cafe_items WHERE is_available = 1 ORDER BY category ASC, id ASC').all();
-    res.json(items);
+    const { data: items } = await supabase
+      .from('cafe_items')
+      .select('*')
+      .eq('is_available', 1)
+      .order('category')
+      .order('id');
+    res.json(items || []);
   } catch (err) {
     res.status(500).json({ error: 'Could not load cafe menu' });
   }
 });
 
-// ════════════════ ADMIN DASHBOARD ROUTES ════════════════
-// Admin Stats
-app.get('/api/admin/stats', requireAdmin, (req, res) => {
-  try {
-    const totalUsers = db.prepare('SELECT COUNT(*) as count FROM users WHERE role = ?').get('user').count;
-    const totalFeedback = db.prepare('SELECT COUNT(*) as count FROM feedback').get().count;
-    const pendingBookings = db.prepare('SELECT COUNT(*) as count FROM bookings WHERE status = ?').get('pending').count;
-    const totalBookings = db.prepare('SELECT COUNT(*) as count FROM bookings').get().count;
-    const totalCafeItems = db.prepare('SELECT COUNT(*) as count FROM cafe_items').get().count;
+// ════════════════════════════════════════════════════════════════════════════
+// ADMIN DASHBOARD ROUTES
+// ════════════════════════════════════════════════════════════════════════════
 
-    res.json({
-      totalUsers,
-      totalFeedback,
-      pendingBookings,
-      totalBookings,
-      totalCafeItems
-    });
+// Admin Stats
+app.get('/api/admin/stats', requireAdmin, async (req, res) => {
+  try {
+    const [
+      { count: totalUsers },
+      { count: totalFeedback },
+      { count: pendingBookings },
+      { count: totalBookings },
+      { count: totalCafeItems }
+    ] = await Promise.all([
+      supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'user'),
+      supabase.from('feedback').select('*', { count: 'exact', head: true }),
+      supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('bookings').select('*', { count: 'exact', head: true }),
+      supabase.from('cafe_items').select('*', { count: 'exact', head: true })
+    ]);
+    res.json({ totalUsers, totalFeedback, pendingBookings, totalBookings, totalCafeItems });
   } catch (err) {
     res.status(500).json({ error: 'Could not load stats' });
   }
 });
 
 // Admin: Feedback Management
-app.get('/api/admin/feedback', requireAdmin, (req, res) => {
+app.get('/api/admin/feedback', requireAdmin, async (req, res) => {
   try {
-    const list = db.prepare('SELECT * FROM feedback ORDER BY id DESC').all();
-    res.json(list);
+    const { data: list } = await supabase.from('feedback').select('*').order('id', { ascending: false });
+    res.json(list || []);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch feedback list' });
   }
 });
 
-app.put('/api/admin/feedback/:id/feature', requireAdmin, (req, res) => {
+app.put('/api/admin/feedback/:id/feature', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const current = db.prepare('SELECT is_featured FROM feedback WHERE id = ?').get(id);
+    const { data: current } = await supabase.from('feedback').select('is_featured').eq('id', id).maybeSingle();
     if (!current) return res.status(404).json({ error: 'Feedback not found' });
-
     const newStatus = current.is_featured ? 0 : 1;
-    db.prepare('UPDATE feedback SET is_featured = ? WHERE id = ?').run(newStatus, id);
+    await supabase.from('feedback').update({ is_featured: newStatus }).eq('id', id);
     res.json({ message: 'Featured status toggled', is_featured: newStatus });
   } catch (err) {
     res.status(500).json({ error: 'Could not update feedback' });
   }
 });
 
-app.delete('/api/admin/feedback/:id', requireAdmin, (req, res) => {
+app.delete('/api/admin/feedback/:id', requireAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
-    db.prepare('DELETE FROM feedback WHERE id = ?').run(id);
+    await supabase.from('feedback').delete().eq('id', req.params.id);
     res.json({ message: 'Feedback entry deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Could not delete feedback' });
@@ -680,33 +724,31 @@ app.delete('/api/admin/feedback/:id', requireAdmin, (req, res) => {
 });
 
 // Admin: Bookings Management
-app.get('/api/admin/bookings', requireAdmin, (req, res) => {
+app.get('/api/admin/bookings', requireAdmin, async (req, res) => {
   try {
-    const list = db.prepare('SELECT * FROM bookings ORDER BY id DESC').all();
-    res.json(list);
+    const { data: list } = await supabase.from('bookings').select('*').order('id', { ascending: false });
+    res.json(list || []);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch bookings' });
   }
 });
 
-app.put('/api/admin/bookings/:id/status', requireAdmin, (req, res) => {
+app.put('/api/admin/bookings/:id/status', requireAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
     const { status } = req.body;
     if (!['pending', 'confirmed', 'completed', 'cancelled'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
-    db.prepare('UPDATE bookings SET status = ? WHERE id = ?').run(status, id);
+    await supabase.from('bookings').update({ status }).eq('id', req.params.id);
     res.json({ message: 'Booking status updated successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Could not update booking status' });
   }
 });
 
-app.delete('/api/admin/bookings/:id', requireAdmin, (req, res) => {
+app.delete('/api/admin/bookings/:id', requireAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
-    db.prepare('DELETE FROM bookings WHERE id = ?').run(id);
+    await supabase.from('bookings').delete().eq('id', req.params.id);
     res.json({ message: 'Booking deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Could not delete booking' });
@@ -714,51 +756,43 @@ app.delete('/api/admin/bookings/:id', requireAdmin, (req, res) => {
 });
 
 // Admin: Announcements Management
-app.get('/api/admin/announcements', requireAdmin, (req, res) => {
+app.get('/api/admin/announcements', requireAdmin, async (req, res) => {
   try {
-    const list = db.prepare('SELECT * FROM announcements ORDER BY id DESC').all();
-    res.json(list);
+    const { data: list } = await supabase.from('announcements').select('*').order('id', { ascending: false });
+    res.json(list || []);
   } catch (err) {
     res.status(500).json({ error: 'Could not fetch announcements' });
   }
 });
 
-app.post('/api/admin/announcements', requireAdmin, (req, res) => {
+app.post('/api/admin/announcements', requireAdmin, async (req, res) => {
   try {
     const { title, badge, message, link, is_active } = req.body;
-    if (!title || !message) {
-      return res.status(400).json({ error: 'Title and message are required' });
-    }
-    const stmt = db.prepare(`
-      INSERT INTO announcements (title, badge, message, link, is_active)
-      VALUES (?, ?, ?, ?, ?)
-    `);
-    const result = stmt.run(title, badge || '🔥 NEW', message, link || null, is_active !== undefined ? is_active : 1);
-    res.status(201).json({ message: 'Announcement created!', id: result.lastInsertRowid });
+    if (!title || !message) return res.status(400).json({ error: 'Title and message are required' });
+    const { data: result, error } = await supabase
+      .from('announcements')
+      .insert({ title, badge: badge || '🔥 NEW', message, link: link || null, is_active: is_active !== undefined ? is_active : 1 })
+      .select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.status(201).json({ message: 'Announcement created!', id: result.id });
   } catch (err) {
     res.status(500).json({ error: 'Could not create announcement' });
   }
 });
 
-app.put('/api/admin/announcements/:id', requireAdmin, (req, res) => {
+app.put('/api/admin/announcements/:id', requireAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
     const { title, badge, message, link, is_active } = req.body;
-    db.prepare(`
-      UPDATE announcements
-      SET title = ?, badge = ?, message = ?, link = ?, is_active = ?
-      WHERE id = ?
-    `).run(title, badge, message, link, is_active ? 1 : 0, id);
+    await supabase.from('announcements').update({ title, badge, message, link, is_active: is_active ? 1 : 0 }).eq('id', req.params.id);
     res.json({ message: 'Announcement updated!' });
   } catch (err) {
     res.status(500).json({ error: 'Could not update announcement' });
   }
 });
 
-app.delete('/api/admin/announcements/:id', requireAdmin, (req, res) => {
+app.delete('/api/admin/announcements/:id', requireAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
-    db.prepare('DELETE FROM announcements WHERE id = ?').run(id);
+    await supabase.from('announcements').delete().eq('id', req.params.id);
     res.json({ message: 'Announcement deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Could not delete announcement' });
@@ -766,68 +800,54 @@ app.delete('/api/admin/announcements/:id', requireAdmin, (req, res) => {
 });
 
 // Admin: Cafe Menu Management
-app.get('/api/admin/cafe', requireAdmin, (req, res) => {
+app.get('/api/admin/cafe', requireAdmin, async (req, res) => {
   try {
-    const items = db.prepare('SELECT * FROM cafe_items ORDER BY category ASC, id DESC').all();
-    res.json(items);
+    const { data: items } = await supabase.from('cafe_items').select('*').order('category').order('id', { ascending: false });
+    res.json(items || []);
   } catch (err) {
     res.status(500).json({ error: 'Could not fetch cafe items' });
   }
 });
 
-app.post('/api/admin/cafe', requireAdmin, (req, res) => {
+app.post('/api/admin/cafe', requireAdmin, async (req, res) => {
   try {
     const { category, name, description, price, original_price, badge, is_available } = req.body;
-    if (!category || !name || price === undefined) {
-      return res.status(400).json({ error: 'Category, name, and price are required' });
-    }
-    const stmt = db.prepare(`
-      INSERT INTO cafe_items (category, name, description, price, original_price, badge, is_available)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
-    const result = stmt.run(
-      category,
-      name,
-      description || null,
-      parseFloat(price),
-      original_price ? parseFloat(original_price) : null,
-      badge || null,
-      is_available !== undefined ? is_available : 1
-    );
-    res.status(201).json({ message: 'Menu item added successfully!', id: result.lastInsertRowid });
+    if (!category || !name || price === undefined) return res.status(400).json({ error: 'Category, name, and price are required' });
+    const { data: result, error } = await supabase
+      .from('cafe_items')
+      .insert({
+        category, name, description: description || null,
+        price: parseFloat(price),
+        original_price: original_price ? parseFloat(original_price) : null,
+        badge: badge || null,
+        is_available: is_available !== undefined ? is_available : 1
+      })
+      .select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    res.status(201).json({ message: 'Menu item added successfully!', id: result.id });
   } catch (err) {
     res.status(500).json({ error: 'Could not add cafe item' });
   }
 });
 
-app.put('/api/admin/cafe/:id', requireAdmin, (req, res) => {
+app.put('/api/admin/cafe/:id', requireAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
     const { category, name, description, price, original_price, badge, is_available } = req.body;
-    db.prepare(`
-      UPDATE cafe_items
-      SET category = ?, name = ?, description = ?, price = ?, original_price = ?, badge = ?, is_available = ?
-      WHERE id = ?
-    `).run(
-      category,
-      name,
-      description,
-      parseFloat(price),
-      original_price ? parseFloat(original_price) : null,
-      badge,
-      is_available ? 1 : 0,
-      id
-    );
+    await supabase.from('cafe_items').update({
+      category, name, description,
+      price: parseFloat(price),
+      original_price: original_price ? parseFloat(original_price) : null,
+      badge, is_available: is_available ? 1 : 0
+    }).eq('id', req.params.id);
     res.json({ message: 'Menu item updated successfully!' });
   } catch (err) {
     res.status(500).json({ error: 'Could not update cafe item' });
   }
 });
 
-app.delete('/api/admin/cafe/:id', requireAdmin, (req, res) => {
+app.delete('/api/admin/cafe/:id', requireAdmin, async (req, res) => {
   try {
-    const { id } = req.params;
-    db.prepare('DELETE FROM cafe_items WHERE id = ?').run(id);
+    await supabase.from('cafe_items').delete().eq('id', req.params.id);
     res.json({ message: 'Menu item deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Could not delete cafe item' });
@@ -835,10 +855,13 @@ app.delete('/api/admin/cafe/:id', requireAdmin, (req, res) => {
 });
 
 // Admin: Users list
-app.get('/api/admin/users', requireAdmin, (req, res) => {
+app.get('/api/admin/users', requireAdmin, async (req, res) => {
   try {
-    const users = db.prepare('SELECT id, name, email, phone, role, membership_id, stamps_count, created_at FROM users ORDER BY id DESC').all();
-    const formatted = users.map(u => ({
+    const { data: users } = await supabase
+      .from('users')
+      .select('id, name, email, phone, role, membership_id, stamps_count, created_at')
+      .order('id', { ascending: false });
+    const formatted = (users || []).map(u => ({
       ...u,
       membership_id: u.membership_id || formatMembershipId(u.id),
       stamps_count: u.stamps_count || 0
@@ -849,26 +872,24 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
   }
 });
 
-// Fallback to index.html for unknown routes if needed
+// ─── Root fallback ─────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
   const fs = require('fs');
   const pubPath = path.join(__dirname, 'public', 'index.html');
-  if (fs.existsSync(pubPath)) {
-    return res.sendFile(pubPath);
-  }
+  if (fs.existsSync(pubPath)) return res.sendFile(pubPath);
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// ─── Start ──────────────────────────────────────────────────────────────────
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`\n==================================================`);
-    console.log(`🚀 Virtux Gaming Hub Server running on: http://localhost:${PORT}`);
+    console.log(`🚀 Virtux Gaming Hub Server: http://localhost:${PORT}`);
     console.log(`⚡ Admin Panel: http://localhost:${PORT}/admin.html`);
     console.log(`👤 User Login:  http://localhost:${PORT}/login.html`);
-    console.log(`🔑 Default Admin Credentials: admin@virtux.com / admin123`);
+    console.log(`🗄️  Database:   Supabase (${SUPABASE_URL})`);
     console.log(`==================================================\n`);
   });
 }
 
 module.exports = app;
-

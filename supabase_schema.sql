@@ -88,7 +88,7 @@ INSERT INTO public.users (name, email, password, phone, role, membership_id, sta
 VALUES (
   'Virtux Admin',
   'admin@virtux.com',
-  '$2a$10$wT0XhPqgZf7WfV0nO6V0reM1/Qc5G8f0Q8Z7V1p2s3t4u5v6w7x8y', -- bcrypt hash of admin123
+  '$2b$10$FEjIMHcE4RPqSWroBaUcteY5Q77zwpNbyiKrNZPv2wSFbUgivuJ.W', -- valid bcrypt hash of admin123
   '+91 91477 18768',
   'admin',
   'VIRTUXGAMING000000001',
