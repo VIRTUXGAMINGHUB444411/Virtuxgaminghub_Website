@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-main: #ffffff;
+    --bg-subtle: #f8fafc;
+    --bg-card: #ffffff;
+    --crimson: #f92f35;
+    --crimson-hover: #e02228;
+    --text-primary: #09090b;
+    --text-muted: #64748b;
+    --border-light: rgba(15, 23, 42, 0.08);
+  }
+
+  body {
+    background-color: #ffffff;
+    color: #09090b;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: #f92f35;
+    color: #ffffff;
+  }
+}
+
+/* Angular Diagonal Splits as seen in Sekiro UI */
+.clip-diagonal-right {
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 0 100%);
+}
+
+@media (max-width: 1024px) {
+  .clip-diagonal-right {
+    clip-path: none;
+  }
+}
+
+.clip-diagonal-left {
+  clip-path: polygon(20% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+@media (max-width: 1024px) {
+  .clip-diagonal-left {
+    clip-path: none;
+  }
+}
+
+/* Signature Sekiro Red Action Button */
+.btn-red-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #f92f35;
+  color: #ffffff;
+  font-family: var(--font-orbitron), 'Orbitron', sans-serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.85rem 2rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 10px 25px -4px rgba(249, 47, 53, 0.45);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.btn-red-action:hover {
+  background-color: #e02228;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -4px rgba(249, 47, 53, 0.6);
+}
+
+.btn-white-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #ffffff;
+  color: #09090b;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  font-family: var(--font-orbitron), 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.85rem 1.8rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.btn-white-action:hover {
+  border-color: #f92f35;
+  color: #f92f35;
+  background-color: #fff5f5;
+  transform: translateY(-2px);
+}
+
+/* Clean Editorial Card */
+.editorial-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 0 1px 1px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.editorial-card:hover {
+  border-color: rgba(249, 47, 53, 0.3);
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(249, 47, 53, 0.2);
+  transform: translateY(-4px);
+}
+
+/* Light Pattern Backgrounds */
+.light-dot-grid {
+  background-image: radial-gradient(rgba(15, 23, 42, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.light-angular-lines {
+  background: 
+    linear-gradient(135deg, rgba(249, 47, 53, 0.03) 25%, transparent 25%) -50px 0,
+    linear-gradient(225deg, rgba(249, 47, 53, 0.03) 25%, transparent 25%) -50px 0,
+    linear-gradient(315deg, rgba(249, 47, 53, 0.03) 25%, transparent 25%),
+    linear-gradient(45deg, rgba(249, 47, 53, 0.03) 25%, transparent 25%);
+  background-size: 100px 100px;
+}
+
+/* Custom Red Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f92f35;
+}
