@@ -22,7 +22,7 @@ export const GAMES_DATA: GameItem[] = [
     framerate: '120 FPS',
     coverGradient: 'from-emerald-900 via-teal-950 to-black',
     accentColor: '#10b981',
-    icon: '⚽',
+    icon: 'football',
   },
   {
     id: 'g2',
@@ -34,7 +34,7 @@ export const GAMES_DATA: GameItem[] = [
     framerate: '60 FPS Ultra-low Lag',
     coverGradient: 'from-red-950 via-rose-950 to-black',
     accentColor: '#f43f5e',
-    icon: '🥊',
+    icon: 'swords',
   },
   {
     id: 'g3',
@@ -46,7 +46,7 @@ export const GAMES_DATA: GameItem[] = [
     framerate: '144+ FPS',
     coverGradient: 'from-yellow-950 via-amber-950 to-black',
     accentColor: '#eab308',
-    icon: '🦾',
+    icon: 'cpu',
   },
   {
     id: 'g4',
@@ -58,7 +58,7 @@ export const GAMES_DATA: GameItem[] = [
     framerate: '400+ FPS',
     coverGradient: 'from-rose-950 via-red-950 to-black',
     accentColor: '#fb7185',
-    icon: '🎯',
+    icon: 'crosshair',
   },
   {
     id: 'g5',
@@ -70,7 +70,7 @@ export const GAMES_DATA: GameItem[] = [
     framerate: '120 FPS',
     coverGradient: 'from-blue-950 via-indigo-950 to-black',
     accentColor: '#38bdf8',
-    icon: '🏎️',
+    icon: 'car',
   },
   {
     id: 'g6',
@@ -82,7 +82,7 @@ export const GAMES_DATA: GameItem[] = [
     framerate: '144 FPS',
     coverGradient: 'from-orange-950 via-amber-950 to-black',
     accentColor: '#f97316',
-    icon: '🏁',
+    icon: 'flag',
   },
   {
     id: 'g7',
@@ -94,7 +94,7 @@ export const GAMES_DATA: GameItem[] = [
     framerate: '60-120 FPS',
     coverGradient: 'from-red-900 via-blue-950 to-black',
     accentColor: '#ef4444',
-    icon: '🕷️',
+    icon: 'target',
   },
   {
     id: 'g8',
@@ -106,7 +106,7 @@ export const GAMES_DATA: GameItem[] = [
     framerate: '300+ FPS',
     coverGradient: 'from-sky-950 via-slate-900 to-black',
     accentColor: '#0ea5e9',
-    icon: '💣',
+    icon: 'bomb',
   },
   {
     id: 'g9',
@@ -118,7 +118,7 @@ export const GAMES_DATA: GameItem[] = [
     framerate: '60 FPS',
     coverGradient: 'from-stone-900 via-amber-950 to-black',
     accentColor: '#d97706',
-    icon: '🐒',
+    icon: 'flame',
   },
   {
     id: 'g10',
@@ -130,7 +130,7 @@ export const GAMES_DATA: GameItem[] = [
     framerate: '60 FPS',
     coverGradient: 'from-purple-950 via-indigo-950 to-black',
     accentColor: '#a855f7',
-    icon: '🤼',
+    icon: 'users',
   },
   {
     id: 'g11',
@@ -142,7 +142,7 @@ export const GAMES_DATA: GameItem[] = [
     framerate: 'Smooth Performance',
     coverGradient: 'from-emerald-950 via-zinc-900 to-black',
     accentColor: '#22c55e',
-    icon: '🚗',
+    icon: 'car',
   },
   {
     id: 'g12',
@@ -154,6 +154,6 @@ export const GAMES_DATA: GameItem[] = [
     framerate: '60 FPS',
     coverGradient: 'from-yellow-950 via-red-950 to-black',
     accentColor: '#e11d48',
-    icon: '🐉',
+    icon: 'sparkles',
   },
 ];

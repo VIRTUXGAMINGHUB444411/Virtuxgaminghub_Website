@@ -5,9 +5,9 @@ import React, { useEffect, useRef } from "react";
 /**
  * Live 3D Virtux icon (V+X blades + triangle gems), blood-red palette.
  * Three.js is imported lazily so it only ships where this component mounts.
- * Renders on pure black + mix-blend-screen, since bloom post-processing drops alpha.
+ * Transparent canvas (no backdrop, no bloom halo) so it sits cleanly on any background.
  */
-export const Logo3D: React.FC<{ className?: string; bg?: number }> = ({ className = "", bg = 0x000000 }) => {
+export const Logo3D: React.FC<{ className?: string; scrollSpin?: boolean }> = ({ className = "", scrollSpin = false }) => {
   const host = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,25 +19,26 @@ export const Logo3D: React.FC<{ className?: string; bg?: number }> = ({ classNam
     (async () => {
       const THREE = await import("three");
       const { RoomEnvironment } = await import("three/examples/jsm/environments/RoomEnvironment.js");
-      const { EffectComposer } = await import("three/examples/jsm/postprocessing/EffectComposer.js");
-      const { RenderPass } = await import("three/examples/jsm/postprocessing/RenderPass.js");
-      const { UnrealBloomPass } = await import("three/examples/jsm/postprocessing/UnrealBloomPass.js");
-      const { OutputPass } = await import("three/examples/jsm/postprocessing/OutputPass.js");
       if (disposed) return;
 
       let w = el.clientWidth || 300, h = el.clientHeight || 300;
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      let renderer: InstanceType<typeof THREE.WebGLRenderer>;
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, premultipliedAlpha: true });
+      } catch {
+        return; // no WebGL: leave the slot empty
+      }
+      renderer.setClearColor(0x000000, 0);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.matchMedia("(max-width: 768px)").matches ? 1.5 : 2));
       renderer.setSize(w, h);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.05;
-      renderer.domElement.style.display = "block";
+      renderer.toneMappingExposure = 1.25;
+      renderer.domElement.style.cssText = "display:block;width:100%;height:100%";
       el.appendChild(renderer.domElement);
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(bg);
       const pmrem = new THREE.PMREMGenerator(renderer);
-      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.02).texture;
 
       const camera = new THREE.PerspectiveCamera(32, w / h, 0.1, 100);
       const fit = () => (camera.position.z = Math.max(17, 18 / camera.aspect));
@@ -66,7 +67,7 @@ export const Logo3D: React.FC<{ className?: string; bg?: number }> = ({ classNam
       const triTop = { outer: [[380,168],[645,168],[512,318]] as Pt[], inner: [[430,192],[595,192],[512,285]] as Pt[], gem: [[468,212],[556,212],[512,258]] as Pt[] };
       const triBot = { outer: [[452,652],[572,652],[512,575]] as Pt[], inner: [[474,640],[550,640],[512,600]] as Pt[], gem: [[486,636],[538,636],[512,608]] as Pt[] };
 
-      const metal = new THREE.MeshPhysicalMaterial({ color: 0x34353b, metalness: 0.88, roughness: 0.34, clearcoat: 0.6, clearcoatRoughness: 0.25 });
+      const metal = new THREE.MeshPhysicalMaterial({ color: 0x8a8c95, metalness: 0.9, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.6 });
       const glowA = new THREE.MeshBasicMaterial({ color: 0xff1a0d, toneMapped: false });
       const glowB = new THREE.MeshBasicMaterial({ color: 0xff2a1f, toneMapped: false });
       const gemTop = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xff1a0d, emissiveIntensity: 1.4, toneMapped: false });
@@ -110,8 +111,8 @@ export const Logo3D: React.FC<{ className?: string; bg?: number }> = ({ classNam
       pivot.add(logo);
       scene.add(pivot);
 
-      scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-      const key = new THREE.DirectionalLight(0xffffff, 1.9);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      const key = new THREE.DirectionalLight(0xffffff, 2.6);
       key.position.set(4, 6, 8);
       scene.add(key);
       const l1 = new THREE.PointLight(0xff1a0d, 60, 30);
@@ -120,11 +121,10 @@ export const Logo3D: React.FC<{ className?: string; bg?: number }> = ({ classNam
       const l2 = new THREE.PointLight(0xff2a1f, 60, 30);
       l2.position.set(6, -3, 3);
       scene.add(l2);
+      /* moving specular sweep: a bright highlight glides across the metal so it reads as polished */
+      const sweep = new THREE.PointLight(0xffffff, 90, 22);
+      scene.add(sweep);
 
-      const composer = new EffectComposer(renderer);
-      composer.addPass(new RenderPass(scene, camera));
-      composer.addPass(new UnrealBloomPass(new THREE.Vector2(w, h), 0.75, 0.5, 0.45));
-      composer.addPass(new OutputPass());
 
       /* interaction */
       let drag = false, lx = 0, ly = 0, rx = 0, ry = 0, vy = 0, tx = 0, ty = 0;
@@ -155,29 +155,36 @@ export const Logo3D: React.FC<{ className?: string; bg?: number }> = ({ classNam
         camera.updateProjectionMatrix();
         fit();
         renderer.setSize(w, h);
-        composer.setSize(w, h);
       });
       ro.observe(el);
+
+      let visible = true;
+      const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
+      io.observe(el);
 
       const clock = new THREE.Clock();
       let raf = 0;
       const loop = () => {
+        raf = requestAnimationFrame(loop);
+        if (!visible || document.hidden) return;
         const t = clock.getElapsedTime();
+        const sc = scrollSpin ? window.scrollY * 0.0025 : 0;
         if (!drag) { vy *= 0.92; ry += vy; ry *= 0.97; rx *= 0.96; }
         const sway = Math.sin(t * 0.7) * 0.35;
-        pivot.rotation.y += (ry + ty + sway - pivot.rotation.y) * 0.08;
+        pivot.rotation.y += (ry + ty + sway + sc - pivot.rotation.y) * 0.08;
         pivot.rotation.x += (rx + tx - pivot.rotation.x) * 0.08;
         pivot.position.y = Math.sin(t * 1.2) * 0.12;
+        sweep.position.set(Math.sin(t * 0.9) * 7, Math.cos(t * 0.6) * 3, 6);
         const pulse = 1.4 + Math.sin(t * 3) * 0.4;
         gemTop.emissiveIntensity = pulse;
         gemBot.emissiveIntensity = 2.8 - pulse;
-        composer.render();
-        raf = requestAnimationFrame(loop);
+        renderer.render(scene, camera);
       };
       loop();
 
       cleanup = () => {
         cancelAnimationFrame(raf);
+        io.disconnect();
         ro.disconnect();
         cv.removeEventListener("pointerdown", down);
         cv.removeEventListener("click", stopClick);
@@ -189,7 +196,6 @@ export const Logo3D: React.FC<{ className?: string; bg?: number }> = ({ classNam
         });
         [metal, glowA, glowB, gemTop, gemBot].forEach((m) => m.dispose());
         pmrem.dispose();
-        composer.dispose();
         renderer.dispose();
         cv.remove();
       };
@@ -199,7 +205,7 @@ export const Logo3D: React.FC<{ className?: string; bg?: number }> = ({ classNam
       disposed = true;
       cleanup();
     };
-  }, [bg]);
+  }, [scrollSpin]);
 
-  return <div ref={host} className={`mix-blend-screen ${className}`} data-cursor aria-label="Virtux 3D logo" role="img" />;
+  return <div ref={host} className={className} data-cursor aria-label="Virtux 3D logo" role="img" />;
 };

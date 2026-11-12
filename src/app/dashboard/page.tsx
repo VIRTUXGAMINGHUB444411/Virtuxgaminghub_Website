@@ -3,6 +3,20 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
+import {
+  User,
+  Copy,
+  LogOut,
+  Activity,
+  Calendar,
+  UtensilsCrossed,
+  Settings,
+  Headphones,
+  Coffee,
+  Trophy,
+  Clock,
+  ShoppingBag,
+} from "@/components/Icons";
 
 export default function DashboardPage() {
   const { user, bookings, cafeOrders, logout, showToast, setIsBookingOpen, setIsCartOpen } = useStore();
@@ -16,7 +30,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center bg-white text-slate-900">
         <div className="w-16 h-16 rounded-full bg-red-50 border border-red-200 flex items-center justify-center text-3xl mb-4 text-[#e10600]">
-          👤
+          <User className="w-8 h-8 text-[#e10600]" />
         </div>
         <h2 className="font-orbitron font-black text-2xl text-slate-900 mb-2">
           Player Access Required
@@ -85,9 +99,10 @@ export default function DashboardPage() {
                 </div>
                 <button
                   onClick={copyMemberId}
-                  className="px-2.5 py-1 rounded bg-white border border-slate-200 text-xs font-rajdhani font-bold text-slate-700 hover:text-slate-900 shadow-xs"
+                  className="px-2.5 py-1 rounded bg-white border border-slate-200 text-xs font-rajdhani font-bold text-slate-700 hover:text-slate-900 shadow-xs flex items-center gap-1"
                 >
-                  Copy ID 📋
+                  <span>Copy ID</span>
+                  <Copy className="w-3 h-3 text-[#e10600]" />
                 </button>
                 <div className="px-3 py-1 rounded bg-slate-200 text-slate-800 font-orbitron text-xs font-bold">
                   Level 8 · {user.points} XP Points
@@ -105,9 +120,10 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={logout}
-              className="px-4 py-2 rounded-md bg-white border border-slate-200 text-slate-700 hover:text-red-600 text-xs font-orbitron font-bold shadow-xs transition-colors"
+              className="px-4 py-2 rounded-md bg-white border border-slate-200 text-slate-700 hover:text-red-600 text-xs font-orbitron font-bold shadow-xs transition-colors flex items-center gap-1.5"
             >
-              Logout 🚪
+              <span>Logout</span>
+              <LogOut className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -115,23 +131,27 @@ export default function DashboardPage() {
         {/* Navigation Tabs */}
         <div className="flex items-center gap-2 pb-4 border-b border-slate-200 mb-8 overflow-x-auto">
           {[
-            { id: "session", label: "⚡ Active Station HUD" },
-            { id: "bookings", label: `📅 My Bookings (${bookings.length})` },
-            { id: "orders", label: `🍔 Café Orders (${cafeOrders.length})` },
-            { id: "profile", label: "⚙️ Profile Settings" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2 rounded-md font-orbitron text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
-                activeTab === tab.id
-                  ? "bg-[#e10600] text-white shadow-crimsonSm"
-                  : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+            { id: "session", label: "Active Station HUD", icon: Activity },
+            { id: "bookings", label: `My Bookings (${bookings.length})`, icon: Calendar },
+            { id: "orders", label: `Café Orders (${cafeOrders.length})`, icon: UtensilsCrossed },
+            { id: "profile", label: "Profile Settings", icon: Settings },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-4 py-2 rounded-md font-orbitron text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all flex items-center gap-2 ${
+                  activeTab === tab.id
+                    ? "bg-[#e10600] text-white shadow-crimsonSm"
+                    : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* ══════════ TAB: ACTIVE SESSION ══════════ */}
@@ -170,9 +190,10 @@ export default function DashboardPage() {
                     </button>
                     <button
                       onClick={() => setIsCartOpen(true)}
-                      className="px-3 py-1.5 rounded-md bg-[#e10600] text-white text-xs font-orbitron font-bold hover:bg-[#b80000] shadow-xs"
+                      className="px-3 py-1.5 rounded-md bg-[#e10600] text-white text-xs font-orbitron font-bold hover:bg-[#b80000] shadow-xs flex items-center gap-1.5"
                     >
-                      Order Food 🍔
+                      <span>Order Food</span>
+                      <UtensilsCrossed className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -192,7 +213,9 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <span className="text-2xl">⚡</span>
+                <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+                  <Headphones className="w-5 h-5" />
+                </div>
                 <h4 className="font-orbitron font-bold text-slate-900 text-sm">Need Controller / Headset?</h4>
                 <p className="text-xs text-slate-600 font-sans">
                   Notify arena staff directly or request sanitized DualSense controllers at the counter.
@@ -200,7 +223,9 @@ export default function DashboardPage() {
               </div>
 
               <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <span className="text-2xl">☕</span>
+                <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+                  <Coffee className="w-5 h-5" />
+                </div>
                 <h4 className="font-orbitron font-bold text-slate-900 text-sm">Active 5% Café Perk</h4>
                 <p className="text-xs text-slate-600 font-sans">
                   Your VIP player tag entitles you to 5% off on all snacks, burgers, and cold mocktails.
@@ -208,7 +233,9 @@ export default function DashboardPage() {
               </div>
 
               <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <span className="text-2xl">🏆</span>
+                <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+                  <Trophy className="w-5 h-5" />
+                </div>
                 <h4 className="font-orbitron font-bold text-slate-900 text-sm">Weekly FIFA Cup</h4>
                 <p className="text-xs text-slate-600 font-sans">
                   Registered for the Saturday EA FC 25 tournament? Leaderboards update every Sunday.
@@ -251,8 +278,16 @@ export default function DashboardPage() {
                       </span>
                     </div>
                     <h4 className="font-rajdhani font-bold text-base text-slate-900">{b.service}</h4>
-                    <p className="text-xs text-slate-500 font-rajdhani font-semibold">
-                      📅 {b.date} · ⏰ {b.timeSlot} ({b.hours} hrs)
+                    <p className="text-xs text-slate-500 font-rajdhani font-semibold flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-[#e10600]" />
+                        {b.date}
+                      </span>
+                      <span>·</span>
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-[#e10600]" />
+                        {b.timeSlot} ({b.hours} hrs)
+                      </span>
                     </p>
                   </div>
 
@@ -279,9 +314,10 @@ export default function DashboardPage() {
               </h3>
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="px-3.5 py-1.5 rounded-md bg-[#e10600] text-white font-orbitron font-bold text-xs uppercase"
+                className="px-3.5 py-1.5 rounded-md bg-[#e10600] text-white font-orbitron font-bold text-xs uppercase flex items-center gap-1.5"
               >
-                Open Café Cart 🍔
+                <span>Open Café Cart</span>
+                <ShoppingBag className="w-3.5 h-3.5" />
               </button>
             </div>
 

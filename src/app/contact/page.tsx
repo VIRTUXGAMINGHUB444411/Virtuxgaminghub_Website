@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
+import { MapPin, Phone, Mail, Clock, Zap, Compass } from "@/components/Icons";
 
 export default function ContactPage() {
   const { showToast } = useStore();
@@ -14,7 +15,7 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    showToast("🚀 Message sent! Our team will contact you on WhatsApp/Phone shortly.", "success");
+    showToast("Message sent! Our team will contact you on WhatsApp/Phone shortly.", "success");
     setName("");
     setEmail("");
     setPhone("");
@@ -48,8 +49,8 @@ export default function ContactPage() {
           {/* Contact Information Cards */}
           <div className="space-y-6">
             <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#e10600]">
-                📍
+              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center shrink-0 text-[#e10600]">
+                <MapPin className="w-6 h-6" />
               </div>
               <div className="space-y-1">
                 <h4 className="font-orbitron font-bold text-slate-900 text-base">Arena Address</h4>
@@ -61,8 +62,8 @@ export default function ContactPage() {
             </div>
 
             <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#e10600]">
-                📞
+              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center shrink-0 text-[#e10600]">
+                <Phone className="w-6 h-6" />
               </div>
               <div className="space-y-1">
                 <h4 className="font-orbitron font-bold text-slate-900 text-base">Phone & WhatsApp</h4>
@@ -79,8 +80,8 @@ export default function ContactPage() {
             </div>
 
             <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#e10600]">
-                📧
+              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center shrink-0 text-[#e10600]">
+                <Mail className="w-6 h-6" />
               </div>
               <div className="space-y-1">
                 <h4 className="font-orbitron font-bold text-slate-900 text-base">Email Support</h4>
@@ -95,8 +96,8 @@ export default function ContactPage() {
             </div>
 
             <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#e10600]">
-                🕐
+              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center shrink-0 text-[#e10600]">
+                <Clock className="w-6 h-6" />
               </div>
               <div className="space-y-1">
                 <h4 className="font-orbitron font-bold text-slate-900 text-base">Operating Hours</h4>
@@ -196,9 +197,10 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm transition-all"
+                className="w-full py-3.5 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm transition-all flex items-center justify-center gap-2"
               >
-                Send Message ⚡
+                <span>Send Message</span>
+                <Zap className="w-4 h-4" />
               </button>
             </form>
           </div>
@@ -207,7 +209,9 @@ export default function ContactPage() {
         {/* Map / Directions Helper */}
         <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200">
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-2xl">🗺️</span>
+            <div className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600]">
+              <Compass className="w-5 h-5" />
+            </div>
             <div>
               <h3 className="font-orbitron font-bold text-lg text-slate-900">
                 How to Reach Virtux Gaming Hub

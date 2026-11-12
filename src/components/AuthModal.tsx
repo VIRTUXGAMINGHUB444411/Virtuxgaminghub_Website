@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useStore } from "@/context/StoreContext";
+import { Gamepad2, ArrowRight, Lock, Zap } from "@/components/Icons";
 
 export const AuthModal: React.FC = () => {
   const { isAuthOpen, setIsAuthOpen, authTab, setAuthTab, login, showToast } = useStore();
@@ -29,7 +30,7 @@ export const AuthModal: React.FC = () => {
     if (adminPin === "1234" || adminPin === "admin" || adminPin === "9999" || adminPin.length >= 4) {
       login("admin@virtuxgaminghub.com", "admin");
     } else {
-      showToast("❌ Invalid Security Code! (Demo code is: 1234)", "error");
+      showToast("Invalid Security Code! (Demo code is: 1234)", "error");
     }
   };
 
@@ -133,9 +134,10 @@ export const AuthModal: React.FC = () => {
               <button
                 type="button"
                 onClick={() => quickDemoLogin("customer")}
-                className="w-full py-2 rounded-md bg-slate-100 border border-slate-200 text-xs font-rajdhani font-bold text-slate-800 hover:bg-slate-200"
+                className="w-full py-2 rounded-md bg-slate-100 border border-slate-200 text-xs font-rajdhani font-bold text-slate-800 hover:bg-slate-200 flex items-center justify-center gap-1.5"
               >
-                🎮 Quick Demo Gamer Login (Arpan Roy)
+                <Gamepad2 className="w-4 h-4 text-[#e10600]" />
+                <span>Quick Demo Gamer Login (Arpan Roy)</span>
               </button>
             </div>
           </form>
@@ -200,9 +202,10 @@ export const AuthModal: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-3 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
+              className="w-full py-3 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm flex items-center justify-center gap-2"
             >
-              Create Virtux Gamer Pass 🚀
+              <span>Create Virtux Gamer Pass</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </form>
         )}
@@ -210,8 +213,9 @@ export const AuthModal: React.FC = () => {
         {/* Admin Login */}
         {authTab === "admin" && (
           <form onSubmit={handleAdminSubmit} className="space-y-4">
-            <div className="p-3.5 rounded-lg bg-slate-100 border border-slate-200 text-xs text-slate-700 font-rajdhani">
-              🔒 Arena Manager / Admin Access. Requires 4-digit PIN.
+            <div className="p-3.5 rounded-lg bg-slate-100 border border-slate-200 text-xs text-slate-700 font-rajdhani flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5 text-slate-700 shrink-0" />
+              <span>Arena Manager / Admin Access. Requires 4-digit PIN.</span>
             </div>
 
             <div>
@@ -237,9 +241,10 @@ export const AuthModal: React.FC = () => {
             <button
               type="button"
               onClick={() => quickDemoLogin("admin")}
-              className="w-full py-2 rounded-md bg-slate-100 border border-slate-200 text-xs font-rajdhani font-bold text-slate-700 hover:bg-slate-200"
+              className="w-full py-2 rounded-md bg-slate-100 border border-slate-200 text-xs font-rajdhani font-bold text-slate-700 hover:bg-slate-200 flex items-center justify-center gap-1.5"
             >
-              ⚡ Quick Demo Admin Access (PIN: 1234)
+              <Zap className="w-3.5 h-3.5 text-[#e10600]" />
+              <span>Quick Demo Admin Access (PIN: 1234)</span>
             </button>
           </form>
         )}

@@ -290,8 +290,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem("virtux_user", JSON.stringify(newUser));
     showToast(
       role === "admin"
-        ? "⚡ Admin access granted! Command Center unlocked."
-        : `🎮 Welcome back, ${newUser.name}!`,
+        ? "Admin access granted. Command Center unlocked."
+        : `Welcome back, ${newUser.name}!`,
       "success"
     );
     setIsAuthOpen(false);
@@ -314,7 +314,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
       return [...prev, { item, quantity: 1 }];
     });
-    showToast(`Added ${item.name} to café cart! 🍟`, "success");
+    showToast(`Added ${item.name} to café cart!`, "success");
   };
 
   const removeFromCart = (itemId: string) => {
@@ -356,7 +356,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCafeOrders((prev) => [newOrder, ...prev]);
     clearCart();
     setIsCartOpen(false);
-    showToast(`Order #${newOrder.id} confirmed! Delivering to ${newOrder.stationOrTable} shortly 🍔`, "success");
+    showToast(`Order #${newOrder.id} confirmed! Delivering to ${newOrder.stationOrTable} shortly.`, "success");
   };
 
   // Bookings
@@ -369,7 +369,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setBookings((prev) => [newBooking, ...prev]);
     setIsBookingOpen(false);
-    showToast(`🎉 Reservation confirmed! Booking ID: ${newBooking.id}`, "success");
+    showToast(`Reservation confirmed! Booking ID: ${newBooking.id}`, "success");
   };
 
   const updateBookingStatus = (id: string, status: Booking["status"]) => {
@@ -404,7 +404,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       avatarLetter: (reviewData.name || "G").charAt(0).toUpperCase(),
     };
     setReviews((prev) => [newReview, ...prev]);
-    showToast("⭐ Thank you! Your review has been published.", "success");
+    showToast("Thank you! Your review has been published.", "success");
   };
 
   return (

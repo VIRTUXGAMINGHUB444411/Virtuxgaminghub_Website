@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useStore } from "@/context/StoreContext";
+import { UtensilsCrossed, ShoppingBag, Zap } from "@/components/Icons";
 
 export const CafeCartDrawer: React.FC = () => {
   const {
@@ -42,8 +43,10 @@ export const CafeCartDrawer: React.FC = () => {
         <div className="w-screen max-w-md bg-white border-l border-slate-200 text-slate-900 flex flex-col shadow-2xl relative">
           {/* Header */}
           <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🍔</span>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600]">
+                <UtensilsCrossed className="w-4 h-4" />
+              </div>
               <div>
                 <h3 className="font-orbitron font-black text-base text-slate-900">
                   Gamer Fuel Cart
@@ -68,8 +71,8 @@ export const CafeCartDrawer: React.FC = () => {
           <div className="flex-1 overflow-y-auto p-5 space-y-4">
             {cart.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 space-y-3">
-                <div className="w-16 h-16 rounded-full bg-red-50 border border-red-200 flex items-center justify-center text-3xl">
-                  🍟
+                <div className="w-16 h-16 rounded-full bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600]">
+                  <ShoppingBag className="w-7 h-7" />
                 </div>
                 <h4 className="font-orbitron text-sm font-bold text-slate-900">Your cart is empty</h4>
                 <p className="text-xs text-slate-500 max-w-xs font-sans">
@@ -216,9 +219,10 @@ export const CafeCartDrawer: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs tracking-wider uppercase shadow-crimsonSm transition-all"
+                className="w-full py-3.5 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs tracking-wider uppercase shadow-crimsonSm transition-all flex items-center justify-center gap-2"
               >
-                Send Order to Kitchen (₹{finalTotal}) ⚡
+                <span>Send Order to Kitchen (₹{finalTotal})</span>
+                <Zap className="w-4 h-4 fill-current" />
               </button>
             </form>
           )}

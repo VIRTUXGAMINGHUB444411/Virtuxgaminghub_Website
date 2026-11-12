@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Anton, Space_Grotesk, JetBrains_Mono, UnifrakturMaguntia } from "next/font/google";
+import { Anton, Space_Grotesk, JetBrains_Mono, UnifrakturMaguntia, Bebas_Neue, Ruthie } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/context/StoreContext";
 import { ParticleBackground } from "@/components/ParticleBackground";
@@ -39,6 +39,20 @@ const gothic = UnifrakturMaguntia({
   display: "swap",
 });
 
+const bebas = Bebas_Neue({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-bebas",
+  display: "swap",
+});
+
+const script = Ruthie({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-script",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Virtux Gaming Hub – Play. Eat. Chill. | Ranaghat's Premier Esports & Lounge",
   description: "Ranaghat's first premium gaming hub featuring PlayStation 5 4K 120Hz consoles, RTX liquid-cooled Gaming PCs, Logitech Motion Simulators, Private Dolby Cinema, and Gourmet Café.",
@@ -62,7 +76,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${grotesk.variable} ${mono.variable} ${gothic.variable}`}
+      className={`${display.variable} ${grotesk.variable} ${mono.variable} ${gothic.variable} ${bebas.variable} ${script.variable}`}
       suppressHydrationWarning
     >
       <head>

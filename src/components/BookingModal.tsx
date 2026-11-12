@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useStore } from "@/context/StoreContext";
+import { Zap } from "@/components/Icons";
 
 export const BookingModal: React.FC = () => {
   const { isBookingOpen, setIsBookingOpen, bookingServicePreset, addBooking, user } = useStore();
@@ -69,7 +70,7 @@ export const BookingModal: React.FC = () => {
         <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-md bg-[#e10600] text-white flex items-center justify-center text-sm font-bold shadow-xs">
-              ⚡
+              <Zap className="w-4 h-4 fill-current text-white" />
             </div>
             <div>
               <h3 className="font-orbitron font-black text-lg text-slate-900">
@@ -131,10 +132,10 @@ export const BookingModal: React.FC = () => {
               onChange={(e) => setService(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600] font-rajdhani font-bold"
             >
-              <option value="PlayStation 5 (Console + Controller)">🎮 PlayStation 5 4K 120Hz Arena</option>
-              <option value="Gaming PC Battle Station (RTX Rigs)">💻 High-FPS RTX Gaming PC Battle Station</option>
-              <option value="Racing Simulator (Logitech G29)">🏎️ Motion Racing Cockpit (Logitech G29)</option>
-              <option value="Dolby Cinema & OTT Suite">🎬 Private Dolby Cinema & Squad Suite</option>
+              <option value="PlayStation 5 (Console + Controller)">PlayStation 5 · 4K 120Hz Arena</option>
+              <option value="Gaming PC Battle Station (RTX Rigs)">High-FPS RTX Gaming PC Battle Station</option>
+              <option value="Racing Simulator (Logitech G29)">Motion Racing Cockpit (Logitech G29)</option>
+              <option value="Dolby Cinema & OTT Suite">Private Dolby Cinema & Squad Suite</option>
             </select>
           </div>
 
@@ -245,9 +246,10 @@ export const BookingModal: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full py-3.5 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-black text-xs tracking-widest uppercase shadow-crimsonSm transition-all"
+            className="w-full py-3.5 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-black text-xs tracking-widest uppercase shadow-crimsonSm transition-all flex items-center justify-center gap-2"
           >
-            PLAY NOW · Confirm Reservation ⚡
+            <span>PLAY NOW · Confirm Reservation</span>
+            <Zap className="w-4 h-4 fill-current" />
           </button>
         </form>
       </div>

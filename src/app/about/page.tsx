@@ -3,6 +3,19 @@
 import React from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
+import {
+  Gamepad2,
+  Monitor,
+  Car,
+  Film,
+  Coffee,
+  Trophy,
+  Zap,
+  ShieldCheck,
+  Snowflake,
+  Activity,
+  FileText,
+} from "@/components/Icons";
 
 export default function AboutPage() {
   const { setIsBookingOpen } = useStore();
@@ -33,8 +46,8 @@ export default function AboutPage() {
         {/* Anti-Gambling Ethical Pledge Box */}
         <div className="p-6 sm:p-8 rounded-xl bg-red-50/70 border border-red-200 mb-16 relative overflow-hidden">
           <div className="flex flex-col sm:flex-row items-start gap-4">
-            <div className="w-12 h-12 rounded-lg bg-[#e10600] text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
-              🛡️
+            <div className="w-12 h-12 rounded-lg bg-[#e10600] text-white flex items-center justify-center shrink-0 shadow-sm">
+              <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
               <h3 className="font-orbitron font-black text-lg text-slate-900 mb-1.5">
@@ -60,7 +73,9 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="editorial-card p-6 space-y-3">
-              <div className="text-3xl">🎮</div>
+              <div className="w-12 h-12 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600">
+                <Gamepad2 className="w-6 h-6" />
+              </div>
               <h3 className="font-orbitron font-bold text-lg text-slate-900">Sony PlayStation 5 Arena</h3>
               <p className="text-xs text-[#e10600] font-orbitron font-semibold">4K 120Hz Displays · DualSense Haptics</p>
               <p className="text-sm text-slate-600 font-sans leading-relaxed">
@@ -69,7 +84,9 @@ export default function AboutPage() {
             </div>
 
             <div className="editorial-card p-6 space-y-3">
-              <div className="text-3xl">💻</div>
+              <div className="w-12 h-12 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600">
+                <Monitor className="w-6 h-6" />
+              </div>
               <h3 className="font-orbitron font-bold text-lg text-slate-900">High-End RTX Battle Rigs</h3>
               <p className="text-xs text-[#e10600] font-orbitron font-semibold">RTX 4090 / 4070 · 240Hz to 360Hz Monitors</p>
               <p className="text-sm text-slate-600 font-sans leading-relaxed">
@@ -78,7 +95,9 @@ export default function AboutPage() {
             </div>
 
             <div className="editorial-card p-6 space-y-3">
-              <div className="text-3xl">🏎️</div>
+              <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+                <Car className="w-6 h-6" />
+              </div>
               <h3 className="font-orbitron font-bold text-lg text-slate-900">Sim Racing Cockpit</h3>
               <p className="text-xs text-amber-600 font-orbitron font-semibold">Logitech G29 TrueForce Dual-Motor</p>
               <p className="text-sm text-slate-600 font-sans leading-relaxed">
@@ -87,7 +106,9 @@ export default function AboutPage() {
             </div>
 
             <div className="editorial-card p-6 space-y-3">
-              <div className="text-3xl">🎬</div>
+              <div className="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
+                <Film className="w-6 h-6" />
+              </div>
               <h3 className="font-orbitron font-bold text-lg text-slate-900">Dolby Cinema Screening</h3>
               <p className="text-xs text-rose-600 font-orbitron font-semibold">150-inch 4K Laser · 7.2 Dolby Atmos</p>
               <p className="text-sm text-slate-600 font-sans leading-relaxed">
@@ -96,7 +117,9 @@ export default function AboutPage() {
             </div>
 
             <div className="editorial-card p-6 space-y-3">
-              <div className="text-3xl">☕</div>
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+                <Coffee className="w-6 h-6" />
+              </div>
               <h3 className="font-orbitron font-bold text-lg text-slate-900">Gourmet Gamer Café</h3>
               <p className="text-xs text-emerald-600 font-orbitron font-semibold">Fresh Espresso, Mocktails & Hot Bites</p>
               <p className="text-sm text-slate-600 font-sans leading-relaxed">
@@ -105,7 +128,9 @@ export default function AboutPage() {
             </div>
 
             <div className="editorial-card p-6 space-y-3">
-              <div className="text-3xl">🏆</div>
+              <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+                <Trophy className="w-6 h-6" />
+              </div>
               <h3 className="font-orbitron font-bold text-lg text-slate-900">Community Tournaments</h3>
               <p className="text-xs text-blue-600 font-orbitron font-semibold">Weekly FIFA, Tekken & Valorant Cups</p>
               <p className="text-sm text-slate-600 font-sans leading-relaxed">
@@ -127,32 +152,40 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-2">
-              <div className="text-3xl">🚀</div>
+            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] mx-auto">
+                <Zap className="w-6 h-6" />
+              </div>
               <h4 className="font-orbitron font-bold text-slate-900 text-base">Gigabit Fiber LAN</h4>
               <p className="text-xs text-slate-600 font-sans leading-relaxed">
                 Zero packet loss with redundant enterprise optical lines yielding under 10ms pings to game servers.
               </p>
             </div>
 
-            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-2">
-              <div className="text-3xl">❄️</div>
+            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 mx-auto">
+                <Snowflake className="w-6 h-6" />
+              </div>
               <h4 className="font-orbitron font-bold text-slate-900 text-base">21°C Climate Control</h4>
               <p className="text-xs text-slate-600 font-sans leading-relaxed">
                 Dual commercial chillers keep you and high-wattage GPUs running at peak comfort through long sessions.
               </p>
             </div>
 
-            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-2">
-              <div className="text-3xl">⚡</div>
+            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 mx-auto">
+                <Activity className="w-6 h-6" />
+              </div>
               <h4 className="font-orbitron font-bold text-slate-900 text-base">100% Power Backup</h4>
               <p className="text-xs text-slate-600 font-sans leading-relaxed">
                 Industrial online UPS coupled with a silent diesel generator ensures zero disconnections in ranked matches.
               </p>
             </div>
 
-            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-2">
-              <div className="text-3xl">🛡️</div>
+            <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mx-auto">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
               <h4 className="font-orbitron font-bold text-slate-900 text-base">Medical Grade Hygiene</h4>
               <p className="text-xs text-slate-600 font-sans leading-relaxed">
                 Every controller, mouse, keyboard, and headset is sanitized with antibacterial wipes between player sessions.
@@ -164,7 +197,8 @@ export default function AboutPage() {
         {/* Operating Rules */}
         <div className="p-8 rounded-xl bg-slate-50 border border-slate-200 mb-16 space-y-6">
           <h3 className="font-orbitron font-black text-xl text-slate-900 flex items-center gap-2">
-            <span className="text-[#e10600]">📋</span> Arena Guidelines & Fair Play
+            <span className="text-[#e10600]"><FileText className="w-5 h-5" /></span>
+            <span>Arena Guidelines & Fair Play</span>
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans text-slate-700 leading-relaxed">

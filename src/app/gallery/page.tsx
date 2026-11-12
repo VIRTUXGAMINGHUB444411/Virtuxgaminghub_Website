@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { GALLERY_ITEMS, GalleryItem } from "@/data/galleryData";
 import { useStore } from "@/context/StoreContext";
+import { CategoryIcon, Search, Rocket, Snowflake, Zap, LayoutGrid } from "@/components/Icons";
 
 export default function GalleryPage() {
   const { setIsBookingOpen } = useStore();
@@ -42,12 +43,12 @@ export default function GalleryPage() {
         <div className="flex flex-wrap items-center gap-2 pb-6 border-b border-slate-200 mb-10">
           {[
             { id: "all", label: "All Zones" },
-            { id: "ps5", label: "🎮 PS5 Pods" },
-            { id: "pc", label: "💻 RTX Battle Stations" },
-            { id: "sim", label: "🏎️ Sim Racing" },
-            { id: "cinema", label: "🎬 Dolby Cinema" },
-            { id: "cafe", label: "☕ Café Lounge" },
-            { id: "events", label: "🏆 Esports Stage" },
+            { id: "ps5", label: "PS5 Pods" },
+            { id: "pc", label: "RTX Battle Stations" },
+            { id: "sim", label: "Sim Racing" },
+            { id: "cinema", label: "Dolby Cinema" },
+            { id: "cafe", label: "Café Lounge" },
+            { id: "events", label: "Esports Stage" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -58,7 +59,14 @@ export default function GalleryPage() {
                   : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
               }`}
             >
-              {tab.label}
+              <span className="inline-flex items-center gap-2">
+                {tab.id === "all" ? (
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                ) : (
+                  <CategoryIcon category={tab.id} className="w-3.5 h-3.5" />
+                )}
+                {tab.label}
+              </span>
             </button>
           ))}
         </div>
@@ -76,7 +84,9 @@ export default function GalleryPage() {
                 className={`h-52 bg-gradient-to-br ${item.bgGradient} p-6 flex flex-col justify-between relative overflow-hidden text-white`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-4xl filter drop-shadow-md">{item.icon}</span>
+                  <span className="w-14 h-14 rounded-xl bg-black/40 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-[0_0_18px_rgba(225,6,0,0.35)]">
+                    <CategoryIcon category={item.icon} className="w-7 h-7 text-white" />
+                  </span>
                   <span className="text-[10px] font-orbitron font-bold px-2.5 py-1 rounded-full bg-black/60 border border-white/20 text-white backdrop-blur-md">
                     {item.categoryLabel}
                   </span>
@@ -108,7 +118,7 @@ export default function GalleryPage() {
 
                 <div className="pt-4 flex items-center justify-between text-xs font-orbitron font-bold text-[#e10600] group-hover:text-[#b80000] transition-colors">
                   <span>Inspect Zone Details</span>
-                  <span>🔍</span>
+                  <Search className="w-4 h-4" />
                 </div>
               </div>
             </div>
@@ -128,7 +138,9 @@ export default function GalleryPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="p-5 rounded-xl bg-white border border-slate-200 space-y-2 shadow-xs">
-              <span className="text-2xl">🚀</span>
+              <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600]">
+                <Rocket className="w-5 h-5" />
+              </span>
               <h4 className="font-orbitron font-bold text-slate-900 text-sm">Gigabit Fiber Internet</h4>
               <p className="text-xs text-slate-600 font-sans leading-relaxed">
                 Zero jitter, ultra-low ping under 10ms to all Indian & SEA game servers with redundant enterprise optical connections.
@@ -136,7 +148,9 @@ export default function GalleryPage() {
             </div>
 
             <div className="p-5 rounded-xl bg-white border border-slate-200 space-y-2 shadow-xs">
-              <span className="text-2xl">❄️</span>
+              <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600]">
+                <Snowflake className="w-5 h-5" />
+              </span>
               <h4 className="font-orbitron font-bold text-slate-900 text-sm">Climate Controlled</h4>
               <p className="text-xs text-slate-600 font-sans leading-relaxed">
                 100% air-conditioned arena kept at an optimum 21°C to keep you and high-end hardware running cool throughout marathons.
@@ -144,7 +158,9 @@ export default function GalleryPage() {
             </div>
 
             <div className="p-5 rounded-xl bg-white border border-slate-200 space-y-2 shadow-xs">
-              <span className="text-2xl">⚡</span>
+              <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600]">
+                <Zap className="w-5 h-5" />
+              </span>
               <h4 className="font-orbitron font-bold text-slate-900 text-sm">100% Power Backup</h4>
               <p className="text-xs text-slate-600 font-sans leading-relaxed">
                 Industrial online UPS and silent generator backup ensure you never get disconnected in the final championship round.
@@ -184,7 +200,9 @@ export default function GalleryPage() {
               </button>
 
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-4xl">{activeModalItem.icon}</span>
+                <span className="w-14 h-14 rounded-xl bg-black/40 border border-white/20 backdrop-blur-md flex items-center justify-center">
+                  <CategoryIcon category={activeModalItem.icon} className="w-7 h-7 text-white" />
+                </span>
                 <div>
                   <h3 className="font-orbitron font-black text-2xl text-slate-900">
                     {activeModalItem.title}

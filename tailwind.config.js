@@ -56,6 +56,8 @@ module.exports = {
       fontFamily: {
         display: ["var(--font-display)", "Anton", "Impact", "sans-serif"],
         gothic: ["var(--font-gothic)", "UnifrakturMaguntia", "serif"],
+        bebas: ["var(--font-bebas)", "Bebas Neue", "Impact", "sans-serif"],
+        script: ["var(--font-script)", "Ruthie", "cursive"],
         orbitron: ["var(--font-grotesk)", "Space Grotesk", "sans-serif"],
         rajdhani: ["var(--font-mono)", "JetBrains Mono", "monospace"],
         sans: ["var(--font-grotesk)", "Space Grotesk", "system-ui", "sans-serif"],

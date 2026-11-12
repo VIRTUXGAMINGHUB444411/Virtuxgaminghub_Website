@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
+import { Zap, Gamepad2, Rocket, Lock, Mail, ArrowLeft } from "@/components/Icons";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function LoginPage() {
       login("admin@virtuxgaminghub.com", "admin");
       router.push("/admin");
     } else {
-      showToast("❌ Invalid Master PIN! Use 1234 for demo.", "error");
+      showToast("Invalid Master PIN! Use 1234 for demo.", "error");
     }
   };
 
@@ -147,7 +148,7 @@ export default function LoginPage() {
               type="submit"
               className="w-full py-3 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider transition-all shadow-crimsonSm"
             >
-              Sign In to Player Portal ⚡
+              <span className="inline-flex items-center justify-center gap-2">Sign In to Player Portal <Zap className="w-4 h-4" /></span>
             </button>
 
             <div className="pt-4 border-t border-slate-100 space-y-2">
@@ -159,7 +160,7 @@ export default function LoginPage() {
                 onClick={() => quickDemo("customer")}
                 className="w-full py-2 rounded-md bg-slate-100 border border-slate-200 text-xs font-rajdhani font-bold text-slate-800 hover:bg-slate-200"
               >
-                🎮 Quick Demo Gamer Login (Arpan Roy)
+                <span className="inline-flex items-center justify-center gap-2"><Gamepad2 className="w-4 h-4" /> Quick Demo Gamer Login (Arpan Roy)</span>
               </button>
             </div>
           </form>
@@ -226,7 +227,7 @@ export default function LoginPage() {
               type="submit"
               className="w-full py-3 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
             >
-              Create Virtux Account 🚀
+              <span className="inline-flex items-center justify-center gap-2">Create Virtux Account <Rocket className="w-4 h-4" /></span>
             </button>
           </form>
         )}
@@ -235,7 +236,7 @@ export default function LoginPage() {
         {mode === "admin" && (
           <form onSubmit={handleAdminSubmit} className="space-y-4">
             <div className="p-3.5 rounded-lg bg-slate-100 border border-slate-200 text-xs text-slate-700 font-rajdhani leading-relaxed">
-              🔒 Arena Manager / Administrative console. Master PIN: <strong>1234</strong>.
+              <Lock className="w-3.5 h-3.5 inline-block mr-1.5 -mt-0.5 text-[#e10600]" /> Arena Manager / Administrative console. Master PIN: <strong>1234</strong>.
             </div>
 
             <div>
@@ -263,7 +264,7 @@ export default function LoginPage() {
               onClick={() => quickDemo("admin")}
               className="w-full py-2 rounded-md bg-slate-100 border border-slate-200 text-xs font-rajdhani font-bold text-slate-700 hover:bg-slate-200"
             >
-              ⚡ Instant 1-Click Admin Access (Demo)
+              <span className="inline-flex items-center justify-center gap-2"><Zap className="w-4 h-4" /> Instant 1-Click Admin Access (Demo)</span>
             </button>
           </form>
         )}
@@ -293,7 +294,7 @@ export default function LoginPage() {
               type="submit"
               className="w-full py-2.5 rounded-md bg-[#e10600] text-white font-orbitron font-bold text-xs uppercase tracking-wider"
             >
-              Send Reset Code 📧
+              <span className="inline-flex items-center justify-center gap-2">Send Reset Code <Mail className="w-4 h-4" /></span>
             </button>
 
             <button
@@ -301,7 +302,7 @@ export default function LoginPage() {
               onClick={() => setMode("login")}
               className="w-full text-center text-xs text-slate-500 hover:text-slate-900 underline font-rajdhani"
             >
-              ← Back to Login
+              <span className="inline-flex items-center gap-1.5"><ArrowLeft className="w-3.5 h-3.5" /> Back to Login</span>
             </button>
           </form>
         )}

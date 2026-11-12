@@ -273,3 +273,31 @@ main > div > .bg-white:first-child {
 ::-webkit-scrollbar-track { background: #050505; }
 ::-webkit-scrollbar-thumb { background: #2a2a2d; }
 ::-webkit-scrollbar-thumb:hover { background: #e10600; }
+
+/* footer sound-meter bars */
+@keyframes vxbar {
+  0%, 100% { height: 3px; }
+  50% { height: 12px; }
+}
+
+/* navbar motion */
+@keyframes vxNavIn {
+  from { opacity: 0; transform: translateY(-10px); filter: blur(4px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes vxSheen {
+  0% { transform: translateX(-120%); }
+  60%, 100% { transform: translateX(320%); }
+}
+@keyframes vxShine {
+  0%, 55% { transform: translateX(0) skewX(-20deg); }
+  100% { transform: translateX(520%) skewX(-20deg); }
+}
+.vx-nav { animation: vxBarIn 1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes vxBarIn {
+  from { opacity: 0; transform: translateY(-16px) scaleX(0.92); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vx-nav, .vx-nav * { animation: none !important; }
+}

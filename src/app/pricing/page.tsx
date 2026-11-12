@@ -4,6 +4,21 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
 import {
+  CategoryIcon,
+  Gamepad2,
+  Monitor,
+  Car,
+  Film,
+  Crown,
+  Joystick,
+  Users,
+  Zap,
+  Timer,
+  Popcorn,
+  Hourglass,
+  Infinity as InfinityIcon,
+} from "@/components/Icons";
+import {
   PS5_NORMAL_RATES,
   PS5_EXTRA_CONTROLLER_RATES,
   PS5_SUBSCRIPTIONS,
@@ -83,7 +98,7 @@ export default function PricingPage() {
         {/* Interactive Live Calculator HUD (Light Edition) */}
         <div className="p-6 sm:p-8 rounded-2xl bg-slate-50 border border-slate-200 mb-16 shadow-clean">
           <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
-            <span className="text-2xl">⚡</span>
+            <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Zap className="w-5 h-5" /></span>
             <div>
               <h3 className="font-orbitron font-black text-lg text-slate-900">
                 Live Pricing & Session Calculator
@@ -104,10 +119,10 @@ export default function PricingPage() {
                 onChange={(e) => setCalcStation(e.target.value as any)}
                 className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#e10600]"
               >
-                <option value="ps5">🎮 PlayStation 5 4K 120Hz</option>
-                <option value="pc">💻 High-FPS Gaming PC Rig</option>
-                <option value="sim">🏎️ Sim Racing Cockpit G29</option>
-                <option value="movie">🎬 Dolby Cinema Suite</option>
+                <option value="ps5">PlayStation 5 4K 120Hz</option>
+                <option value="pc">High-FPS Gaming PC Rig</option>
+                <option value="sim">Sim Racing Cockpit G29</option>
+                <option value="movie">Dolby Cinema Suite</option>
               </select>
             </div>
 
@@ -185,11 +200,11 @@ export default function PricingPage() {
         {/* Category Tabs */}
         <div className="flex flex-wrap items-center gap-2 pb-6 border-b border-slate-200 mb-10">
           {[
-            { id: "ps5", label: "🎮 PLAYSTATION 5" },
-            { id: "pc", label: "💻 GAMING PC" },
-            { id: "movie", label: "🎬 MOVIE" },
-            { id: "sim", label: "🏎️ RACING SIMULATION" },
-            { id: "membership", label: "👑 MEMBERSHIP" },
+            { id: "ps5", label: "PLAYSTATION 5" },
+            { id: "pc", label: "GAMING PC" },
+            { id: "movie", label: "MOVIE" },
+            { id: "sim", label: "RACING SIMULATION" },
+            { id: "membership", label: "MEMBERSHIP" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -200,7 +215,14 @@ export default function PricingPage() {
                   : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
               }`}
             >
-              {tab.label}
+              <span className="inline-flex items-center gap-2">
+                {tab.id === "membership" ? (
+                  <Crown className="w-4 h-4" />
+                ) : (
+                  <CategoryIcon category={tab.id} className="w-4 h-4" />
+                )}
+                {tab.label}
+              </span>
             </button>
           ))}
         </div>
@@ -229,7 +251,7 @@ export default function PricingPage() {
                     <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-wider">
                       Standard Console
                     </span>
-                    <span className="text-2xl">🎮</span>
+                    <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Gamepad2 className="w-5 h-5" /></span>
                   </div>
                   <h4 className="font-orbitron font-bold text-lg text-slate-900">
                     PlayStation 5 (Console + Controller)
@@ -253,7 +275,7 @@ export default function PricingPage() {
                     ))}
                   </div>
                   <div className="text-[11px] text-slate-500 font-rajdhani pt-2 flex items-center gap-1.5 font-bold">
-                    <span>⏱️</span>
+                    <Timer className="w-3.5 h-3.5 text-[#e10600]" />
                     <span>After time limit: <strong>₹2/- per minute</strong></span>
                   </div>
                 </div>
@@ -263,7 +285,7 @@ export default function PricingPage() {
                     <span className="text-xs font-orbitron font-bold text-slate-700 uppercase tracking-wider">
                       Multiplayer Add-On
                     </span>
-                    <span className="text-2xl">🕹️</span>
+                    <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Joystick className="w-5 h-5" /></span>
                   </div>
                   <h4 className="font-orbitron font-bold text-lg text-slate-900">
                     Extra Controller Only
@@ -287,7 +309,7 @@ export default function PricingPage() {
                     ))}
                   </div>
                   <div className="text-[11px] text-slate-500 font-rajdhani pt-2 flex items-center gap-1.5 font-bold">
-                    <span>⏱️</span>
+                    <Timer className="w-3.5 h-3.5 text-[#e10600]" />
                     <span>After time limit: <strong>₹1/- per minute</strong></span>
                   </div>
                 </div>
@@ -310,7 +332,7 @@ export default function PricingPage() {
                     <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-wider">
                       Shareable Pack
                     </span>
-                    <span className="text-2xl">👑</span>
+                    <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Crown className="w-5 h-5" /></span>
                   </div>
                   <h4 className="font-orbitron font-bold text-lg text-slate-900">
                     PS5 Monthly Hours Pack (Single Controller)
@@ -340,7 +362,7 @@ export default function PricingPage() {
                     <span className="text-xs font-orbitron font-bold text-slate-800 uppercase tracking-wider">
                       Duo & Squad Pack
                     </span>
-                    <span className="text-2xl">👥</span>
+                    <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Users className="w-5 h-5" /></span>
                   </div>
                   <h4 className="font-orbitron font-bold text-lg text-slate-900">
                     PS5 + 1 Extra Controller Pack (2 Controllers)
@@ -393,7 +415,7 @@ export default function PricingPage() {
                     <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-wider">
                       Esports Ready
                     </span>
-                    <span className="text-2xl">💻</span>
+                    <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Monitor className="w-5 h-5" /></span>
                   </div>
                   <h4 className="font-orbitron font-bold text-lg text-slate-900">
                     Gaming PC – Standard Session
@@ -414,7 +436,7 @@ export default function PricingPage() {
                     ))}
                   </div>
                   <div className="text-[11px] text-slate-500 font-rajdhani pt-2 flex items-center gap-1.5 font-bold">
-                    <span>⏱️</span>
+                    <Timer className="w-3.5 h-3.5 text-[#e10600]" />
                     <span>After time limit: <strong>₹1.5/- per minute</strong></span>
                   </div>
                 </div>
@@ -424,7 +446,7 @@ export default function PricingPage() {
                     <span className="text-xs font-orbitron font-bold text-slate-800 uppercase tracking-wider">
                       Loaded Features
                     </span>
-                    <span className="text-2xl">⚡</span>
+                    <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Zap className="w-5 h-5" /></span>
                   </div>
                   <h4 className="font-orbitron font-bold text-lg text-slate-900">
                     What&apos;s Included with PC
@@ -513,7 +535,7 @@ export default function PricingPage() {
                 <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-wider">
                   Cinema & OTT Suite
                 </span>
-                <span className="text-3xl">🎬</span>
+                <span className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Film className="w-6 h-6" /></span>
               </div>
               <h3 className="font-orbitron font-black text-2xl text-slate-900">
                 OTT Subscription Watch (Any OTT)
@@ -539,7 +561,7 @@ export default function PricingPage() {
               </div>
 
               <div className="p-3.5 rounded bg-slate-100 text-xs text-slate-700 font-sans">
-                👥 <strong>{PRICING_RULES.movieRules}</strong>
+                <Users className="w-4 h-4 inline-block mr-1.5 -mt-0.5 text-[#e10600]" /> <strong>{PRICING_RULES.movieRules}</strong>
               </div>
 
               <button
@@ -549,7 +571,7 @@ export default function PricingPage() {
                 }}
                 className="w-full py-3.5 rounded bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
               >
-                PLAY NOW · Reserve Cinema Suite 🍿
+                <span className="inline-flex items-center justify-center gap-2">PLAY NOW · Reserve Cinema Suite <Popcorn className="w-4 h-4" /></span>
               </button>
             </div>
           </div>
@@ -563,7 +585,7 @@ export default function PricingPage() {
                 <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-wider">
                   Force Feedback Cockpit
                 </span>
-                <span className="text-3xl">🏎️</span>
+                <span className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Car className="w-6 h-6" /></span>
               </div>
               <h3 className="font-orbitron font-black text-2xl text-slate-900">
                 Racing Simulator Rig
@@ -595,7 +617,7 @@ export default function PricingPage() {
                 }}
                 className="w-full py-3.5 rounded bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
               >
-                PLAY NOW · Book Racing Cockpit 🏎️
+                <span className="inline-flex items-center justify-center gap-2">PLAY NOW · Book Racing Cockpit <Car className="w-4 h-4" /></span>
               </button>
             </div>
           </div>
@@ -614,7 +636,7 @@ export default function PricingPage() {
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
-                  ⏳ LIMITED PASSES
+                  <span className="inline-flex items-center gap-2"><Hourglass className="w-4 h-4" /> LIMITED PASSES</span>
                 </button>
                 <button
                   onClick={() => setMembershipType("unlimited")}
@@ -624,7 +646,7 @@ export default function PricingPage() {
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
-                  ♾️ UNLIMITED PASSES
+                  <span className="inline-flex items-center gap-2"><InfinityIcon className="w-4 h-4" /> UNLIMITED PASSES</span>
                 </button>
               </div>
             </div>
@@ -641,8 +663,9 @@ export default function PricingPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="editorial-card p-5 space-y-3">
-                      <h4 className="font-orbitron font-bold text-sm text-[#e10600]">
-                        🎮 PS5 (Console + Controller)
+                      <h4 className="font-orbitron font-bold text-sm text-[#e10600] flex items-center gap-2">
+                        <Gamepad2 className="w-4 h-4 shrink-0" />
+                        PS5 (Console + Controller)
                       </h4>
                       <div className="space-y-2 text-xs font-rajdhani font-semibold">
                         {MEMBERSHIP_LIMITED_WEEKLY.ps5.map((row, i) => (
@@ -655,8 +678,9 @@ export default function PricingPage() {
                     </div>
 
                     <div className="editorial-card p-5 space-y-3">
-                      <h4 className="font-orbitron font-bold text-sm text-slate-800">
-                        🕹️ PS5 + 1 Controller
+                      <h4 className="font-orbitron font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <Joystick className="w-4 h-4 shrink-0 text-[#e10600]" />
+                        PS5 + 1 Controller
                       </h4>
                       <div className="space-y-2 text-xs font-rajdhani font-semibold">
                         {MEMBERSHIP_LIMITED_WEEKLY.ps5Duo.map((row, i) => (
@@ -669,8 +693,9 @@ export default function PricingPage() {
                     </div>
 
                     <div className="editorial-card p-5 space-y-3">
-                      <h4 className="font-orbitron font-bold text-sm text-slate-800">
-                        💻 Gaming PC Rigs
+                      <h4 className="font-orbitron font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <Monitor className="w-4 h-4 shrink-0 text-[#e10600]" />
+                        Gaming PC Rigs
                       </h4>
                       <div className="space-y-2 text-xs font-rajdhani font-semibold">
                         {MEMBERSHIP_LIMITED_WEEKLY.pc.map((row, i) => (
@@ -694,8 +719,9 @@ export default function PricingPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="editorial-card p-5 space-y-3">
-                      <h4 className="font-orbitron font-bold text-sm text-[#e10600]">
-                        🎮 PS5 (Console + Controller)
+                      <h4 className="font-orbitron font-bold text-sm text-[#e10600] flex items-center gap-2">
+                        <Gamepad2 className="w-4 h-4 shrink-0" />
+                        PS5 (Console + Controller)
                       </h4>
                       <div className="space-y-2 text-xs font-rajdhani font-semibold">
                         {MEMBERSHIP_LIMITED_MONTHLY.ps5.map((row, i) => (
@@ -708,8 +734,9 @@ export default function PricingPage() {
                     </div>
 
                     <div className="editorial-card p-5 space-y-3">
-                      <h4 className="font-orbitron font-bold text-sm text-slate-800">
-                        🕹️ PS5 + 1 Controller
+                      <h4 className="font-orbitron font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <Joystick className="w-4 h-4 shrink-0 text-[#e10600]" />
+                        PS5 + 1 Controller
                       </h4>
                       <div className="space-y-2 text-xs font-rajdhani font-semibold">
                         {MEMBERSHIP_LIMITED_MONTHLY.ps5Duo.map((row, i) => (
@@ -722,8 +749,9 @@ export default function PricingPage() {
                     </div>
 
                     <div className="editorial-card p-5 space-y-3">
-                      <h4 className="font-orbitron font-bold text-sm text-slate-800">
-                        💻 Gaming PC Rigs
+                      <h4 className="font-orbitron font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <Monitor className="w-4 h-4 shrink-0 text-[#e10600]" />
+                        Gaming PC Rigs
                       </h4>
                       <div className="space-y-2 text-xs font-rajdhani font-semibold">
                         {MEMBERSHIP_LIMITED_MONTHLY.pc.map((row, i) => (
@@ -745,7 +773,7 @@ export default function PricingPage() {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="editorial-card p-6 space-y-3">
-                      <span className="text-2xl">🎮</span>
+                      <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Gamepad2 className="w-5 h-5" /></span>
                       <h4 className="font-orbitron font-bold text-base text-slate-900">PS5 Console</h4>
                       <div className="font-orbitron font-black text-3xl text-[#e10600]">
                         ₹{MEMBERSHIP_UNLIMITED.weekly.ps5}/-
@@ -754,7 +782,7 @@ export default function PricingPage() {
                     </div>
 
                     <div className="editorial-card p-6 space-y-3">
-                      <span className="text-2xl">🕹️</span>
+                      <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Joystick className="w-5 h-5" /></span>
                       <h4 className="font-orbitron font-bold text-base text-slate-900">PS5 + 1 Controller</h4>
                       <div className="font-orbitron font-black text-3xl text-slate-900">
                         ₹{MEMBERSHIP_UNLIMITED.weekly.ps5Duo}/-
@@ -763,7 +791,7 @@ export default function PricingPage() {
                     </div>
 
                     <div className="editorial-card p-6 space-y-3">
-                      <span className="text-2xl">💻</span>
+                      <span className="w-10 h-10 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-[#e10600] shadow-[0_0_14px_rgba(225,6,0,0.18)]"><Monitor className="w-5 h-5" /></span>
                       <h4 className="font-orbitron font-bold text-base text-slate-900">Gaming PC Rig</h4>
                       <div className="font-orbitron font-black text-3xl text-slate-900">
                         ₹{MEMBERSHIP_UNLIMITED.weekly.pc}/-

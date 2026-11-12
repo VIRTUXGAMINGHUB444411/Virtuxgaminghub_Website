@@ -3,6 +3,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useStore, StationStatus } from "@/context/StoreContext";
+import {
+  Lock,
+  Zap,
+  RotateCw,
+  Gamepad2,
+  Calendar,
+  UtensilsCrossed,
+  Check,
+} from "@/components/Icons";
 
 export default function AdminPage() {
   const {
@@ -27,7 +36,7 @@ export default function AdminPage() {
     if (pinInput === "1234" || pinInput === "admin" || pinInput.length >= 4) {
       login("admin@virtuxgaminghub.com", "admin");
     } else {
-      showToast("❌ Incorrect PIN. Enter '1234' for demo admin.", "error");
+      showToast("Incorrect PIN. Enter '1234' for demo admin.", "error");
     }
   };
 
@@ -36,7 +45,7 @@ export default function AdminPage() {
       <div className="min-h-[75vh] flex items-center justify-center p-6 bg-white text-slate-900">
         <div className="w-full max-w-md p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-6 shadow-clean">
           <div className="w-16 h-16 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-3xl mx-auto text-[#e10600]">
-            🔒
+            <Lock className="w-8 h-8 text-[#e10600]" />
           </div>
 
           <div>
@@ -67,9 +76,10 @@ export default function AdminPage() {
 
           <button
             onClick={() => login("admin@virtuxgaminghub.com", "admin")}
-            className="text-xs text-[#e10600] hover:underline font-rajdhani font-bold"
+            className="text-xs text-[#e10600] hover:underline font-rajdhani font-bold flex items-center justify-center gap-1 mx-auto"
           >
-            ⚡ Click Here for One-Tap Instant Demo Admin Access
+            <Zap className="w-3.5 h-3.5" />
+            <span>Click Here for One-Tap Instant Demo Admin Access</span>
           </button>
         </div>
       </div>
@@ -106,9 +116,10 @@ export default function AdminPage() {
             </Link>
             <button
               onClick={() => showToast("Telemetry synchronized across stations.", "info")}
-              className="px-3.5 py-1.5 rounded-md bg-red-50 border border-red-200 text-xs font-orbitron font-bold text-[#e10600] hover:bg-red-100"
+              className="px-3.5 py-1.5 rounded-md bg-red-50 border border-red-200 text-xs font-orbitron font-bold text-[#e10600] hover:bg-red-100 flex items-center gap-1.5"
             >
-              Sync Telemetry 🔄
+              <span>Sync Telemetry</span>
+              <RotateCw className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -151,22 +162,26 @@ export default function AdminPage() {
         {/* Tab switchers */}
         <div className="flex items-center gap-2 pb-4 border-b border-slate-200 mb-8 overflow-x-auto">
           {[
-            { id: "stations", label: `🎮 Stations Matrix (${stations.length})` },
-            { id: "bookings", label: `📅 Bookings Queue (${bookings.length})` },
-            { id: "orders", label: `🍔 Café Kitchen (${cafeOrders.length})` },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveAdminTab(tab.id as any)}
-              className={`px-4 py-2 rounded-md font-orbitron text-xs font-bold uppercase tracking-wider transition-all ${
-                activeAdminTab === tab.id
-                  ? "bg-[#e10600] text-white shadow-crimsonSm"
-                  : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+            { id: "stations", label: `Stations Matrix (${stations.length})`, icon: Gamepad2 },
+            { id: "bookings", label: `Bookings Queue (${bookings.length})`, icon: Calendar },
+            { id: "orders", label: `Café Kitchen (${cafeOrders.length})`, icon: UtensilsCrossed },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveAdminTab(tab.id as any)}
+                className={`px-4 py-2 rounded-md font-orbitron text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
+                  activeAdminTab === tab.id
+                    ? "bg-[#e10600] text-white shadow-crimsonSm"
+                    : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* ══════════ ADMIN: STATIONS ══════════ */}
@@ -350,9 +365,10 @@ export default function AdminPage() {
                     </button>
                     <button
                       onClick={() => updateOrderStatus(ord.id, "Delivered")}
-                      className="flex-1 py-1.5 rounded bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-orbitron font-bold"
+                      className="flex-1 py-1.5 rounded bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-orbitron font-bold flex items-center justify-center gap-1.5"
                     >
-                      Delivered ✓
+                      <span>Delivered</span>
+                      <Check className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>

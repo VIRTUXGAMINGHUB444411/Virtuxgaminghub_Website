@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
+import { StarRating, Star, CheckCircle2 } from "@/components/Icons";
 
 export default function FeedbackPage() {
   const { reviews, addReview } = useStore();
@@ -65,9 +66,10 @@ export default function FeedbackPage() {
               {averageRating}
             </div>
             <div>
-              <div className="flex items-center gap-1 text-amber-500 text-lg">
-                {"★★★★★"}
-              </div>
+              <StarRating
+                rating={Math.round(Number(averageRating))}
+                starClassName="w-5 h-5"
+              />
               <span className="text-xs text-slate-500 font-rajdhani font-semibold block">
                 Based on {reviews.length} authentic gamer reviews in Ranaghat
               </span>
@@ -93,7 +95,9 @@ export default function FeedbackPage() {
                   : "bg-white border border-slate-200 text-slate-700 hover:text-slate-900"
               }`}
             >
-              5 ★
+              <span className="inline-flex items-center gap-1">
+                5 <Star className="w-3.5 h-3.5 fill-current" />
+              </span>
             </button>
             <button
               onClick={() => setSelectedFilter(4)}
@@ -103,7 +107,9 @@ export default function FeedbackPage() {
                   : "bg-white border border-slate-200 text-slate-700 hover:text-slate-900"
               }`}
             >
-              4 ★
+              <span className="inline-flex items-center gap-1">
+                4 <Star className="w-3.5 h-3.5 fill-current" />
+              </span>
             </button>
           </div>
         </div>
@@ -112,8 +118,9 @@ export default function FeedbackPage() {
           {/* Submit Review Card */}
           <div className="lg:col-span-1">
             <div className="editorial-card p-6 sm:p-8 sticky top-28">
-              <h3 className="font-orbitron font-bold text-xl text-slate-900 mb-2">
-                Leave Your Review ⭐
+              <h3 className="font-orbitron font-bold text-xl text-slate-900 mb-2 flex items-center gap-2">
+                Leave Your Review
+                <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
               </h3>
               <p className="text-xs text-slate-500 font-sans mb-6">
                 Tell us about your gaming session and food quality!
@@ -139,7 +146,13 @@ export default function FeedbackPage() {
                             : "text-slate-300"
                         }`}
                       >
-                        ★
+                        <Star
+                          className={`w-8 h-8 ${
+                            (hoverRating || rating) >= star
+                              ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.6)]"
+                              : "fill-transparent text-slate-300"
+                          }`}
+                        />
                       </button>
                     ))}
                     <span className="text-xs font-orbitron font-bold text-amber-600 ml-2">
@@ -171,12 +184,12 @@ export default function FeedbackPage() {
                     onChange={(e) => setService(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#e10600]"
                   >
-                    <option value="PS5 Console Arena">🎮 PlayStation 5 Arena</option>
-                    <option value="PC Battle Rig (RTX 4090)">💻 PC Battle Rig (RTX 4090 / 360Hz)</option>
-                    <option value="Racing Simulator (G29)">🏎️ Motion Racing Cockpit (Logitech G29)</option>
-                    <option value="Cinema & OTT Suite">🎬 Private Dolby Cinema Suite</option>
-                    <option value="Gamer Café & Lounge">☕ Gamer Café & Bites</option>
-                    <option value="Staff & Atmosphere">🛡️ Staff Co-operation & Hygiene</option>
+                    <option value="PS5 Console Arena">PlayStation 5 Arena</option>
+                    <option value="PC Battle Rig (RTX 4090)">PC Battle Rig (RTX 4090 / 360Hz)</option>
+                    <option value="Racing Simulator (G29)">Motion Racing Cockpit (Logitech G29)</option>
+                    <option value="Cinema & OTT Suite">Private Dolby Cinema Suite</option>
+                    <option value="Gamer Café & Lounge">Gamer Café & Bites</option>
+                    <option value="Staff & Atmosphere">Staff Co-operation & Hygiene</option>
                   </select>
                 </div>
 
@@ -198,7 +211,10 @@ export default function FeedbackPage() {
                   type="submit"
                   className="w-full py-3 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider transition-all shadow-crimsonSm"
                 >
-                  Publish Public Review ⭐
+                  <span className="inline-flex items-center justify-center gap-2">
+                    Publish Public Review
+                    <Star className="w-4 h-4 fill-current" />
+                  </span>
                 </button>
               </form>
             </div>
@@ -231,9 +247,11 @@ export default function FeedbackPage() {
                   </div>
 
                   <div className="text-right">
-                    <div className="flex text-amber-500 text-sm">
-                      {"★".repeat(rev.rating)}
-                    </div>
+                    <StarRating
+                      rating={rev.rating}
+                      className="flex items-center justify-end gap-0.5"
+                      starClassName="w-3.5 h-3.5"
+                    />
                     <span className="text-[11px] font-rajdhani text-slate-400 font-semibold">
                       {rev.date}
                     </span>

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useStore } from "@/context/StoreContext";
 import { CAFE_ITEMS } from "@/data/cafeData";
+import { Coffee, UtensilsCrossed, Cake, Gift, Zap, ShoppingBag } from "@/components/Icons";
 
 export default function CafePage() {
   const { cart, addToCart, updateCartQuantity, setIsCartOpen } = useStore();
@@ -54,8 +55,8 @@ export default function CafePage() {
           </div>
 
           <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-4 shrink-0">
-            <div className="w-10 h-10 rounded-full bg-[#e10600] text-white flex items-center justify-center text-xl shadow-xs">
-              🚀
+            <div className="w-10 h-10 rounded-full bg-[#e10600] text-white flex items-center justify-center shadow-xs">
+              <Zap className="w-5 h-5 text-white fill-current" />
             </div>
             <div>
               <span className="text-xs font-orbitron font-black text-slate-900 block">
@@ -72,23 +73,27 @@ export default function CafePage() {
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pb-6 border-b border-slate-200 mb-8">
           <div className="flex flex-wrap items-center gap-2">
             {[
-              { id: "drinks", label: "☕ Drinkable Items" },
-              { id: "snacks", label: "🍟 Snacks & Bites" },
-              { id: "cakes", label: "🎂 Cakes & Desserts" },
-              { id: "combos", label: "🎁 Gamer Combos" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveCategory(tab.id as any)}
-                className={`px-4 py-2 rounded-md font-orbitron text-xs font-bold uppercase tracking-wider transition-all ${
-                  activeCategory === tab.id
-                    ? "bg-[#e10600] text-white shadow-crimsonSm"
-                    : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+              { id: "drinks", label: "Drinkable Items", icon: Coffee },
+              { id: "snacks", label: "Snacks & Bites", icon: UtensilsCrossed },
+              { id: "cakes", label: "Cakes & Desserts", icon: Cake },
+              { id: "combos", label: "Gamer Combos", icon: Gift },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveCategory(tab.id as any)}
+                  className={`px-4 py-2 rounded-md font-orbitron text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
+                    activeCategory === tab.id
+                      ? "bg-[#e10600] text-white shadow-crimsonSm"
+                      : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-3">
@@ -204,7 +209,10 @@ export default function CafePage() {
               onClick={() => setIsCartOpen(true)}
               className="px-6 py-3 rounded-full bg-[#e10600] text-white font-orbitron font-black text-xs uppercase tracking-wider shadow-crimson flex items-center gap-3 animate-bounce"
             >
-              <span>🍔 View Cart ({totalCartCount} items)</span>
+              <span className="flex items-center gap-2">
+                <ShoppingBag className="w-4 h-4" />
+                <span>View Cart ({totalCartCount} items)</span>
+              </span>
               <span className="bg-black/30 px-2.5 py-0.5 rounded-full text-white">
                 ₹{totalCartSum}
               </span>

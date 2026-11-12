@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
+import { Logo3D } from "@/components/Logo3D";
 
 const navLinks = [
   { name: "Home", href: "/", tag: "Spawn point" },
@@ -39,6 +40,14 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => setOpen(false), [pathname]);
 
+  /* the full-screen menu is only for widths without inline links: close it if the window grows past xl */
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1280px)");
+    const onChange = () => mq.matches && setOpen(false);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   useEffect(() => {
     document.documentElement.style.overflow = open ? "hidden" : "";
     const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -46,47 +55,112 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener("keydown", esc);
   }, [open]);
 
+  const menuBtn = useRef<HTMLButtonElement>(null);
+  const [origin, setOrigin] = useState("calc(100% - 48px) 44px");
+  const toggleMenu = () => {
+    const r = menuBtn.current?.getBoundingClientRect();
+    if (r) setOrigin(`${r.left + r.width / 2}px ${r.top + r.height / 2}px`);
+    setOpen((o) => !o);
+  };
+
+  /* sliding highlight that follows the hovered link and rests on the active one */
+  const navRef = useRef<HTMLElement>(null);
+  const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const [hoverLink, setHoverLink] = useState<number | null>(null);
+  const [pill, setPill] = useState<{ x: number; w: number; on: boolean }>({ x: 0, w: 0, on: false });
+  const activeIdx = navLinks.findIndex((l) => l.href === pathname);
+  useEffect(() => {
+    const place = () => {
+      const i = hoverLink ?? activeIdx;
+      const el = i >= 0 ? linkRefs.current[i] : null;
+      setPill(el ? { x: el.offsetLeft, w: el.offsetWidth, on: true } : (p) => ({ ...p, on: false }));
+    };
+    place();
+    window.addEventListener("resize", place);
+    document.fonts?.ready.then(place);
+    return () => window.removeEventListener("resize", place);
+  }, [hoverLink, activeIdx, mounted]);
+
   const totalCartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          hidden && !open ? "-translate-y-full" : "translate-y-0"
-        } ${scrolled && !open ? "bg-[#050505]/80 backdrop-blur-md border-b border-white/5" : "bg-transparent border-b border-transparent"}`}
+        className={`fixed top-3 sm:top-4 inset-x-0 z-50 px-3 sm:px-6 pointer-events-none transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          hidden && !open ? "-translate-y-[140%]" : "translate-y-0"
+        }`}
       >
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 h-16 flex items-center justify-between">
-          {/* Brand */}
-          <Link href="/" className="flex items-center gap-2.5 group" aria-label="Virtux home">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo-icon-3d.png"
-              alt="Virtux"
-              className="w-10 h-10 object-contain mix-blend-screen scale-125 transition-transform duration-700 group-hover:[transform:perspective(400px)_rotateY(360deg)_scale(1.25)]"
-            />
-            <div className="hidden sm:flex flex-col leading-none">
-              <span className="font-display text-xl tracking-wide text-white">VIRTUX</span>
-              <span className="font-mono text-[9px] tracking-[0.3em] text-[#e10600] uppercase mt-0.5">
+        <div
+          className={`vx-nav pointer-events-auto relative mx-auto max-w-[1180px] pl-1.5 pr-1.5 sm:pl-2 flex items-center justify-between gap-3 rounded-full border transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            scrolled ? "h-14 sm:h-[60px]" : "h-14 sm:h-16"
+          } ${
+            open
+              ? "bg-transparent border-transparent"
+              : scrolled
+              ? "bg-[#070707]/85 border-white/[0.09] backdrop-blur-2xl shadow-[0_20px_60px_-24px_rgba(225,6,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)]"
+              : "bg-[#070707]/60 border-white/[0.09] backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+          }`}
+        >
+          {/* hairline red sheen travelling along the bottom edge */}
+          {!open && (
+            <span aria-hidden className="pointer-events-none absolute inset-x-10 -bottom-px h-px overflow-hidden rounded-full">
+              <span className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-[#ff2a1f] to-transparent animate-[vxSheen_5s_ease-in-out_infinite]" />
+            </span>
+          )}
+          {/* Brand: live 3D emblem + wordmark */}
+          <Link href="/" className="flex items-center gap-2.5 group shrink-0" aria-label="Virtux Gaming Hub home">
+            <span className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[radial-gradient(circle_at_50%_40%,#2a0605,#050505_70%)] border border-white/10 overflow-hidden group-hover:border-[#e10600]/70 transition-colors duration-500">
+              <span className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,transparent,rgba(225,6,0,0.6),transparent_35%)] animate-[spin_3.5s_linear_infinite] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <span className="absolute inset-[1.5px] rounded-full bg-[radial-gradient(circle_at_50%_40%,#250504,#050505_72%)]" />
+              {/* pointer-events-none so the whole badge stays a plain link */}
+              <span className="absolute -inset-[18%] pointer-events-none">
+                <Logo3D className="w-full h-full" />
+              </span>
+            </span>
+            <span className="flex flex-col leading-none pr-1.5">
+              <span className="font-display text-[19px] tracking-[0.06em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.6)]">
+                VIRTUX
+              </span>
+              <span className="mt-1 flex items-center gap-1.5 font-mono text-[8.5px] font-medium tracking-[0.34em] uppercase text-white/80">
+                <span className="w-2.5 h-px bg-[#ff3b30]" />
                 Gaming Hub
               </span>
-            </div>
+            </span>
           </Link>
 
-          {/* Center: inline links (wide desktop) */}
-          <nav className="hidden xl:flex items-center gap-7">
-            {navLinks.map((link) => {
+          {/* Center: inline links inside a nested pill (wide desktop) */}
+          <nav
+            ref={navRef}
+            onMouseLeave={() => setHoverLink(null)}
+            className="hidden xl:flex relative items-center gap-0.5 rounded-full bg-white/[0.035] border border-white/[0.06] p-1"
+          >
+            <span
+              aria-hidden
+              className={`absolute top-1 bottom-1 left-0 rounded-full transition-[transform,width,background-color,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                hoverLink !== null && hoverLink !== activeIdx ? "bg-white/[0.1]" : "bg-[#e10600] shadow-[0_0_22px_-4px_rgba(225,6,0,0.9)]"
+              }`}
+              style={{ transform: `translateX(${pill.x}px)`, width: pill.w, opacity: pill.on ? 1 : 0 }}
+            />
+            {navLinks.map((link, i) => {
               const active = pathname === link.href;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="group relative font-mono text-[11px] tracking-[0.22em] uppercase overflow-hidden h-4 leading-4"
+                  ref={(el) => {
+                    linkRefs.current[i] = el;
+                  }}
+                  onMouseEnter={() => setHoverLink(i)}
+                  className={`group relative z-10 font-mono text-[10.5px] tracking-[0.2em] uppercase overflow-hidden h-9 px-3.5 rounded-full flex items-center transition-colors duration-300 ${
+                    active || hoverLink === i ? "text-white" : "text-white/65"
+                  }`}
+                  style={{ animation: `vxNavIn 0.8s cubic-bezier(0.16,1,0.3,1) ${0.15 + i * 0.05}s both` }}
                 >
-                  <span className={`block transition-transform duration-300 group-hover:-translate-y-full ${active ? "text-[#e10600]" : "text-white/70"}`}>
-                    {link.name}
-                  </span>
-                  <span className="absolute inset-0 block translate-y-full transition-transform duration-300 group-hover:translate-y-0 text-white">
-                    {link.name}
+                  <span className="relative block h-4 leading-4 overflow-hidden">
+                    <span className="block transition-transform duration-300 group-hover:-translate-y-full">{link.name}</span>
+                    <span className="absolute inset-0 block translate-y-full transition-transform duration-300 group-hover:translate-y-0 text-white">
+                      {link.name}
+                    </span>
                   </span>
                 </Link>
               );
@@ -94,10 +168,10 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Right actions */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative w-10 h-10 flex items-center justify-center border border-white/15 text-white/80 hover:text-white hover:border-[#e10600] transition-colors"
+              className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center border border-white/15 text-white/80 hover:text-white hover:border-[#e10600] hover:bg-[#e10600]/10 transition-colors"
               title="View Café Order Cart"
               aria-label="Open cart"
             >
@@ -107,7 +181,7 @@ export const Navbar: React.FC = () => {
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
               </svg>
               {totalCartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-[#e10600] text-white font-mono text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-[#e10600] text-white font-mono text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {totalCartCount}
                 </span>
               )}
@@ -116,7 +190,7 @@ export const Navbar: React.FC = () => {
             {mounted && user ? (
               <Link
                 href={user.role === "admin" ? "/admin" : "/dashboard"}
-                className="hidden sm:inline-flex items-center gap-2 h-10 px-3 border border-white/15 text-white/80 hover:text-white hover:border-[#e10600] font-mono text-[11px] uppercase tracking-widest transition-colors"
+                className="hidden md:inline-flex items-center gap-2 h-11 px-4 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-[#e10600] font-mono text-[10.5px] uppercase tracking-widest transition-colors"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span>{user.name.split(" ")[0]}</span>
@@ -128,7 +202,7 @@ export const Navbar: React.FC = () => {
                   setAuthTab("login");
                   setIsAuthOpen(true);
                 }}
-                className="hidden sm:inline-flex items-center h-10 px-4 border border-white/15 text-white/80 hover:text-white hover:border-white font-mono text-[11px] uppercase tracking-widest transition-colors"
+                className="hidden md:inline-flex items-center h-11 px-4 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white font-mono text-[10.5px] uppercase tracking-widest transition-colors"
               >
                 Login
               </button>
@@ -136,21 +210,25 @@ export const Navbar: React.FC = () => {
 
             <button
               onClick={() => setIsBookingOpen(true)}
-              className="hidden sm:inline-flex items-center gap-2 h-10 px-5 bg-[#e10600] hover:bg-white hover:text-black text-white font-mono font-bold text-[11px] tracking-[0.2em] uppercase transition-colors"
+              className="group relative overflow-hidden hidden sm:inline-flex items-center gap-2 h-11 px-5 rounded-full bg-[#e10600] hover:bg-white hover:text-black text-white font-mono font-bold text-[10.5px] tracking-[0.2em] uppercase transition-colors duration-300 shadow-[0_0_24px_-4px_rgba(225,6,0,0.8)]"
             >
-              <span className="w-1.5 h-1.5 bg-current rotate-45" />
-              Play Now
+              <span aria-hidden className="absolute inset-y-0 -left-1/2 w-1/3 skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/45 to-transparent animate-[vxShine_3.2s_ease-in-out_infinite] group-hover:opacity-0" />
+              <span className="relative w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+              <span className="relative">Play Now</span>
             </button>
 
-            {/* Hamburger: two lines → X */}
+            {/* Menu button: round, two lines → X (same animation) */}
             <button
-              onClick={() => setOpen((o) => !o)}
-              className="relative w-11 h-10 flex flex-col items-end justify-center gap-[7px] group"
+              ref={menuBtn}
+              onClick={toggleMenu}
+              className={`xl:hidden relative w-10 h-10 sm:w-11 sm:h-11 rounded-full flex flex-col items-center justify-center gap-[6px] group border transition-colors ${
+                open ? "bg-black border-black" : "bg-white/5 border-white/15 hover:border-[#e10600]"
+              }`}
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
             >
-              <span className={`block h-[1.5px] bg-white transition-all duration-500 ${open ? "w-8 translate-y-[4.25px] rotate-45" : "w-8 group-hover:w-5"}`} />
-              <span className={`block h-[1.5px] bg-white transition-all duration-500 ${open ? "w-8 -translate-y-[4.25px] -rotate-45" : "w-5 group-hover:w-8"}`} />
+              <span className={`block h-[1.5px] bg-white transition-all duration-500 ${open ? "w-5 translate-y-[3.75px] rotate-45" : "w-5 group-hover:w-3"}`} />
+              <span className={`block h-[1.5px] bg-white transition-all duration-500 ${open ? "w-5 -translate-y-[3.75px] -rotate-45" : "w-3 group-hover:w-5"}`} />
             </button>
           </div>
         </div>
@@ -160,7 +238,7 @@ export const Navbar: React.FC = () => {
       <div
         className="fixed inset-0 z-40 bg-[#8f0000] text-black transition-[clip-path] duration-[900ms] ease-[cubic-bezier(0.77,0,0.18,1)]"
         style={{
-          clipPath: open ? "circle(150% at calc(100% - 40px) 32px)" : "circle(0% at calc(100% - 40px) 32px)",
+          clipPath: `circle(${open ? 150 : 0}% at ${origin})`,
           pointerEvents: open ? "auto" : "none",
         }}
         aria-hidden={!open}
