@@ -65,7 +65,7 @@ export const AuthModal: React.FC = () => {
             onClick={() => setAuthTab("login")}
             className={`pb-3 text-xs font-orbitron font-bold tracking-wider uppercase transition-colors relative ${
               authTab === "login"
-                ? "text-[#f92f35] border-b-2 border-[#f92f35]"
+                ? "text-[#e10600] border-b-2 border-[#e10600]"
                 : "text-slate-500 hover:text-slate-900"
             }`}
           >
@@ -75,7 +75,7 @@ export const AuthModal: React.FC = () => {
             onClick={() => setAuthTab("register")}
             className={`pb-3 text-xs font-orbitron font-bold tracking-wider uppercase transition-colors relative ${
               authTab === "register"
-                ? "text-[#f92f35] border-b-2 border-[#f92f35]"
+                ? "text-[#e10600] border-b-2 border-[#e10600]"
                 : "text-slate-500 hover:text-slate-900"
             }`}
           >
@@ -105,7 +105,7 @@ export const AuthModal: React.FC = () => {
                 placeholder="gamer@virtux.local or phone"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
@@ -118,13 +118,13 @@ export const AuthModal: React.FC = () => {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 rounded-md bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
+              className="w-full py-3 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
             >
               Log In to Player Hub
             </button>
@@ -154,7 +154,7 @@ export const AuthModal: React.FC = () => {
                 placeholder="e.g. Rahul Sharma"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
@@ -168,7 +168,7 @@ export const AuthModal: React.FC = () => {
                 placeholder="rahul@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
@@ -181,7 +181,7 @@ export const AuthModal: React.FC = () => {
                 placeholder="+91 91477 18768"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
@@ -194,13 +194,13 @@ export const AuthModal: React.FC = () => {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 rounded-md bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
+              className="w-full py-3 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
             >
               Create Virtux Gamer Pass 🚀
             </button>
@@ -223,13 +223,13 @@ export const AuthModal: React.FC = () => {
                 placeholder="1234"
                 value={adminPin}
                 onChange={(e) => setAdminPin(e.target.value)}
-                className="w-full px-4 py-3 rounded-md bg-white border border-slate-200 text-center tracking-widest text-lg text-slate-900 focus:outline-none focus:border-[#f92f35] font-orbitron"
+                className="w-full px-4 py-3 rounded-md bg-white border border-slate-200 text-center tracking-widest text-lg text-slate-900 focus:outline-none focus:border-[#e10600] font-orbitron"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 rounded-md bg-slate-900 hover:bg-slate-800 text-white font-orbitron font-bold text-xs uppercase tracking-wider"
+              className="w-full py-3 rounded-md bg-[#1a1a1c] hover:bg-[#262628] text-white border border-white/10 font-orbitron font-bold text-xs uppercase tracking-wider"
             >
               Authenticate Control Center
             </button>

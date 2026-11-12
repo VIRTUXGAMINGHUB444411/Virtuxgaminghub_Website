@@ -12,18 +12,18 @@ export default function AboutPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-xs font-rajdhani text-slate-500 mb-6 uppercase tracking-wider font-semibold">
-          <Link href="/" className="hover:text-[#f92f35]">Home</Link>
+          <Link href="/" className="hover:text-[#e10600]">Home</Link>
           <span>/</span>
-          <span className="text-[#f92f35] font-bold">About Us</span>
+          <span className="text-[#e10600] font-bold">About Us</span>
         </div>
 
         {/* Hero Section */}
         <div className="max-w-3xl mb-14">
-          <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-widest block mb-2">
+          <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-widest block mb-2">
             The Virtux Philosophy
           </span>
           <h1 className="text-3xl sm:text-5xl font-orbitron font-black text-slate-900 leading-tight">
-            Ranaghat&apos;s Premier <span className="text-[#f92f35]">Gaming Sanctuary</span>
+            Ranaghat&apos;s Premier <span className="text-[#e10600]">Gaming Sanctuary</span>
           </h1>
           <p className="mt-4 text-base text-slate-600 font-sans leading-relaxed">
             Born out of uncompromised passion for gaming, high frame-rates, and vibrant community. Built for comfort, speed, and unforgettable squad sessions.
@@ -33,7 +33,7 @@ export default function AboutPage() {
         {/* Anti-Gambling Ethical Pledge Box */}
         <div className="p-6 sm:p-8 rounded-xl bg-red-50/70 border border-red-200 mb-16 relative overflow-hidden">
           <div className="flex flex-col sm:flex-row items-start gap-4">
-            <div className="w-12 h-12 rounded-lg bg-[#f92f35] text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
+            <div className="w-12 h-12 rounded-lg bg-[#e10600] text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
               🛡️
             </div>
             <div>
@@ -41,7 +41,7 @@ export default function AboutPage() {
                 Ethical & Transparent Gaming Guarantee
               </h3>
               <p className="text-sm text-slate-700 font-sans leading-relaxed">
-                At Virtux Gaming Hub, we <strong className="text-[#f92f35]">do not promote, support, or encourage gambling</strong> or any activity involving betting your hard-earned money. We operate strictly as a professional rental facility — providing gamers access to high-end PlayStation consoles, RTX 4090 PC rigs, and racing simulators at affordable, transparent hourly rates so everyone can enjoy gaming without prohibitive equipment costs.
+                At Virtux Gaming Hub, we <strong className="text-[#e10600]">do not promote, support, or encourage gambling</strong> or any activity involving betting your hard-earned money. We operate strictly as a professional rental facility — providing gamers access to high-end PlayStation consoles, RTX 4090 PC rigs, and racing simulators at affordable, transparent hourly rates so everyone can enjoy gaming without prohibitive equipment costs.
               </p>
             </div>
           </div>
@@ -50,11 +50,11 @@ export default function AboutPage() {
         {/* Hardware & Arena Zones Breakdown */}
         <div className="mb-20">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-widest">
+            <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-widest">
               State-of-the-Art Gear
             </span>
             <h2 className="text-2xl sm:text-4xl font-orbitron font-black text-slate-900 mt-1">
-              Engineered For <span className="text-[#f92f35]">Victory</span>
+              Engineered For <span className="text-[#e10600]">Victory</span>
             </h2>
           </div>
 
@@ -62,7 +62,7 @@ export default function AboutPage() {
             <div className="editorial-card p-6 space-y-3">
               <div className="text-3xl">🎮</div>
               <h3 className="font-orbitron font-bold text-lg text-slate-900">Sony PlayStation 5 Arena</h3>
-              <p className="text-xs text-[#f92f35] font-orbitron font-semibold">4K 120Hz Displays · DualSense Haptics</p>
+              <p className="text-xs text-[#e10600] font-orbitron font-semibold">4K 120Hz Displays · DualSense Haptics</p>
               <p className="text-sm text-slate-600 font-sans leading-relaxed">
                 Dedicated PS5 stations running on low-lag gaming displays. Sanitized wireless DualSense controllers with adaptive triggers, Tempest 3D Audio headsets, and over 100 pre-installed games.
               </p>
@@ -71,7 +71,7 @@ export default function AboutPage() {
             <div className="editorial-card p-6 space-y-3">
               <div className="text-3xl">💻</div>
               <h3 className="font-orbitron font-bold text-lg text-slate-900">High-End RTX Battle Rigs</h3>
-              <p className="text-xs text-[#f92f35] font-orbitron font-semibold">RTX 4090 / 4070 · 240Hz to 360Hz Monitors</p>
+              <p className="text-xs text-[#e10600] font-orbitron font-semibold">RTX 4090 / 4070 · 240Hz to 360Hz Monitors</p>
               <p className="text-sm text-slate-600 font-sans leading-relaxed">
                 Custom liquid-cooled beasts powered by NVIDIA GeForce RTX 3060, 4070, and flagship 4090 GPUs. Mechanical keyboards, esports mice with 8000Hz polling, and noise-isolating headsets.
               </p>
@@ -118,11 +118,11 @@ export default function AboutPage() {
         {/* Arena Amenities */}
         <div className="mb-20">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-widest">
+            <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-widest">
               Unrivaled Standards
             </span>
             <h2 className="text-2xl sm:text-4xl font-orbitron font-black text-slate-900 mt-1">
-              Arena <span className="text-[#f92f35]">Amenities</span>
+              Arena <span className="text-[#e10600]">Amenities</span>
             </h2>
           </div>
 
@@ -164,7 +164,7 @@ export default function AboutPage() {
         {/* Operating Rules */}
         <div className="p-8 rounded-xl bg-slate-50 border border-slate-200 mb-16 space-y-6">
           <h3 className="font-orbitron font-black text-xl text-slate-900 flex items-center gap-2">
-            <span className="text-[#f92f35]">📋</span> Arena Guidelines & Fair Play
+            <span className="text-[#e10600]">📋</span> Arena Guidelines & Fair Play
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans text-slate-700 leading-relaxed">

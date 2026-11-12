@@ -15,7 +15,7 @@ export default function DashboardPage() {
   if (!user) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center bg-white text-slate-900">
-        <div className="w-16 h-16 rounded-full bg-red-50 border border-red-200 flex items-center justify-center text-3xl mb-4 text-[#f92f35]">
+        <div className="w-16 h-16 rounded-full bg-red-50 border border-red-200 flex items-center justify-center text-3xl mb-4 text-[#e10600]">
           👤
         </div>
         <h2 className="font-orbitron font-black text-2xl text-slate-900 mb-2">
@@ -49,17 +49,17 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-rajdhani text-slate-500 mb-6 uppercase tracking-wider font-semibold">
-          <Link href="/" className="hover:text-[#f92f35]">Home</Link>
+          <Link href="/" className="hover:text-[#e10600]">Home</Link>
           <span>/</span>
-          <span className="text-[#f92f35] font-bold">Player Dashboard</span>
+          <span className="text-[#e10600] font-bold">Player Dashboard</span>
         </div>
 
         {/* Gamer Profile Header Card */}
         <div className="p-6 sm:p-8 rounded-2xl bg-slate-50 border border-slate-200 mb-10 flex flex-col md:flex-row items-center justify-between gap-6 relative shadow-clean">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
             {/* Avatar */}
-            <div className="w-20 h-20 rounded-full bg-[#f92f35] p-1 flex items-center justify-center shadow-md shrink-0">
-              <div className="w-full h-full rounded-full bg-white flex items-center justify-center font-orbitron font-black text-2xl text-[#f92f35]">
+            <div className="w-20 h-20 rounded-full bg-[#e10600] p-1 flex items-center justify-center shadow-md shrink-0">
+              <div className="w-full h-full rounded-full bg-white flex items-center justify-center font-orbitron font-black text-2xl text-[#e10600]">
                 {user.name.charAt(0).toUpperCase()}
               </div>
             </div>
@@ -80,7 +80,7 @@ export default function DashboardPage() {
 
               {/* Member ID with Copy Button */}
               <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <div className="px-3 py-1 rounded bg-white border border-slate-200 font-orbitron text-xs font-bold text-[#f92f35] shadow-xs">
+                <div className="px-3 py-1 rounded bg-white border border-slate-200 font-orbitron text-xs font-bold text-[#e10600] shadow-xs">
                   ID: {user.memberId}
                 </div>
                 <button
@@ -125,7 +125,7 @@ export default function DashboardPage() {
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-4 py-2 rounded-md font-orbitron text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
                 activeTab === tab.id
-                  ? "bg-[#f92f35] text-white shadow-crimsonSm"
+                  ? "bg-[#e10600] text-white shadow-crimsonSm"
                   : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
               }`}
             >
@@ -158,7 +158,7 @@ export default function DashboardPage() {
                   <span className="text-[11px] font-orbitron text-slate-400 uppercase font-bold">
                     Time Remaining
                   </span>
-                  <div className="font-orbitron font-black text-3xl sm:text-4xl text-[#f92f35]">
+                  <div className="font-orbitron font-black text-3xl sm:text-4xl text-[#e10600]">
                     42:18 min
                   </div>
                   <div className="flex gap-2">
@@ -170,7 +170,7 @@ export default function DashboardPage() {
                     </button>
                     <button
                       onClick={() => setIsCartOpen(true)}
-                      className="px-3 py-1.5 rounded-md bg-[#f92f35] text-white text-xs font-orbitron font-bold hover:bg-[#e02228] shadow-xs"
+                      className="px-3 py-1.5 rounded-md bg-[#e10600] text-white text-xs font-orbitron font-bold hover:bg-[#b80000] shadow-xs"
                     >
                       Order Food 🍔
                     </button>
@@ -185,7 +185,7 @@ export default function DashboardPage() {
                   <span>Total Booked: 120 mins</span>
                 </div>
                 <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-[#f92f35] to-red-400 rounded-full w-[65%]" />
+                  <div className="h-full bg-gradient-to-r from-[#e10600] to-red-400 rounded-full w-[65%]" />
                 </div>
               </div>
             </div>
@@ -227,7 +227,7 @@ export default function DashboardPage() {
               </h3>
               <button
                 onClick={() => setIsBookingOpen(true)}
-                className="px-3.5 py-1.5 rounded-md bg-[#f92f35] text-white font-orbitron font-bold text-xs uppercase"
+                className="px-3.5 py-1.5 rounded-md bg-[#e10600] text-white font-orbitron font-bold text-xs uppercase"
               >
                 + New Reservation
               </button>
@@ -245,7 +245,7 @@ export default function DashboardPage() {
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-orbitron font-bold text-sm text-[#f92f35]">{b.id}</span>
+                      <span className="font-orbitron font-bold text-sm text-[#e10600]">{b.id}</span>
                       <span className="text-[10px] font-orbitron font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                         {b.status}
                       </span>
@@ -279,7 +279,7 @@ export default function DashboardPage() {
               </h3>
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="px-3.5 py-1.5 rounded-md bg-[#f92f35] text-white font-orbitron font-bold text-xs uppercase"
+                className="px-3.5 py-1.5 rounded-md bg-[#e10600] text-white font-orbitron font-bold text-xs uppercase"
               >
                 Open Café Cart 🍔
               </button>
@@ -297,7 +297,7 @@ export default function DashboardPage() {
                 >
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="font-orbitron font-bold text-sm text-[#f92f35]">{ord.id}</span>
+                      <span className="font-orbitron font-bold text-sm text-[#e10600]">{ord.id}</span>
                       <span
                         className={`text-[10px] font-orbitron font-bold px-2 py-0.5 rounded ${
                           ord.status === "Delivered"
@@ -310,7 +310,7 @@ export default function DashboardPage() {
                     </div>
 
                     <p className="text-xs text-slate-800 font-rajdhani font-bold">
-                      Destination: <strong className="text-[#f92f35]">{ord.stationOrTable}</strong> · {ord.timestamp}
+                      Destination: <strong className="text-[#e10600]">{ord.stationOrTable}</strong> · {ord.timestamp}
                     </p>
 
                     <div className="text-xs text-slate-600 font-sans">
@@ -353,7 +353,7 @@ export default function DashboardPage() {
                     type="text"
                     value={gamerTag}
                     onChange={(e) => setGamerTag(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
                   />
                 </div>
 
@@ -365,7 +365,7 @@ export default function DashboardPage() {
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
                   />
                 </div>
 
@@ -377,13 +377,13 @@ export default function DashboardPage() {
                     type="text"
                     value={favoriteGame}
                     onChange={(e) => setFavoriteGame(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 rounded-md bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-bold text-xs uppercase tracking-wider"
+                  className="w-full py-2.5 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider"
                 >
                   Save Profile Changes
                 </button>

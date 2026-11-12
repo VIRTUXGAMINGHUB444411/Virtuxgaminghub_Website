@@ -68,14 +68,14 @@ export const BookingModal: React.FC = () => {
       <div className="relative w-full max-w-lg rounded-2xl bg-white border border-slate-200 p-6 md:p-8 shadow-2xl text-slate-900 z-10 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-md bg-[#f92f35] text-white flex items-center justify-center text-sm font-bold shadow-xs">
+            <div className="w-8 h-8 rounded-md bg-[#e10600] text-white flex items-center justify-center text-sm font-bold shadow-xs">
               ⚡
             </div>
             <div>
               <h3 className="font-orbitron font-black text-lg text-slate-900">
                 Reserve Station
               </h3>
-              <p className="text-xs text-[#f92f35] font-rajdhani font-bold">
+              <p className="text-xs text-[#e10600] font-rajdhani font-bold">
                 Instant Lock-In · Zero Hidden Fees · Pay at Counter
               </p>
             </div>
@@ -103,7 +103,7 @@ export const BookingModal: React.FC = () => {
                 placeholder="e.g. Suman Roy"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35] font-rajdhani font-semibold"
+                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600] font-rajdhani font-semibold"
               />
             </div>
 
@@ -117,7 +117,7 @@ export const BookingModal: React.FC = () => {
                 placeholder="+91 98000 00000"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35] font-rajdhani font-semibold"
+                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600] font-rajdhani font-semibold"
               />
             </div>
           </div>
@@ -129,7 +129,7 @@ export const BookingModal: React.FC = () => {
             <select
               value={service}
               onChange={(e) => setService(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35] font-rajdhani font-bold"
+              className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600] font-rajdhani font-bold"
             >
               <option value="PlayStation 5 (Console + Controller)">🎮 PlayStation 5 4K 120Hz Arena</option>
               <option value="Gaming PC Battle Station (RTX Rigs)">💻 High-FPS RTX Gaming PC Battle Station</option>
@@ -146,7 +146,7 @@ export const BookingModal: React.FC = () => {
               <select
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35] font-rajdhani font-semibold"
+                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600] font-rajdhani font-semibold"
               >
                 <option value="Today">Today (Open until 9:30 PM)</option>
                 <option value="Tomorrow">Tomorrow</option>
@@ -161,7 +161,7 @@ export const BookingModal: React.FC = () => {
               <select
                 value={timeSlot}
                 onChange={(e) => setTimeSlot(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35] font-rajdhani font-semibold"
+                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600] font-rajdhani font-semibold"
               >
                 <option value="11:00 AM">11:00 AM (Morning Grind)</option>
                 <option value="01:00 PM">01:00 PM (Afternoon)</option>
@@ -186,7 +186,7 @@ export const BookingModal: React.FC = () => {
                     onClick={() => setHours(h)}
                     className={`flex-1 py-2 rounded-md text-xs font-orbitron font-bold transition-all ${
                       hours === h
-                        ? "bg-[#f92f35] text-white shadow-xs"
+                        ? "bg-[#e10600] text-white shadow-xs"
                         : "bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200"
                     }`}
                   >
@@ -203,7 +203,7 @@ export const BookingModal: React.FC = () => {
                     type="checkbox"
                     checked={extraController}
                     onChange={(e) => setExtraController(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#f92f35] focus:ring-0"
+                    className="w-4 h-4 rounded text-[#e10600] focus:ring-0"
                   />
                   <span className="text-xs font-rajdhani font-bold text-slate-800">
                     + Add 2nd Controller (Co-op/FIFA)
@@ -222,7 +222,7 @@ export const BookingModal: React.FC = () => {
               placeholder="e.g. Please preload EA FC 25 / Tekken 8"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-[#f92f35]"
+              className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-[#e10600]"
             />
           </div>
 
@@ -232,12 +232,12 @@ export const BookingModal: React.FC = () => {
               <span className="text-[11px] font-orbitron text-slate-500 uppercase block font-bold">
                 Estimated Rate
               </span>
-              <span className="text-xs text-[#f92f35] font-rajdhani font-bold">
+              <span className="text-xs text-[#e10600] font-rajdhani font-bold">
                 Pay after your session at the counter
               </span>
             </div>
             <div className="text-right">
-              <span className="font-orbitron font-black text-2xl text-[#f92f35]">
+              <span className="font-orbitron font-black text-2xl text-[#e10600]">
                 ₹{estimatedPrice}/-
               </span>
             </div>
@@ -245,7 +245,7 @@ export const BookingModal: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full py-3.5 rounded-md bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-black text-xs tracking-widest uppercase shadow-crimsonSm transition-all"
+            className="w-full py-3.5 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-black text-xs tracking-widest uppercase shadow-crimsonSm transition-all"
           >
             PLAY NOW · Confirm Reservation ⚡
           </button>

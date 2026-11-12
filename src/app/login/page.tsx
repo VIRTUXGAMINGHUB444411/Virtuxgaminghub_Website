@@ -59,14 +59,14 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-8 rounded-2xl bg-white border border-slate-200 shadow-cleanLg relative">
         {/* Logo and Brand */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-md bg-[#f92f35] p-1.5 mx-auto flex items-center justify-center mb-3 shadow-sm">
+          <div className="w-14 h-14 rounded-md bg-[#e10600] p-1.5 mx-auto flex items-center justify-center mb-3 shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Virtux" className="w-full h-full object-contain filter brightness-200" />
+            <img src="/logo-icon-3d.png" alt="Virtux" className="w-full h-full object-contain mix-blend-screen scale-125" />
           </div>
           <h2 className="font-orbitron font-black text-2xl text-slate-900">
             VIRTUX GAMING HUB
           </h2>
-          <p className="text-xs font-rajdhani text-[#f92f35] font-bold tracking-widest uppercase mt-0.5">
+          <p className="text-xs font-rajdhani text-[#e10600] font-bold tracking-widest uppercase mt-0.5">
             Player Access & Station Pass
           </p>
         </div>
@@ -77,7 +77,7 @@ export default function LoginPage() {
             onClick={() => setMode("login")}
             className={`pb-3 text-xs font-orbitron font-bold tracking-wider uppercase transition-colors relative flex-1 text-center ${
               mode === "login"
-                ? "text-[#f92f35] border-b-2 border-[#f92f35]"
+                ? "text-[#e10600] border-b-2 border-[#e10600]"
                 : "text-slate-500 hover:text-slate-900"
             }`}
           >
@@ -87,7 +87,7 @@ export default function LoginPage() {
             onClick={() => setMode("register")}
             className={`pb-3 text-xs font-orbitron font-bold tracking-wider uppercase transition-colors relative flex-1 text-center ${
               mode === "register"
-                ? "text-[#f92f35] border-b-2 border-[#f92f35]"
+                ? "text-[#e10600] border-b-2 border-[#e10600]"
                 : "text-slate-500 hover:text-slate-900"
             }`}
           >
@@ -117,7 +117,7 @@ export default function LoginPage() {
                 placeholder="player@virtux.local or phone"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35] font-rajdhani font-semibold"
+                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600] font-rajdhani font-semibold"
               />
             </div>
 
@@ -129,7 +129,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setMode("forgot")}
-                  className="text-[11px] text-[#f92f35] hover:underline font-rajdhani font-bold"
+                  className="text-[11px] text-[#e10600] hover:underline font-rajdhani font-bold"
                 >
                   Forgot Password?
                 </button>
@@ -139,13 +139,13 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 rounded-md bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-bold text-xs uppercase tracking-wider transition-all shadow-crimsonSm"
+              className="w-full py-3 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider transition-all shadow-crimsonSm"
             >
               Sign In to Player Portal ⚡
             </button>
@@ -178,7 +178,7 @@ export default function LoginPage() {
                 placeholder="e.g. Rahul Sen"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35] font-rajdhani font-semibold"
+                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600] font-rajdhani font-semibold"
               />
             </div>
 
@@ -192,7 +192,7 @@ export default function LoginPage() {
                 placeholder="rahul@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
@@ -205,7 +205,7 @@ export default function LoginPage() {
                 placeholder="+91 91477 18768"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
@@ -218,13 +218,13 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 rounded-md bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
+              className="w-full py-3 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
             >
               Create Virtux Account 🚀
             </button>
@@ -247,13 +247,13 @@ export default function LoginPage() {
                 placeholder="1234"
                 value={adminPin}
                 onChange={(e) => setAdminPin(e.target.value)}
-                className="w-full px-4 py-3 rounded-md bg-white border border-slate-200 text-center font-orbitron tracking-widest text-xl text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-4 py-3 rounded-md bg-white border border-slate-200 text-center font-orbitron tracking-widest text-xl text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 rounded-md bg-slate-900 hover:bg-slate-800 text-white font-orbitron font-bold text-xs uppercase tracking-wider"
+              className="w-full py-3 rounded-md bg-[#1a1a1c] hover:bg-[#262628] text-white border border-white/10 font-orbitron font-bold text-xs uppercase tracking-wider"
             >
               Access Command Center
             </button>
@@ -285,13 +285,13 @@ export default function LoginPage() {
                 placeholder="player@example.com"
                 value={forgotEmail}
                 onChange={(e) => setForgotEmail(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-2.5 rounded-md bg-[#f92f35] text-white font-orbitron font-bold text-xs uppercase tracking-wider"
+              className="w-full py-2.5 rounded-md bg-[#e10600] text-white font-orbitron font-bold text-xs uppercase tracking-wider"
             >
               Send Reset Code 📧
             </button>

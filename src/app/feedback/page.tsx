@@ -40,18 +40,18 @@ export default function FeedbackPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-rajdhani text-slate-500 mb-6 uppercase tracking-wider font-semibold">
-          <Link href="/" className="hover:text-[#f92f35]">Home</Link>
+          <Link href="/" className="hover:text-[#e10600]">Home</Link>
           <span>/</span>
-          <span className="text-[#f92f35] font-bold">Feedback & Reviews</span>
+          <span className="text-[#e10600] font-bold">Feedback & Reviews</span>
         </div>
 
         {/* Hero Section */}
         <div className="max-w-3xl mb-12">
-          <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-widest block mb-2">
+          <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-widest block mb-2">
             Community Hall of Fame
           </span>
           <h1 className="text-3xl sm:text-5xl font-orbitron font-black text-slate-900 leading-tight">
-            Player Feedback & <span className="text-[#f92f35]">Reviews</span>
+            Player Feedback & <span className="text-[#e10600]">Reviews</span>
           </h1>
           <p className="mt-4 text-base text-slate-600 font-sans leading-relaxed">
             Every review helps us elevate the arena experience. Read what local champions think or share your own thoughts on our PS5 pods, RTX rigs, and café treats.
@@ -79,7 +79,7 @@ export default function FeedbackPage() {
               onClick={() => setSelectedFilter("all")}
               className={`px-3 py-1.5 rounded-md ${
                 selectedFilter === "all"
-                  ? "bg-[#f92f35] text-white font-bold"
+                  ? "bg-[#e10600] text-white font-bold"
                   : "bg-white border border-slate-200 text-slate-700 hover:text-slate-900"
               }`}
             >
@@ -89,7 +89,7 @@ export default function FeedbackPage() {
               onClick={() => setSelectedFilter(5)}
               className={`px-3 py-1.5 rounded-md ${
                 selectedFilter === 5
-                  ? "bg-[#f92f35] text-white font-bold"
+                  ? "bg-[#e10600] text-white font-bold"
                   : "bg-white border border-slate-200 text-slate-700 hover:text-slate-900"
               }`}
             >
@@ -99,7 +99,7 @@ export default function FeedbackPage() {
               onClick={() => setSelectedFilter(4)}
               className={`px-3 py-1.5 rounded-md ${
                 selectedFilter === 4
-                  ? "bg-[#f92f35] text-white font-bold"
+                  ? "bg-[#e10600] text-white font-bold"
                   : "bg-white border border-slate-200 text-slate-700 hover:text-slate-900"
               }`}
             >
@@ -158,7 +158,7 @@ export default function FeedbackPage() {
                     placeholder="e.g. Subhojit K."
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35] font-rajdhani font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600] font-rajdhani font-semibold"
                   />
                 </div>
 
@@ -169,7 +169,7 @@ export default function FeedbackPage() {
                   <select
                     value={service}
                     onChange={(e) => setService(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#e10600]"
                   >
                     <option value="PS5 Console Arena">🎮 PlayStation 5 Arena</option>
                     <option value="PC Battle Rig (RTX 4090)">💻 PC Battle Rig (RTX 4090 / 360Hz)</option>
@@ -190,13 +190,13 @@ export default function FeedbackPage() {
                     placeholder="How was the display smoothness, controllers, food, or ambiance?"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35] font-sans"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600] font-sans"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-md bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-bold text-xs uppercase tracking-wider transition-all shadow-crimsonSm"
+                  className="w-full py-3 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider transition-all shadow-crimsonSm"
                 >
                   Publish Public Review ⭐
                 </button>
@@ -217,14 +217,14 @@ export default function FeedbackPage() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-red-50 border border-red-200 flex items-center justify-center font-orbitron font-bold text-[#f92f35] text-sm">
+                    <div className="w-9 h-9 rounded-full bg-red-50 border border-red-200 flex items-center justify-center font-orbitron font-bold text-[#e10600] text-sm">
                       {rev.avatarLetter}
                     </div>
                     <div>
                       <h4 className="font-rajdhani font-bold text-base text-slate-900">
                         {rev.name}
                       </h4>
-                      <span className="text-xs text-[#f92f35] font-rajdhani font-semibold block -mt-0.5">
+                      <span className="text-xs text-[#e10600] font-rajdhani font-semibold block -mt-0.5">
                         {rev.service}
                       </span>
                     </div>

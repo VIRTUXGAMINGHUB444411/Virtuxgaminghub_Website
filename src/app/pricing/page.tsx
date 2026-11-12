@@ -62,18 +62,18 @@ export default function PricingPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-rajdhani text-slate-500 mb-6 uppercase tracking-wider font-semibold">
-          <Link href="/" className="hover:text-[#f92f35]">Home</Link>
+          <Link href="/" className="hover:text-[#e10600]">Home</Link>
           <span>/</span>
-          <span className="text-[#f92f35] font-bold">Pricing Plans</span>
+          <span className="text-[#e10600] font-bold">Pricing Plans</span>
         </div>
 
         {/* Page Hero */}
         <div className="max-w-3xl mb-12">
-          <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-widest block mb-2">
+          <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-widest block mb-2">
             Transparent Rates · Zero Hidden Charges
           </span>
           <h1 className="text-3xl sm:text-5xl font-orbitron font-black text-slate-900 leading-tight">
-            Gaming & Pass <span className="text-[#f92f35]">Pricing</span>
+            Gaming & Pass <span className="text-[#e10600]">Pricing</span>
           </h1>
           <p className="mt-4 text-base text-slate-600 font-sans leading-relaxed">
             Zero hidden charges. Pay per 30-minute block, session hours, or grab a transferable monthly pass for maximum savings across PS5, Gaming PCs, Motion Simulators, and Private Cinema.
@@ -102,7 +102,7 @@ export default function PricingPage() {
               <select
                 value={calcStation}
                 onChange={(e) => setCalcStation(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#e10600]"
               >
                 <option value="ps5">🎮 PlayStation 5 4K 120Hz</option>
                 <option value="pc">💻 High-FPS Gaming PC Rig</option>
@@ -118,7 +118,7 @@ export default function PricingPage() {
               <select
                 value={calcDuration}
                 onChange={(e) => setCalcDuration(parseFloat(e.target.value))}
-                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#e10600]"
               >
                 <option value="0.5">30 Minutes (Quick Lap / Warmup)</option>
                 <option value="1">1 Hour Session</option>
@@ -135,7 +135,7 @@ export default function PricingPage() {
                 <select
                   value={calcControllers}
                   onChange={(e) => setCalcControllers(parseInt(e.target.value))}
-                  className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                  className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#e10600]"
                 >
                   <option value="1">Single Player (1 DualSense)</option>
                   <option value="2">Multiplayer / Co-op (2 DualSense)</option>
@@ -151,7 +151,7 @@ export default function PricingPage() {
                 <select
                   value={calcPeople}
                   onChange={(e) => setCalcPeople(parseInt(e.target.value))}
-                  className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                  className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#e10600]"
                 >
                   <option value="2">1 to 3 People (Included in Base)</option>
                   <option value="4">4 People (+₹15 extra)</option>
@@ -167,13 +167,13 @@ export default function PricingPage() {
                   <span className="text-[10px] font-orbitron text-slate-400 block uppercase font-bold">
                     Total Rate
                   </span>
-                  <span className="font-orbitron font-black text-2xl text-[#f92f35]">
+                  <span className="font-orbitron font-black text-2xl text-[#e10600]">
                     ₹{calculatedAmount}/-
                   </span>
                 </div>
                 <button
                   onClick={handleBookSelected}
-                  className="px-4 py-2 rounded bg-[#f92f35] hover:bg-[#e02228] text-white text-xs font-orbitron font-bold tracking-wider uppercase transition-colors shadow-xs"
+                  className="px-4 py-2 rounded bg-[#e10600] hover:bg-[#b80000] text-white text-xs font-orbitron font-bold tracking-wider uppercase transition-colors shadow-xs"
                 >
                   PLAY NOW
                 </button>
@@ -196,7 +196,7 @@ export default function PricingPage() {
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-5 py-2.5 rounded-md font-orbitron text-xs font-bold uppercase tracking-wider transition-all ${
                 activeTab === tab.id
-                  ? "bg-[#f92f35] text-white shadow-crimsonSm"
+                  ? "bg-[#e10600] text-white shadow-crimsonSm"
                   : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
               }`}
             >
@@ -218,15 +218,15 @@ export default function PricingPage() {
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-lg bg-red-50/70 border-l-4 border-[#f92f35] text-xs font-sans text-slate-700 mb-6">
-                <strong className="text-[#f92f35] font-rajdhani font-bold mr-1">T&C*:</strong>
+              <div className="p-3.5 rounded-lg bg-red-50/70 border-l-4 border-[#e10600] text-xs font-sans text-slate-700 mb-6">
+                <strong className="text-[#e10600] font-rajdhani font-bold mr-1">T&C*:</strong>
                 The particular person who buys this normal session is only able to play; he/she cannot transfer the excess timing to anyone.
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="editorial-card p-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-wider">
+                    <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-wider">
                       Standard Console
                     </span>
                     <span className="text-2xl">🎮</span>
@@ -243,7 +243,7 @@ export default function PricingPage() {
                         key={i}
                         className={`flex items-center justify-between p-2.5 rounded font-rajdhani ${
                           rate.highlight
-                            ? "bg-red-50 border border-red-200 font-bold text-[#f92f35]"
+                            ? "bg-red-50 border border-red-200 font-bold text-[#e10600]"
                             : "text-slate-700"
                         }`}
                       >
@@ -307,7 +307,7 @@ export default function PricingPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="editorial-card p-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-wider">
+                    <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-wider">
                       Shareable Pack
                     </span>
                     <span className="text-2xl">👑</span>
@@ -321,7 +321,7 @@ export default function PricingPage() {
                         key={i}
                         className={`flex items-center justify-between p-2.5 rounded font-rajdhani ${
                           pack.highlight
-                            ? "bg-red-50 border border-red-200 font-bold text-[#f92f35]"
+                            ? "bg-red-50 border border-red-200 font-bold text-[#e10600]"
                             : "text-slate-700"
                         }`}
                       >
@@ -382,15 +382,15 @@ export default function PricingPage() {
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-lg bg-red-50/70 border-l-4 border-[#f92f35] text-xs font-sans text-slate-700 mb-6">
-                <strong className="text-[#f92f35] font-rajdhani font-bold mr-1">T&C*:</strong>
+              <div className="p-3.5 rounded-lg bg-red-50/70 border-l-4 border-[#e10600] text-xs font-sans text-slate-700 mb-6">
+                <strong className="text-[#e10600] font-rajdhani font-bold mr-1">T&C*:</strong>
                 The particular person who buys this normal session is only able to play; he/she cannot transfer the excess timing to anyone.
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="editorial-card p-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-wider">
+                    <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-wider">
                       Esports Ready
                     </span>
                     <span className="text-2xl">💻</span>
@@ -404,7 +404,7 @@ export default function PricingPage() {
                         key={i}
                         className={`flex items-center justify-between p-2.5 rounded font-rajdhani ${
                           rate.highlight
-                            ? "bg-red-50 border border-red-200 font-bold text-[#f92f35]"
+                            ? "bg-red-50 border border-red-200 font-bold text-[#e10600]"
                             : "text-slate-700"
                         }`}
                       >
@@ -442,7 +442,7 @@ export default function PricingPage() {
                       <span>Audio</span>
                       <span className="text-slate-900 font-bold">Noise-isolating 7.1 Studio Headset</span>
                     </div>
-                    <div className="flex justify-between text-[#f92f35] font-bold">
+                    <div className="flex justify-between text-[#e10600] font-bold">
                       <span>High-Speed Network</span>
                       <span>Ultra-low Ping Optical Gaming LAN</span>
                     </div>
@@ -467,7 +467,7 @@ export default function PricingPage() {
                         key={i}
                         className={`flex items-center justify-between p-2.5 rounded font-rajdhani ${
                           pack.highlight
-                            ? "bg-red-50 border border-red-200 font-bold text-[#f92f35]"
+                            ? "bg-red-50 border border-red-200 font-bold text-[#e10600]"
                             : "text-slate-700"
                         }`}
                       >
@@ -488,7 +488,7 @@ export default function PricingPage() {
                   <div className="space-y-3 pt-2 border-t border-slate-100 text-xs font-rajdhani font-bold">
                     <div className="flex justify-between">
                       <span className="text-slate-500">Squad Sharing</span>
-                      <span className="text-[#f92f35]">Transfer / Split with Friends</span>
+                      <span className="text-[#e10600]">Transfer / Split with Friends</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Max Savings</span>
@@ -510,7 +510,7 @@ export default function PricingPage() {
           <div className="max-w-2xl mx-auto space-y-6">
             <div className="editorial-card p-8 space-y-5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-wider">
+                <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-wider">
                   Cinema & OTT Suite
                 </span>
                 <span className="text-3xl">🎬</span>
@@ -528,7 +528,7 @@ export default function PricingPage() {
                     key={i}
                     className={`flex items-center justify-between p-3.5 rounded font-rajdhani ${
                       rate.highlight
-                        ? "bg-red-50 border border-red-200 font-bold text-[#f92f35]"
+                        ? "bg-red-50 border border-red-200 font-bold text-[#e10600]"
                         : "text-slate-800 bg-slate-50"
                     }`}
                   >
@@ -547,7 +547,7 @@ export default function PricingPage() {
                   setBookingServicePreset("Dolby Cinema & OTT Suite");
                   setIsBookingOpen(true);
                 }}
-                className="w-full py-3.5 rounded bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
+                className="w-full py-3.5 rounded bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
               >
                 PLAY NOW · Reserve Cinema Suite 🍿
               </button>
@@ -560,7 +560,7 @@ export default function PricingPage() {
           <div className="max-w-2xl mx-auto space-y-6">
             <div className="editorial-card p-8 space-y-5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-wider">
+                <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-wider">
                   Force Feedback Cockpit
                 </span>
                 <span className="text-3xl">🏎️</span>
@@ -578,7 +578,7 @@ export default function PricingPage() {
                     key={i}
                     className={`flex items-center justify-between p-3.5 rounded font-rajdhani ${
                       rate.highlight
-                        ? "bg-red-50 border border-red-200 font-bold text-[#f92f35]"
+                        ? "bg-red-50 border border-red-200 font-bold text-[#e10600]"
                         : "text-slate-800 bg-slate-50"
                     }`}
                   >
@@ -593,7 +593,7 @@ export default function PricingPage() {
                   setBookingServicePreset("Racing Simulator (Logitech G29)");
                   setIsBookingOpen(true);
                 }}
-                className="w-full py-3.5 rounded bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
+                className="w-full py-3.5 rounded bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm"
               >
                 PLAY NOW · Book Racing Cockpit 🏎️
               </button>
@@ -610,7 +610,7 @@ export default function PricingPage() {
                   onClick={() => setMembershipType("limited")}
                   className={`px-6 py-2.5 rounded-md font-orbitron text-xs font-bold uppercase transition-all ${
                     membershipType === "limited"
-                      ? "bg-[#f92f35] text-white shadow-xs"
+                      ? "bg-[#e10600] text-white shadow-xs"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
@@ -620,7 +620,7 @@ export default function PricingPage() {
                   onClick={() => setMembershipType("unlimited")}
                   className={`px-6 py-2.5 rounded-md font-orbitron text-xs font-bold uppercase transition-all ${
                     membershipType === "unlimited"
-                      ? "bg-[#f92f35] text-white shadow-xs"
+                      ? "bg-[#e10600] text-white shadow-xs"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
@@ -635,13 +635,13 @@ export default function PricingPage() {
                   <h3 className="font-orbitron font-black text-2xl text-slate-900 mb-2">
                     Weekly Limited Membership (7 Days)
                   </h3>
-                  <div className="p-3.5 rounded-lg bg-red-50/70 border-l-4 border-[#f92f35] text-xs text-slate-700 mb-6 font-sans">
+                  <div className="p-3.5 rounded-lg bg-red-50/70 border-l-4 border-[#e10600] text-xs text-slate-700 mb-6 font-sans">
                     <strong>T&C*:</strong> Transferable membership. Includes <strong>5% discount on all café food items</strong>.
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="editorial-card p-5 space-y-3">
-                      <h4 className="font-orbitron font-bold text-sm text-[#f92f35]">
+                      <h4 className="font-orbitron font-bold text-sm text-[#e10600]">
                         🎮 PS5 (Console + Controller)
                       </h4>
                       <div className="space-y-2 text-xs font-rajdhani font-semibold">
@@ -688,13 +688,13 @@ export default function PricingPage() {
                   <h3 className="font-orbitron font-black text-2xl text-slate-900 mb-2">
                     Monthly Limited Membership (30 Days)
                   </h3>
-                  <div className="p-3.5 rounded-lg bg-red-50/70 border-l-4 border-[#f92f35] text-xs text-slate-700 mb-6 font-sans">
+                  <div className="p-3.5 rounded-lg bg-red-50/70 border-l-4 border-[#e10600] text-xs text-slate-700 mb-6 font-sans">
                     <strong>T&C*:</strong> Transferable membership. Includes <strong>10% discount on all café food items</strong>.
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="editorial-card p-5 space-y-3">
-                      <h4 className="font-orbitron font-bold text-sm text-[#f92f35]">
+                      <h4 className="font-orbitron font-bold text-sm text-[#e10600]">
                         🎮 PS5 (Console + Controller)
                       </h4>
                       <div className="space-y-2 text-xs font-rajdhani font-semibold">
@@ -747,7 +747,7 @@ export default function PricingPage() {
                     <div className="editorial-card p-6 space-y-3">
                       <span className="text-2xl">🎮</span>
                       <h4 className="font-orbitron font-bold text-base text-slate-900">PS5 Console</h4>
-                      <div className="font-orbitron font-black text-3xl text-[#f92f35]">
+                      <div className="font-orbitron font-black text-3xl text-[#e10600]">
                         ₹{MEMBERSHIP_UNLIMITED.weekly.ps5}/-
                       </div>
                       <span className="text-xs text-slate-500 font-rajdhani font-semibold block">7 Days Unlimited Access</span>
@@ -780,7 +780,7 @@ export default function PricingPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="editorial-card p-6 space-y-3 border-red-200 bg-red-50/30">
                       <h4 className="font-orbitron font-bold text-base text-slate-900">PS5 Unlimited 30 Days</h4>
-                      <div className="font-orbitron font-black text-3xl text-[#f92f35]">
+                      <div className="font-orbitron font-black text-3xl text-[#e10600]">
                         ₹{MEMBERSHIP_UNLIMITED.monthly.ps5}/-
                       </div>
                       <span className="text-xs text-slate-600 font-rajdhani font-bold block">30 Days + Free Daily Drink</span>

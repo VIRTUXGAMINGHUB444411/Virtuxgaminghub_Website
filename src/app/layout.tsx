@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { Orbitron, Rajdhani, Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Anton, Space_Grotesk, JetBrains_Mono, UnifrakturMaguntia } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/context/StoreContext";
 import { ParticleBackground } from "@/components/ParticleBackground";
@@ -9,23 +9,33 @@ import { Toast } from "@/components/Toast";
 import { CafeCartDrawer } from "@/components/CafeCartDrawer";
 import { BookingModal } from "@/components/BookingModal";
 import { AuthModal } from "@/components/AuthModal";
+import { CustomCursor, ScrollReveal } from "@/components/FX";
 
-const orbitron = Orbitron({
+const display = Anton({
   subsets: ["latin"],
-  variable: "--font-orbitron",
+  weight: "400",
+  variable: "--font-display",
   display: "swap",
 });
 
-const rajdhani = Rajdhani({
+const grotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-rajdhani",
+  variable: "--font-grotesk",
   display: "swap",
 });
 
-const inter = Inter({
+const mono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
+const gothic = UnifrakturMaguntia({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-gothic",
   display: "swap",
 });
 
@@ -33,8 +43,15 @@ export const metadata: Metadata = {
   title: "Virtux Gaming Hub – Play. Eat. Chill. | Ranaghat's Premier Esports & Lounge",
   description: "Ranaghat's first premium gaming hub featuring PlayStation 5 4K 120Hz consoles, RTX liquid-cooled Gaming PCs, Logitech Motion Simulators, Private Dolby Cinema, and Gourmet Café.",
   icons: {
-    icon: "/logo.png",
+    icon: [{ url: "/icon-64.png", sizes: "64x64", type: "image/png" }],
+    apple: "/apple-touch-icon.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#050505",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -43,28 +60,46 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${orbitron.variable} ${rajdhani.variable} ${inter.variable}`} suppressHydrationWarning>
-      <body className="bg-white text-slate-900 min-h-screen flex flex-col antialiased selection:bg-[#f92f35] selection:text-white" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${display.variable} ${grotesk.variable} ${mono.variable} ${gothic.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Some browser extensions (e.g. Bitdefender) inject attributes like
+            bis_skin_checked into every element before React hydrates, which
+            triggers hydration-mismatch errors. Strip them as they appear. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var A=["bis_skin_checked","bis_register","bis_use","__processed"];function c(el){if(!el||!el.getAttributeNames)return;var n=el.getAttributeNames();for(var i=0;i<n.length;i++){for(var j=0;j<A.length;j++){if(n[i].indexOf(A[j])===0){el.removeAttribute(n[i]);break;}}}}function all(){var e=document.getElementsByTagName("*");for(var i=0;i<e.length;i++)c(e[i]);}try{new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var m=ms[i];if(m.type==="attributes")c(m.target);else for(var k=0;k<m.addedNodes.length;k++){var x=m.addedNodes[k];if(x.nodeType===1){c(x);var d=x.getElementsByTagName("*");for(var z=0;z<d.length;z++)c(d[z]);}}}}).observe(document.documentElement,{attributes:true,childList:true,subtree:true});all();document.addEventListener("DOMContentLoaded",all);}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body
+        className="grain bg-[#050505] text-slate-900 min-h-screen flex flex-col antialiased selection:bg-[#e10600] selection:text-white"
+        suppressHydrationWarning
+      >
         <StoreProvider>
-          {/* Subtle Ember Particles */}
+          {/* Rising ember particles */}
           <ParticleBackground />
 
-          {/* Persistent Sekiro-inspired Header */}
           <Navbar />
 
-          {/* Main Content Pages */}
           <main className="flex-1 relative z-10 pt-16">
             {children}
           </main>
 
-          {/* Persistent Footer */}
           <Footer />
 
-          {/* Global Interactive Drawers & Modals */}
+          {/* Global interactive drawers & modals */}
           <CafeCartDrawer />
           <BookingModal />
           <AuthModal />
           <Toast />
+
+          {/* Motion layer */}
+          <ScrollReveal />
+          <CustomCursor />
         </StoreProvider>
       </body>
     </html>

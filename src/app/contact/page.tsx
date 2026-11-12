@@ -26,18 +26,18 @@ export default function ContactPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-rajdhani text-slate-500 mb-6 uppercase tracking-wider font-semibold">
-          <Link href="/" className="hover:text-[#f92f35]">Home</Link>
+          <Link href="/" className="hover:text-[#e10600]">Home</Link>
           <span>/</span>
-          <span className="text-[#f92f35] font-bold">Contact & Location</span>
+          <span className="text-[#e10600] font-bold">Contact & Location</span>
         </div>
 
         {/* Hero Section */}
         <div className="max-w-3xl mb-12">
-          <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-widest block mb-2">
+          <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-widest block mb-2">
             Reach The Arena Crew
           </span>
           <h1 className="text-3xl sm:text-5xl font-orbitron font-black text-slate-900 leading-tight">
-            Find Us in <span className="text-[#f92f35]">Ranaghat</span>
+            Find Us in <span className="text-[#e10600]">Ranaghat</span>
           </h1>
           <p className="mt-4 text-base text-slate-600 font-sans leading-relaxed">
             Open daily from morning till night. Whether you want to book for a tournament squad, host a private movie screening, or grab a quick FIFA match, we are ready for you.
@@ -48,12 +48,12 @@ export default function ContactPage() {
           {/* Contact Information Cards */}
           <div className="space-y-6">
             <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#f92f35]">
+              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#e10600]">
                 📍
               </div>
               <div className="space-y-1">
                 <h4 className="font-orbitron font-bold text-slate-900 text-base">Arena Address</h4>
-                <p className="text-xs text-[#f92f35] font-rajdhani font-bold">Ranaghat City Centre</p>
+                <p className="text-xs text-[#e10600] font-rajdhani font-bold">Ranaghat City Centre</p>
                 <p className="text-sm text-slate-700 font-sans leading-relaxed pt-1">
                   Srimanta Kundu Lane, Nearby Brojoballav Mandir, Ghotokpara, Ranaghat, Nadia, West Bengal, Pin - 741201
                 </p>
@@ -61,17 +61,17 @@ export default function ContactPage() {
             </div>
 
             <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#f92f35]">
+              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#e10600]">
                 📞
               </div>
               <div className="space-y-1">
                 <h4 className="font-orbitron font-bold text-slate-900 text-base">Phone & WhatsApp</h4>
-                <p className="text-xs text-[#f92f35] font-rajdhani font-bold">Instant Response Support</p>
+                <p className="text-xs text-[#e10600] font-rajdhani font-bold">Instant Response Support</p>
                 <div className="pt-1 space-y-1">
-                  <a href="tel:+919147718768" className="text-sm font-orbitron font-bold text-slate-900 hover:text-[#f92f35] block">
+                  <a href="tel:+919147718768" className="text-sm font-orbitron font-bold text-slate-900 hover:text-[#e10600] block">
                     +91 91477 18768
                   </a>
-                  <a href="tel:+916294713465" className="text-sm font-orbitron font-bold text-slate-900 hover:text-[#f92f35] block">
+                  <a href="tel:+916294713465" className="text-sm font-orbitron font-bold text-slate-900 hover:text-[#e10600] block">
                     +91 62947 13465
                   </a>
                 </div>
@@ -79,15 +79,15 @@ export default function ContactPage() {
             </div>
 
             <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#f92f35]">
+              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#e10600]">
                 📧
               </div>
               <div className="space-y-1">
                 <h4 className="font-orbitron font-bold text-slate-900 text-base">Email Support</h4>
-                <p className="text-xs text-[#f92f35] font-rajdhani font-bold">Business & Queries</p>
+                <p className="text-xs text-[#e10600] font-rajdhani font-bold">Business & Queries</p>
                 <a
                   href="mailto:consumersupport.virtuxgaminghub@gmail.com"
-                  className="text-sm text-slate-700 hover:text-[#f92f35] transition-colors block pt-1 break-all font-sans"
+                  className="text-sm text-slate-700 hover:text-[#e10600] transition-colors block pt-1 break-all font-sans"
                 >
                   consumersupport.virtuxgaminghub@gmail.com
                 </a>
@@ -95,12 +95,12 @@ export default function ContactPage() {
             </div>
 
             <div className="p-6 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#f92f35]">
+              <div className="w-12 h-12 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-2xl shrink-0 text-[#e10600]">
                 🕐
               </div>
               <div className="space-y-1">
                 <h4 className="font-orbitron font-bold text-slate-900 text-base">Operating Hours</h4>
-                <p className="text-xs text-[#f92f35] font-rajdhani font-bold">Every Single Day</p>
+                <p className="text-xs text-[#e10600] font-rajdhani font-bold">Every Single Day</p>
                 <p className="text-base font-orbitron font-black text-slate-900 pt-1">
                   Open Daily: 10:00 am – 9:30 pm
                 </p>
@@ -111,7 +111,7 @@ export default function ContactPage() {
           {/* Interactive Inquiry Form */}
           <div className="editorial-card p-8">
             <h3 className="font-orbitron font-black text-2xl text-slate-900 mb-2">
-              Send us a <span className="text-[#f92f35]">Direct Message</span>
+              Send us a <span className="text-[#e10600]">Direct Message</span>
             </h3>
             <p className="text-xs text-slate-500 font-sans mb-6">
               Have a question about pricing, private booking, or tournament registrations? Drop your note below.
@@ -129,7 +129,7 @@ export default function ContactPage() {
                     placeholder="e.g. Sayan Mukherjee"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
                   />
                 </div>
 
@@ -143,7 +143,7 @@ export default function ContactPage() {
                     placeholder="+91 91477 18768"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                    className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
                   />
                 </div>
               </div>
@@ -157,7 +157,7 @@ export default function ContactPage() {
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                  className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600]"
                 />
               </div>
 
@@ -168,7 +168,7 @@ export default function ContactPage() {
                 <select
                   value={service}
                   onChange={(e) => setService(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                  className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#e10600]"
                 >
                   <option value="General Arena Inquiry">General Arena Inquiry</option>
                   <option value="PS5 Console Station Booking">PS5 Console Station Booking</option>
@@ -190,13 +190,13 @@ export default function ContactPage() {
                   placeholder="How can we help you plan your gaming session?"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#f92f35] font-sans"
+                  className="w-full px-3.5 py-2.5 rounded-md bg-white border border-slate-200 text-sm text-slate-900 focus:outline-none focus:border-[#e10600] font-sans"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-md bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm transition-all"
+                className="w-full py-3.5 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider shadow-crimsonSm transition-all"
               >
                 Send Message ⚡
               </button>
@@ -220,15 +220,15 @@ export default function ContactPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-600 font-sans leading-relaxed">
             <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-1 shadow-xs">
-              <strong className="text-[#f92f35] block font-orbitron text-xs">From Ranaghat Railway Station:</strong>
+              <strong className="text-[#e10600] block font-orbitron text-xs">From Ranaghat Railway Station:</strong>
               Just 5–7 minutes via auto-rickshaw or toto towards Brojoballav Mandir / Ghotokpara.
             </div>
             <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-1 shadow-xs">
-              <strong className="text-[#f92f35] block font-orbitron text-xs">From College More / NH12:</strong>
+              <strong className="text-[#e10600] block font-orbitron text-xs">From College More / NH12:</strong>
               Head towards Srimanta Kundu Lane. Look for the illuminated Virtux Gaming Hub signage!
             </div>
             <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-1 shadow-xs">
-              <strong className="text-[#f92f35] block font-orbitron text-xs">Parking Available:</strong>
+              <strong className="text-[#e10600] block font-orbitron text-xs">Parking Available:</strong>
               Dedicated two-wheeler and squad parking available directly in front of the arena facility.
             </div>
           </div>

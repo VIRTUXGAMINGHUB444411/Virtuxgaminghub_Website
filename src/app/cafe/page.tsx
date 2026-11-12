@@ -34,19 +34,19 @@ export default function CafePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-rajdhani text-slate-500 mb-6 uppercase tracking-wider font-semibold">
-          <Link href="/" className="hover:text-[#f92f35]">Home</Link>
+          <Link href="/" className="hover:text-[#e10600]">Home</Link>
           <span>/</span>
-          <span className="text-[#f92f35] font-bold">Café & Lounge</span>
+          <span className="text-[#e10600] font-bold">Café & Lounge</span>
         </div>
 
         {/* Hero Section */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
           <div className="max-w-2xl">
-            <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-widest block mb-2">
+            <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-widest block mb-2">
               Gamer Fuel & Refreshments
             </span>
             <h1 className="text-3xl sm:text-5xl font-orbitron font-black text-slate-900 leading-tight">
-              Virtux <span className="text-[#f92f35]">Café & Bites</span>
+              Virtux <span className="text-[#e10600]">Café & Bites</span>
             </h1>
             <p className="mt-3 text-base text-slate-600 font-sans leading-relaxed">
               Premium roasts, chilled mocktails, high-voltage energy cans, loaded peri-peri fries, gourmet burgers, and artisan desserts delivered directly to your gaming station.
@@ -54,14 +54,14 @@ export default function CafePage() {
           </div>
 
           <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-4 shrink-0">
-            <div className="w-10 h-10 rounded-full bg-[#f92f35] text-white flex items-center justify-center text-xl shadow-xs">
+            <div className="w-10 h-10 rounded-full bg-[#e10600] text-white flex items-center justify-center text-xl shadow-xs">
               🚀
             </div>
             <div>
               <span className="text-xs font-orbitron font-black text-slate-900 block">
                 Direct In-Seat Delivery
               </span>
-              <span className="text-xs font-rajdhani text-[#f92f35] font-bold">
+              <span className="text-xs font-rajdhani text-[#e10600] font-bold">
                 Playing right now? Just enter your station number!
               </span>
             </div>
@@ -82,7 +82,7 @@ export default function CafePage() {
                 onClick={() => setActiveCategory(tab.id as any)}
                 className={`px-4 py-2 rounded-md font-orbitron text-xs font-bold uppercase tracking-wider transition-all ${
                   activeCategory === tab.id
-                    ? "bg-[#f92f35] text-white shadow-crimsonSm"
+                    ? "bg-[#e10600] text-white shadow-crimsonSm"
                     : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
                 }`}
               >
@@ -97,7 +97,7 @@ export default function CafePage() {
               placeholder="Search coffee, burger..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="px-3.5 py-2 rounded-md bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f92f35]"
+              className="px-3.5 py-2 rounded-md bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#e10600]"
             />
 
             <label className="flex items-center gap-2 px-3 py-2 rounded-md bg-slate-100 border border-slate-200 cursor-pointer text-xs font-rajdhani font-bold">
@@ -138,13 +138,13 @@ export default function CafePage() {
                     </div>
 
                     {item.badge && (
-                      <span className="text-[10px] font-orbitron font-bold px-2 py-0.5 rounded bg-red-50 text-[#f92f35] border border-red-200">
+                      <span className="text-[10px] font-orbitron font-bold px-2 py-0.5 rounded bg-red-50 text-[#e10600] border border-red-200">
                         {item.badge}
                       </span>
                     )}
                   </div>
 
-                  <h3 className="font-orbitron font-bold text-base text-slate-900 group-hover:text-[#f92f35] transition-colors">
+                  <h3 className="font-orbitron font-bold text-base text-slate-900 group-hover:text-[#e10600] transition-colors">
                     {item.name}
                   </h3>
 
@@ -166,10 +166,10 @@ export default function CafePage() {
                   </div>
 
                   {qty > 0 ? (
-                    <div className="flex items-center rounded-md border border-[#f92f35] bg-red-50 overflow-hidden">
+                    <div className="flex items-center rounded-md border border-[#e10600] bg-red-50 overflow-hidden">
                       <button
                         onClick={() => updateCartQuantity(item.id, -1)}
-                        className="w-8 h-8 flex items-center justify-center text-[#f92f35] font-bold hover:bg-red-100"
+                        className="w-8 h-8 flex items-center justify-center text-[#e10600] font-bold hover:bg-red-100"
                       >
                         -
                       </button>
@@ -178,7 +178,7 @@ export default function CafePage() {
                       </span>
                       <button
                         onClick={() => updateCartQuantity(item.id, 1)}
-                        className="w-8 h-8 flex items-center justify-center text-[#f92f35] font-bold hover:bg-red-100"
+                        className="w-8 h-8 flex items-center justify-center text-[#e10600] font-bold hover:bg-red-100"
                       >
                         +
                       </button>
@@ -186,7 +186,7 @@ export default function CafePage() {
                   ) : (
                     <button
                       onClick={() => addToCart(item)}
-                      className="px-3.5 py-1.5 rounded-md bg-[#f92f35] text-white text-xs font-orbitron font-bold hover:bg-[#e02228] transition-colors shadow-xs"
+                      className="px-3.5 py-1.5 rounded-md bg-[#e10600] text-white text-xs font-orbitron font-bold hover:bg-[#b80000] transition-colors shadow-xs"
                     >
                       + Add to Cart
                     </button>
@@ -202,7 +202,7 @@ export default function CafePage() {
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
             <button
               onClick={() => setIsCartOpen(true)}
-              className="px-6 py-3 rounded-full bg-[#f92f35] text-white font-orbitron font-black text-xs uppercase tracking-wider shadow-crimson flex items-center gap-3 animate-bounce"
+              className="px-6 py-3 rounded-full bg-[#e10600] text-white font-orbitron font-black text-xs uppercase tracking-wider shadow-crimson flex items-center gap-3 animate-bounce"
             >
               <span>🍔 View Cart ({totalCartCount} items)</span>
               <span className="bg-black/30 px-2.5 py-0.5 rounded-full text-white">

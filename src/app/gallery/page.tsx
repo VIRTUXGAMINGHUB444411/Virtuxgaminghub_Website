@@ -20,18 +20,18 @@ export default function GalleryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-rajdhani text-slate-500 mb-6 uppercase tracking-wider font-semibold">
-          <Link href="/" className="hover:text-[#f92f35]">Home</Link>
+          <Link href="/" className="hover:text-[#e10600]">Home</Link>
           <span>/</span>
-          <span className="text-[#f92f35] font-bold">Arena Gallery</span>
+          <span className="text-[#e10600] font-bold">Arena Gallery</span>
         </div>
 
         {/* Hero Section */}
         <div className="max-w-3xl mb-12">
-          <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-widest block mb-2">
+          <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-widest block mb-2">
             Arena Walkthrough & Pods
           </span>
           <h1 className="text-3xl sm:text-5xl font-orbitron font-black text-slate-900 leading-tight">
-            The <span className="text-[#f92f35]">Experience Zones</span>
+            The <span className="text-[#e10600]">Experience Zones</span>
           </h1>
           <p className="mt-4 text-base text-slate-600 font-sans leading-relaxed">
             Designed with ambient illumination, noise-isolated pods, ergonomic racing recliners, and tournament-grade gaming setups.
@@ -54,7 +54,7 @@ export default function GalleryPage() {
               onClick={() => setSelectedFilter(tab.id)}
               className={`px-4 py-2 rounded-md font-orbitron text-xs font-bold uppercase tracking-wider transition-all ${
                 selectedFilter === tab.id
-                  ? "bg-[#f92f35] text-white shadow-crimsonSm"
+                  ? "bg-[#e10600] text-white shadow-crimsonSm"
                   : "bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
               }`}
             >
@@ -99,14 +99,14 @@ export default function GalleryPage() {
                     {item.description}
                   </p>
                   <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] font-rajdhani text-slate-500 font-semibold">
-                    <strong className="text-[#f92f35] block font-orbitron text-[10px] mb-0.5">
+                    <strong className="text-[#e10600] block font-orbitron text-[10px] mb-0.5">
                       EQUIPMENT SPECIFICATIONS
                     </strong>
                     {item.specs}
                   </div>
                 </div>
 
-                <div className="pt-4 flex items-center justify-between text-xs font-orbitron font-bold text-[#f92f35] group-hover:text-[#e02228] transition-colors">
+                <div className="pt-4 flex items-center justify-between text-xs font-orbitron font-bold text-[#e10600] group-hover:text-[#b80000] transition-colors">
                   <span>Inspect Zone Details</span>
                   <span>🔍</span>
                 </div>
@@ -118,11 +118,11 @@ export default function GalleryPage() {
         {/* Hub Specifications Banner */}
         <div className="p-8 rounded-2xl bg-slate-50 border border-slate-200 mb-16">
           <div className="text-center max-w-xl mx-auto mb-10">
-            <span className="text-xs font-orbitron font-bold text-[#f92f35] uppercase tracking-widest">
+            <span className="text-xs font-orbitron font-bold text-[#e10600] uppercase tracking-widest">
               Uncompromising Standards
             </span>
             <h3 className="text-2xl sm:text-3xl font-orbitron font-black text-slate-900 mt-1">
-              Arena Core <span className="text-[#f92f35]">Specifications</span>
+              Arena Core <span className="text-[#e10600]">Specifications</span>
             </h3>
           </div>
 
@@ -189,7 +189,7 @@ export default function GalleryPage() {
                   <h3 className="font-orbitron font-black text-2xl text-slate-900">
                     {activeModalItem.title}
                   </h3>
-                  <span className="text-xs font-rajdhani text-[#f92f35] font-bold">
+                  <span className="text-xs font-rajdhani text-[#e10600] font-bold">
                     {activeModalItem.tagline}
                   </span>
                 </div>
@@ -198,7 +198,7 @@ export default function GalleryPage() {
               <div className="space-y-4 my-6 text-sm text-slate-600 font-sans leading-relaxed">
                 <p>{activeModalItem.description}</p>
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                  <span className="text-xs font-orbitron font-bold text-[#f92f35] block uppercase">
+                  <span className="text-xs font-orbitron font-bold text-[#e10600] block uppercase">
                     Full Hardware & Pod Configuration
                   </span>
                   <p className="text-xs text-slate-800 font-rajdhani font-semibold">{activeModalItem.specs}</p>
@@ -211,7 +211,7 @@ export default function GalleryPage() {
                     setActiveModalItem(null);
                     setIsBookingOpen(true);
                   }}
-                  className="flex-1 py-3 rounded bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-bold text-xs uppercase tracking-wider"
+                  className="flex-1 py-3 rounded bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs uppercase tracking-wider"
                 >
                   PLAY NOW · Book This Zone
                 </button>

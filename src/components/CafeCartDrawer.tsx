@@ -48,7 +48,7 @@ export const CafeCartDrawer: React.FC = () => {
                 <h3 className="font-orbitron font-black text-base text-slate-900">
                   Gamer Fuel Cart
                 </h3>
-                <p className="text-xs text-[#f92f35] font-rajdhani font-bold">
+                <p className="text-xs text-[#e10600] font-rajdhani font-bold">
                   {cart.length} unique item{cart.length !== 1 ? "s" : ""} selected
                 </p>
               </div>
@@ -77,7 +77,7 @@ export const CafeCartDrawer: React.FC = () => {
                 </p>
                 <button
                   onClick={() => setIsCartOpen(false)}
-                  className="px-4 py-2 rounded-md bg-[#f92f35] text-white text-xs font-orbitron font-bold hover:bg-[#e02228] transition-all"
+                  className="px-4 py-2 rounded-md bg-[#e10600] text-white text-xs font-orbitron font-bold hover:bg-[#b80000] transition-all"
                 >
                   Explore Café Menu
                 </button>
@@ -97,7 +97,7 @@ export const CafeCartDrawer: React.FC = () => {
                             {item.name}
                           </h5>
                         </div>
-                        <p className="text-xs text-[#f92f35] font-orbitron font-bold mt-0.5">
+                        <p className="text-xs text-[#e10600] font-orbitron font-bold mt-0.5">
                           ₹{item.price * quantity}
                           <span className="text-slate-400 text-[11px] ml-1.5 font-normal">
                             (₹{item.price} each)
@@ -161,7 +161,7 @@ export const CafeCartDrawer: React.FC = () => {
                 <select
                   value={deliveryLocation}
                   onChange={(e) => setDeliveryLocation(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#f92f35]"
+                  className="w-full px-3 py-2 rounded-md bg-white border border-slate-200 text-sm font-rajdhani font-bold text-slate-900 focus:outline-none focus:border-[#e10600]"
                 >
                   <optgroup label="PlayStation 5 Consoles">
                     <option value="PS5 Station 01">PS5 Station 01</option>
@@ -193,7 +193,7 @@ export const CafeCartDrawer: React.FC = () => {
                   placeholder="Special instructions (e.g. extra spicy / less ice)"
                   value={customNote}
                   onChange={(e) => setCustomNote(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#f92f35]"
+                  className="w-full px-3 py-2 rounded-md bg-white border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#e10600]"
                 />
               </div>
 
@@ -210,13 +210,13 @@ export const CafeCartDrawer: React.FC = () => {
                 )}
                 <div className="flex justify-between text-base font-orbitron font-black text-slate-900 pt-1">
                   <span>Total Amount</span>
-                  <span className="text-[#f92f35]">₹{finalTotal}</span>
+                  <span className="text-[#e10600]">₹{finalTotal}</span>
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-md bg-[#f92f35] hover:bg-[#e02228] text-white font-orbitron font-bold text-xs tracking-wider uppercase shadow-crimsonSm transition-all"
+                className="w-full py-3.5 rounded-md bg-[#e10600] hover:bg-[#b80000] text-white font-orbitron font-bold text-xs tracking-wider uppercase shadow-crimsonSm transition-all"
               >
                 Send Order to Kitchen (₹{finalTotal}) ⚡
               </button>

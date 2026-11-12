@@ -31,7 +31,7 @@ export const Toast: React.FC = () => {
                   ? "#ef4444"
                   : toast.type === "info"
                   ? "#0284c7"
-                  : "#f92f35",
+                  : "#e10600",
             }}
           />
           <span className="text-xs font-semibold text-slate-800 font-sans tracking-wide">
